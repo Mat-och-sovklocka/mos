@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # mos - "Mat- och sovklocka" - Repository structure:
 
 ---
