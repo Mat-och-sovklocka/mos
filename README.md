@@ -12,7 +12,7 @@ project-root/
 ├── backend/                # API server (Express/FastAPI/Django/etc.)
 │   ├── src/
 │   ├── tests/
-│   ├── requirements.txt    # or package.json if Node
+│   ├── pom.xml             # or package.json if Node
 │   └── ...
 |
 ├── docs/                   # shared docs, diagrams, design notes
