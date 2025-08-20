@@ -58,7 +58,9 @@ function Reminders() {
 
     // 🔶 SIMULERAD FÖRDRÖJNING OCH BEKRÄFTELSE
     setTimeout(() => {
-      alert(`Påminnelse skickad:\n${payload.type} - ${payload.date} kl. ${payload.time}`);
+      alert(
+        `Påminnelse skickad:\n${payload.type} - ${payload.date} kl. ${payload.time}`
+      );
       // 🔶 ÅTERSTÄLL STATE EFTER "SKICK"
       setSelectedDateTime(null);
       setTimeSelected(false);
@@ -98,20 +100,24 @@ function Reminders() {
       <h1 className="h1 text-primary fw-bold text-center mb-4">Påminnelser</h1>
 
       <p className="lead text-muted text-center mb-5">
-        För musmarkören över bilden för att se de olika typer av påminnelser. <br />
+        För musmarkören över bilden för att se de olika typer av påminnelser.{" "}
+        <br />
         Klicka sedan på den påminnelse du vill ställa.
       </p>
-
-      <div
-        className="reminder-textfield border border-primary rounded bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
-        style={{ minHeight: "3rem", maxWidth: "800px" }}
-      >
-        {activeLabel ? activeLabel : <span style={{ visibility: "hidden" }}>placeholder</span>}
-      </div>
 
       {/* Bilder */}
       <div className="row">
         <div className="col-8 mx-auto">
+          <div
+            className="reminder-textfield  bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
+            style={{ minHeight: "3rem" }}
+          >
+            {activeLabel ? (
+              activeLabel
+            ) : (
+              <span style={{ visibility: "hidden" }}>placeholder</span>
+            )}
+          </div>
           <div className="row mb-4">
             {images.map((img, i) => (
               <div key={i} className="col-3 d-flex justify-content-center">
@@ -192,7 +198,10 @@ function Reminders() {
 
                   <div className="d-flex gap-3">
                     {/* 🔶 HÄR TRIGGAS "SKICKA TILL BACKEND" Tid och datum -Obs komplettera med påminnelsetyp*/}
-                    <button className="btn btn-success flex-fill fw-bold" onClick={sendReminder}>
+                    <button
+                      className="btn btn-success flex-fill fw-bold"
+                      onClick={sendReminder}
+                    >
                       OK
                     </button>
                     <button
