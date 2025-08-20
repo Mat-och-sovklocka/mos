@@ -1,11 +1,4 @@
 {
-  "name": "mos-root",
-  "private": true,
-  "scripts": {
-    "fe:dev": "npm --prefix frontend run dev",
-    "fe:build": "npm --prefix frontend run build"
-  }
-}{
   "name": "mos",
   "private": true,
   "version": "0.0.0",
