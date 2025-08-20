@@ -39,22 +39,7 @@
   pointer-events: none;
 }
 
-.reminder-textfield {
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  background: #fff;
-  width: 700px;
-  margin: 2rem auto 2rem auto;
-  padding: 1rem;
-  min-height: 3rem;
-  box-sizing: border-box;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 
 .reminder-radio-row {
   display: grid;
