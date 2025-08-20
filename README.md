@@ -1,12 +1,23 @@
-# React + Vite
+## Project Structure
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+project-root/
+|
+├── frontend/               # UI app (React/Next/Vue/etc.)
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+|
+├── backend/                # API server (Express/FastAPI/Django/etc.)
+│   ├── src/
+│   ├── tests/
+│   ├── pom.xml             # or package.json if Node
+│   └── ...
+|
+├── docs/                   # shared docs, diagrams, design notes
+│   └── api-contract.md     # simple API doc (endpoints, payloads)
+|
+├── .gitignore
+├── README.md               # root readme: describes both apps
+└── docker-compose.yml      # optional: spin up frontend+backend together
