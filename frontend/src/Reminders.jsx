@@ -1,4 +1,3 @@
-// ⬇️ IMPORTER
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -13,7 +12,6 @@ import img7 from "./images/img7.png";
 import img8 from "./images/img8.png";
 import "./reminder.css";
 
-// ⬇️ DATA
 const images = [img1, img2, img3, img4, img5, img6, img7, img8];
 const labels = [
   "Måltider",
@@ -27,7 +25,6 @@ const labels = [
 ];
 
 function Reminders() {
-  // ⬇️ STATE
   const [hovered, setHovered] = useState(null);
   const [selected, setSelected] = useState(null);
   const [reminderType, setReminderType] = useState(null);
@@ -35,51 +32,76 @@ function Reminders() {
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [timeSelected, setTimeSelected] = useState(false);
 
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [repeatInterval, setRepeatInterval] = useState("1");
+  const [hour, setHour] = useState("08");
+  const [minute, setMinute] = useState("00");
+
   const activeIndex = selected !== null ? selected : hovered;
   const activeLabel = activeIndex !== null ? labels[activeIndex] : "";
 
-  // ⬇️ TRIGGAS NÄR TID VÄLJS
   const handleTimeSelect = (date) => {
     setSelectedDateTime(date);
     setTimeSelected(true);
   };
 
-  // ⬇️ SIMULERAD BACKEND-FÖRFRÅGAN
   const sendReminder = () => {
-    // 🔶 HÄR ÄR DATAN SOM SKULLE SKICKAS TILL BACKEND
     const payload = {
-      type: activeLabel, // t.ex. "Måltider"
-      date: formatDate(selectedDateTime), // t.ex. "20 augusti 2025"
-      time: formatTime(selectedDateTime), // t.ex. "14:30"
+      type: activeLabel,
+      date: formatDate(selectedDateTime),
+      time: formatTime(selectedDateTime),
     };
 
-    // 🔶 HÄR SKULLE DU ANVÄNDA fetch() ELLER axios.post() FÖR ATT SKICKA TILL BACKEND
     console.log("Skickar till backend...", payload);
 
-    // 🔶 SIMULERAD FÖRDRÖJNING OCH BEKRÄFTELSE
     setTimeout(() => {
       alert(
         `Påminnelse skickad:\n${payload.type} - ${payload.date} kl. ${payload.time}`
       );
-      // 🔶 ÅTERSTÄLL STATE EFTER "SKICK"
-      setSelectedDateTime(null);
-      setTimeSelected(false);
-      setSelected(null);
-      setHovered(null);
-      setReminderType(null);
-      setShowCalendar(false);
+      resetState();
     }, 1000);
   };
 
+  const sendRecurringReminder = () => {
+    const payload = {
+      type: activeLabel,
+      days: selectedDays,
+      interval: repeatInterval,
+      time: `${hour}:${minute}`,
+    };
+
+    console.log("Skickar återkommande påminnelse...", payload);
+
+    alert(
+      `Återkommande påminnelse skickad:\n${payload.type} - ${payload.days.join(
+        ", "
+      )} kl. ${payload.time} (${
+        repeatInterval === "monthly" ? "en gång i månaden" : `var ${repeatInterval}:e vecka`
+      })`
+    );
+
+    resetState();
+  };
+
+  const resetState = () => {
+    setSelectedDateTime(null);
+    setTimeSelected(false);
+    setSelected(null);
+    setHovered(null);
+    setReminderType(null);
+    setShowCalendar(false);
+    setSelectedDays([]);
+    setRepeatInterval("1");
+    setHour("08");
+    setMinute("00");
+  };
+
   const handleClick = (type) => {
+    console.log("Klickad typ:", type);
     setReminderType(type);
-    if (type === "single") {
-      setShowCalendar(true);
-    } else {
-      setShowCalendar(false);
-      setSelectedDateTime(null);
-      setTimeSelected(false);
-    }
+    setShowCalendar(type === "single");
+    setSelectedDateTime(null);
+    setTimeSelected(false);
   };
 
   const formatDate = (date) =>
@@ -100,7 +122,7 @@ function Reminders() {
       <h1 className="h1 text-primary fw-bold text-center mb-4">Påminnelser</h1>
 
       <p className="lead text-muted text-center mb-5">
-        För musmarkören över bilden för att se de olika typer av påminnelser.{" "}
+        För musmarkören över bilden för att se de olika typer av påminnelser.
         <br />
         Klicka sedan på den påminnelse du vill ställa.
       </p>
@@ -109,7 +131,7 @@ function Reminders() {
       <div className="row">
         <div className="col-8 mx-auto">
           <div
-            className="reminder-textfield  bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
+            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
             style={{ minHeight: "3rem" }}
           >
             {activeLabel ? (
@@ -120,7 +142,8 @@ function Reminders() {
           </div>
           <div className="row mb-4">
             {images.map((img, i) => (
-              <div key={i} className="col-3 d-flex justify-content-center">
+              <div key={i} className="col-6 col-sm-4 col-md-3 d-flex justify-content-center">
+
                 <img
                   src={img}
                   alt={labels[i]}
@@ -197,7 +220,6 @@ function Reminders() {
                   </div>
 
                   <div className="d-flex gap-3">
-                    {/* 🔶 HÄR TRIGGAS "SKICKA TILL BACKEND" Tid och datum -Obs komplettera med påminnelsetyp*/}
                     <button
                       className="btn btn-success flex-fill fw-bold"
                       onClick={sendReminder}
@@ -216,6 +238,119 @@ function Reminders() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Återkommande påminnelse */}
+          {reminderType === "recurring" && (
+            <div className="row">
+              <div className="col-md-6">
+                <label className="form-label">Välj veckodagar:</label>
+                <div className="btn-group mb-3" role="group">
+                  {["Mån", "Tis", "Ons", "Tors", "Fre", "Lör", "Sön"].map(
+                    (day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        className={`btn btn-outline-primary ${
+                          selectedDays?.includes(day) ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          setSelectedDays((prev) =>
+                            prev?.includes(day)
+                              ? prev.filter((d) => d !== day)
+                              : [...(prev || []), day]
+                          )
+                        }
+                      >
+                        {day}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <label className="form-label">Repetitionsintervall:</label>
+                <select
+                  className="form-select mb-3"
+                  value={repeatInterval}
+                  onChange={(e) => setRepeatInterval(e.target.value)}
+                >
+                  <option value="1">Varje vecka</option>
+                  <option value="2">Varannan vecka</option>
+                  <option value="3">Var tredje vecka</option>
+                  <option value="monthly">En gång i månaden</option>
+                </select>
+
+                <label className="form-label">Tid:</label>
+                <div className="d-flex gap-2 mb-3">
+                  <select
+                    className="form-select"
+                    value={hour}
+                    onChange={(e) => setHour(e.target.value)}
+                  >
+                    {[...Array(24)].map((_, i) => {
+                      const h = i.toString().padStart(2, "0");
+                      return (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <span>:</span>
+                  <select
+                    className="form-select"
+                    value={minute}
+                    onChange={(e) => setMinute(e.target.value)}
+                  >
+                    {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => {
+                      const min = m.toString().padStart(2, "0");
+                      return (
+                        <option key={min} value={min}>
+                          {min}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              <div className="col-md-6 d-flex flex-column justify-content-start">
+                <div className="border border-info rounded p-3 mb-3 bg-light text-info fw-bold">
+                  Vill du lägga en återkommande påminnelse för <u>{activeLabel}</u> på{" "}
+                  <u>{selectedDays?.join(", ") || "inga valda dagar"}</u> klockan{" "}
+                  <u>
+                    {hour}:{minute}
+                  </u>
+                  ,{" "}
+                  <u>
+                    {repeatInterval === "monthly"
+                      ? "en gång i månaden"
+                      : `var ${repeatInterval}:e vecka`}
+                  </u>
+                  ?
+                </div>
+
+                <div className="d-flex gap-3">
+                  <button
+                    className="btn btn-success flex-fill fw-bold"
+                    onClick={sendRecurringReminder}
+                  >
+                    OK
+                  </button>
+                  <button
+                    className="btn btn-danger flex-fill fw-bold"
+                    onClick={() => {
+                      setSelectedDays([]);
+                      setRepeatInterval("1");
+                      setHour("08");
+                      setMinute("00");
+                    }}
+                  >
+                    Avbryt
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
