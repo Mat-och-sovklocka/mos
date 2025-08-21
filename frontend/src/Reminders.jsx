@@ -34,8 +34,11 @@ function Reminders() {
 
   const [selectedDays, setSelectedDays] = useState([]);
   const [repeatInterval, setRepeatInterval] = useState("1");
-  const [hour, setHour] = useState("08");
-  const [minute, setMinute] = useState("00");
+
+  // 👉 flera tider för återkommande påminnelser
+  const [recurringTimes, setRecurringTimes] = useState([
+    { hour: "08", minute: "00" },
+  ]);
 
   const activeIndex = selected !== null ? selected : hovered;
   const activeLabel = activeIndex !== null ? labels[activeIndex] : "";
@@ -43,6 +46,20 @@ function Reminders() {
   const handleTimeSelect = (date) => {
     setSelectedDateTime(date);
     setTimeSelected(true);
+  };
+
+  const addRecurringTime = () => {
+    setRecurringTimes([...recurringTimes, { hour: "08", minute: "00" }]);
+  };
+
+  const updateRecurringTime = (index, field, value) => {
+    const newTimes = [...recurringTimes];
+    newTimes[index][field] = value;
+    setRecurringTimes(newTimes);
+  };
+
+  const removeRecurringTime = (index) => {
+    setRecurringTimes(recurringTimes.filter((_, i) => i !== index));
   };
 
   const sendReminder = () => {
@@ -67,16 +84,18 @@ function Reminders() {
       type: activeLabel,
       days: selectedDays,
       interval: repeatInterval,
-      time: `${hour}:${minute}`,
+      times: recurringTimes.map((t) => `${t.hour}:${t.minute}`),
     };
 
     console.log("Skickar återkommande påminnelse...", payload);
 
     alert(
-      `Återkommande påminnelse skickad:\n${payload.type} - ${payload.days.join(
-        ", "
-      )} kl. ${payload.time} (${
-        repeatInterval === "monthly" ? "en gång i månaden" : `var ${repeatInterval}:e vecka`
+      `Återkommande påminnelse skickad:\n${payload.type} - ${
+        payload.days.join(", ") || "inga valda dagar"
+      } kl. ${payload.times.join(", ")} (${
+        repeatInterval === "monthly"
+          ? "en gång i månaden"
+          : `var ${repeatInterval}:e vecka`
       })`
     );
 
@@ -92,12 +111,10 @@ function Reminders() {
     setShowCalendar(false);
     setSelectedDays([]);
     setRepeatInterval("1");
-    setHour("08");
-    setMinute("00");
+    setRecurringTimes([{ hour: "08", minute: "00" }]);
   };
 
   const handleClick = (type) => {
-    console.log("Klickad typ:", type);
     setReminderType(type);
     setShowCalendar(type === "single");
     setSelectedDateTime(null);
@@ -142,8 +159,10 @@ function Reminders() {
           </div>
           <div className="row mb-4">
             {images.map((img, i) => (
-              <div key={i} className="col-6 col-sm-4 col-md-3 d-flex justify-content-center">
-
+              <div
+                key={i}
+                className="col-6 col-sm-4 col-md-3 d-flex justify-content-center"
+              >
                 <img
                   src={img}
                   alt={labels[i]}
@@ -160,14 +179,7 @@ function Reminders() {
                   onMouseLeave={() => selected === null && setHovered(null)}
                   onClick={() => {
                     if (selected === null) setSelected(i);
-                    else if (selected === i) {
-                      setSelected(null);
-                      setHovered(null);
-                      setReminderType(null);
-                      setShowCalendar(false);
-                      setSelectedDateTime(null);
-                      setTimeSelected(false);
-                    }
+                    else if (selected === i) resetState();
                   }}
                 />
               </div>
@@ -196,7 +208,7 @@ function Reminders() {
             </div>
           )}
 
-          {/* Kalender + textfält */}
+          {/* Enstaka påminnelser (en tid/datum) */}
           {showCalendar && (
             <div className="row">
               <div className="col-md-6">
@@ -241,7 +253,7 @@ function Reminders() {
             </div>
           )}
 
-          {/* Återkommande påminnelse */}
+          {/* Återkommande påminnelse (flera tider) */}
           {reminderType === "recurring" && (
             <div className="row">
               <div className="col-md-6">
@@ -281,46 +293,77 @@ function Reminders() {
                   <option value="monthly">En gång i månaden</option>
                 </select>
 
-                <label className="form-label">Tid:</label>
-                <div className="d-flex gap-2 mb-3">
-                  <select
-                    className="form-select"
-                    value={hour}
-                    onChange={(e) => setHour(e.target.value)}
+                <label className="form-label">Tider:</label>
+                {recurringTimes.map((t, index) => (
+                  <div
+                    key={index}
+                    className="d-flex gap-2 align-items-center mb-2"
                   >
-                    {[...Array(24)].map((_, i) => {
-                      const h = i.toString().padStart(2, "0");
-                      return (
-                        <option key={h} value={h}>
-                          {h}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <span>:</span>
-                  <select
-                    className="form-select"
-                    value={minute}
-                    onChange={(e) => setMinute(e.target.value)}
-                  >
-                    {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map((m) => {
-                      const min = m.toString().padStart(2, "0");
-                      return (
-                        <option key={min} value={min}>
-                          {min}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
+                    <select
+                      className="form-select"
+                      value={t.hour}
+                      onChange={(e) =>
+                        updateRecurringTime(index, "hour", e.target.value)
+                      }
+                    >
+                      {[...Array(24)].map((_, i) => {
+                        const h = i.toString().padStart(2, "0");
+                        return (
+                          <option key={h} value={h}>
+                            {h}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <span>:</span>
+                    <select
+                      className="form-select"
+                      value={t.minute}
+                      onChange={(e) =>
+                        updateRecurringTime(index, "minute", e.target.value)
+                      }
+                    >
+                      {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(
+                        (m) => {
+                          const min = m.toString().padStart(2, "0");
+                          return (
+                            <option key={min} value={min}>
+                              {min}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+
+                    {index === 0 ? (
+                      <button
+                        className="btn btn-sm btn-outline-success"
+                        onClick={addRecurringTime}
+                      >
+                        +
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => removeRecurringTime(index)}
+                      >
+                        🗑
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
 
               <div className="col-md-6 d-flex flex-column justify-content-start">
                 <div className="border border-info rounded p-3 mb-3 bg-light text-info fw-bold">
-                  Vill du lägga en återkommande påminnelse för <u>{activeLabel}</u> på{" "}
-                  <u>{selectedDays?.join(", ") || "inga valda dagar"}</u> klockan{" "}
+                  Vill du lägga en återkommande påminnelse för{" "}
+                  <u>{activeLabel}</u> på{" "}
+                  <u>{selectedDays?.join(", ") || "inga valda dagar"}</u>{" "}
+                  klockan{" "}
                   <u>
-                    {hour}:{minute}
+                    {recurringTimes.map((t) => `${t.hour}:${t.minute}`).join(
+                      ", "
+                    )}
                   </u>
                   ,{" "}
                   <u>
@@ -343,8 +386,7 @@ function Reminders() {
                     onClick={() => {
                       setSelectedDays([]);
                       setRepeatInterval("1");
-                      setHour("08");
-                      setMinute("00");
+                      setRecurringTimes([{ hour: "08", minute: "00" }]);
                     }}
                   >
                     Avbryt
