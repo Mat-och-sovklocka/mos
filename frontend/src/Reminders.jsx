@@ -191,7 +191,7 @@ function Reminders() {
             <div className="row mb-4">
               <div className="col-6">
                 <button
-                  className="btn btn-primary w-100 fw-bold text-uppercase"
+                  className="btn btn-primary w-100 fw "
                   onClick={() => handleClick("single")}
                 >
                   Enstaka påminnelser
@@ -199,7 +199,7 @@ function Reminders() {
               </div>
               <div className="col-6">
                 <button
-                  className="btn btn-primary w-100 fw-bold text-uppercase"
+                  className="btn btn-primary w-100 fw "
                   onClick={() => handleClick("recurring")}
                 >
                   Återkommande påminnelser
