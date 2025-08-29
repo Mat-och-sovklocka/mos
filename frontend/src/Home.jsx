@@ -1,57 +1,33 @@
-import React, { useState } from "react";
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
 
 const Home = () => {
-  const [text, setText] = useState("");
+  const items = [
+    { className: "allergies", label: "Allergier och specialkost" },
+    { className: "home", label: "Home" },
+    { className: "recepies", label: "Matförslag" },
+    { className: "reminders_handle", label: "Lägg påminnelser" },
+    { className: "reminders_list", label: "Påminnelselista" },
+    { className: "statistics", label: "Statistik" },
+  ];
+
   return (
-    <div className="ring">
-      <div className="text-container">
-        <span className="text">{text}</span>
-      </div>
+    <div className="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center">
+      <h1 className="display-4 text-center mb-5 app-title fw-bold">
+        Mat och sov appen
+      </h1>
 
-      <div
-        className="image allergies"
-        onMouseOver={() => {
-          setText("Allergier och specialkost");
-        }}
-      >
-      </div>
-
-      <div
-        className="image home"
-        onMouseOver={() => {
-          setText("Home");
-        }}
-      >
-        
-      </div>
-      <div
-        className="image recepies"
-        onMouseOver={() => {
-          setText("Matförslag");
-        }}
-      >
-      </div>
-      <div
-        className="image reminders_handle"
-        onMouseOver={() => {
-          setText("Lägg påminnelser");
-        }}
-      >
-      </div>
-      <div
-        className="image reminders_list"
-        onMouseOver={() => {
-          setText("Påminnelselista");
-        }}
-      >
-      </div>
-      <div
-        className="image statistics"
-        onMouseOver={() => {
-          setText("Statistik");
-        }}
-      >
+      <div className="row justify-content-center w-100">
+        {items.map(({ className, label }) => (
+          <div
+            key={className}
+            className="col-12 col-sm-6 col-lg-4 d-flex flex-column align-items-center mb-4"
+          >
+            <div className={`image ${className}`}></div>
+            <span className="mt-2 text-center label-text">{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

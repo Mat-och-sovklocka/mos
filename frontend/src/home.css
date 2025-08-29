@@ -1,105 +1,75 @@
-body {
-  background-color: #F5F5DC !important;
-  color: #333;
-}
-
-.ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 620px;
-  height: 620px;
-  border-radius: 50%;
-  overflow: hidden;
-}
-
 .image {
-  position: absolute;
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
+  transition: transform 0.3s ease;
   background-size: cover;
   background-position: center;
-  margin: 20px;
-  border: 2px solid #F5F5DC;
-  transition: border-color 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.home {
-  background-image: url('images/home.png');
-  top: 10%;
-  left: 50%;
-  transform: translate(-75px, -75px);
+/* Ta bort eventuell bakgrundsfärg */
+.image.allergies,
+.image.home,
+.image.recepies,
+.image.reminders_handle,
+.image.reminders_list,
+.image.statistics {
+  background-color: transparent;
 }
 
-.allergies {
-  background-image: url('images/allergies.png');
-  top: 35%;
-  left: 20%;
-  transform: translate(-75px, -75px);
-}
-
-.recepies {
-  background-image: url('images/recepies.png');
-  top: 35%;
-  left: 75%;
-  transform: translate(-75px, -75px);
-}
-
-.reminders_handle {
-  background-image: url('images/reminders_handle.png');
-  top: 65%;
-  left: 20%;
-  transform: translate(-75px, -75px);
-}
-
-.reminders_list {
-  background-image: url('images/reminders_list.png');
-  top: 65%;
-  left: 75%;
-  transform: translate(-75px, -75px);
-}
-
-.statistics {
-  background-image: url('images/statistics.png');
-  top: 60%;
-  left: 50%;
-  transform: translate(-75px, 75px);
-}
-
+/* Hover-effekt */
 .image:hover {
-  border-color: #333;
+  transform: scale(1.05);
 }
 
-.text-container {
-  position: absolute;
-  top: 54%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  opacity: 0;
-  transition: opacity 0.3s;
+
+.label-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #316e70;
 }
+
 
 .text {
   font-size: 20px;
-  color: #666;
-    display: none;
-    font-weight: 700;
+  color: #316e70;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
-.ring:hover .text-container {
-    display: block;
+.text.show {
   opacity: 1;
 }
 
-.ring:hover .text-container .text {
-  content: attr(data-text);
-  display: block;
+.app-title {
+  color: #316e70; /* din gröna färg */
+  font-weight: 800; /* ännu fetare än standard */
+  text-shadow: 1px 1px 2px #326c6f;
 }
 
-.image:hover ~ .text-container .text {
-  content: attr(data-text);
-  display: block;
+
+
+.home {
+  background-image: url('images/home.png');
+}
+.allergies {
+  background-image: url('images/allergies.png');
+}
+.recepies {
+  background-image: url('images/recepies.png');
+}
+.reminders_handle {
+  background-image: url('images/reminders_handle.png');
+}
+.reminders_list {
+  background-image: url('images/reminders_list.png');
+}
+.statistics {
+  background-image: url('images/statistics.png');
+}
+
+.text.show {
+  opacity: 1;
 }
