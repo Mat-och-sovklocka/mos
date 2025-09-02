@@ -47,21 +47,6 @@ function Reminders() {
   const activeIndex = selected !== null ? selected : hovered;
   const activeLabel = activeIndex !== null ? labels[activeIndex] : "";
 
-  const handleClick = (type) => {
-    setReminderType(type);
-    if (type === "single") {
-      setShowCalendar(true);
-    } else {
-      setShowCalendar(false);
-      setSelectedDateTime(null);
-    }
-  };
-
-  return (
-    <div className="reminders-container">
-      <h1>Påminnelser</h1>
-      <p>
-        För musmarkören över bilden för att se de olika typer av påminnelser.{" "}
   const handleTimeSelect = (date) => {
     setSelectedDateTime(date);
     setTimeSelected(true);
@@ -110,8 +95,8 @@ function Reminders() {
 
     alert(
       `Återkommande påminnelse skickad:\n${payload.type} - ${
-        payload.days.join(", ") || "inga valda dagar"
-      } kl. ${payload.times.join(", ")} (${
+        selectedDays.join(", ") || "inga valda dagar"
+      } kl. ${recurringTimes.map((t) => `${t.hour}:${t.minute}`).join(", ")} (${
         repeatInterval === "monthly"
           ? "en gång i månaden"
           : `var ${repeatInterval}:e vecka`

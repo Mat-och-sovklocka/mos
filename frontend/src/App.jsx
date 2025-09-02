@@ -11,10 +11,7 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <Reminders /> {/* Lägg till komponenten här */}
-    </>
-  )
+
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
