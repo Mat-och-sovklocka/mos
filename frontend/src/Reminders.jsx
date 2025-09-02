@@ -138,9 +138,11 @@ function Reminders() {
 
   return (
     <div className="reminders-container container">
-      <h1 className="h1 text-primary fw-bold text-center mb-4">Påminnelser</h1>
+            <h1 className="display-4 text-center mb-3 app-title fw-bold">
+        Påminnelser
+      </h1>
 
-      <p className="lead text-muted text-center mb-5">
+      <p className="lead text-muted text-center m-4">
         För musmarkören över bilden för att se de olika typer av påminnelser.
         <br />
         Klicka sedan på den påminnelse du vill ställa.
@@ -150,7 +152,7 @@ function Reminders() {
       <div className="row">
         <div className="col-8 mx-auto">
           <div
-            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
+            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-center mb-4 fs-4"
             style={{ minHeight: "3rem" }}
           >
             {activeLabel ? (

@@ -27,7 +27,7 @@
 }
 
 .reminder-img.hovered {
-  border-color: #007bff;
+  border-color: #316e70;
 }
 
 .reminder-img.selected {
@@ -75,6 +75,7 @@
 
 .reminder-textfield {
   margin-bottom: 2rem; /* Ger luft under textfältet */
+  color: #316e70 !important;
 }
 
 .reminder-img {
