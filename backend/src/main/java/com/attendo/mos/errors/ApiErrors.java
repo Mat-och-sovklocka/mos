@@ -10,8 +10,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Global exception handler for API errors.
+ * Handles specific exceptions and returns a standardized error response.
+ */
 @RestControllerAdvice
 class ApiErrors {
+
+    /**
+     * Handles MethodArgumentNotValidException and IllegalArgumentException.
+     * Returns a response with HTTP 400 Bad Request status and error details.
+     *
+     * @param e   the exception that was thrown
+     * @param req the HttpServletRequest in which the exception occurred
+     * @return a map containing error details: status, error, message, and path
+     */
     @ExceptionHandler({ MethodArgumentNotValidException.class, IllegalArgumentException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     Map<String, Object> badReq(Exception e, HttpServletRequest req) {

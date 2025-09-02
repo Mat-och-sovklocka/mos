@@ -15,12 +15,23 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * REST controller for managing reminders.
+ * Handles HTTP requests for creating and retrieving reminders.
+ */
 @RestController
 @RequestMapping("/api/v1/reminders")
 @RequiredArgsConstructor
 public class ReminderController {
     private final ReminderService service;
 
+    /**
+     * Creates a new reminder.
+     *
+     * @param req the request body containing reminder details, validated
+     * @return ResponseEntity containing the created ReminderDto and the location
+     *         header
+     */
     @PostMapping
     public ResponseEntity<ReminderDto> create(@Valid @RequestBody CreateReminderRequest req) {
         ReminderDto created = service.create(req);
