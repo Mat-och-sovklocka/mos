@@ -35,8 +35,7 @@ function Reminders() {
   const [timeSelected, setTimeSelected] = useState(false);
   const [otherText, setOtherText] = useState("");
   const reminderLabel =
-  selected === 7 && otherText.trim() !== "" ? otherText : labels[selected];
-
+    selected === 7 && otherText.trim() !== "" ? otherText : labels[selected];
 
   const [selectedDays, setSelectedDays] = useState([]);
   const [repeatInterval, setRepeatInterval] = useState("1");
@@ -129,7 +128,7 @@ function Reminders() {
 
   const resetState = () => {
     setSelectedDateTime(null);
-     setOtherText("");
+    setOtherText("");
     setTimeSelected(false);
     setSelected(null);
     setHovered(null);
@@ -176,7 +175,7 @@ function Reminders() {
       <div className="row">
         <div className="col-8 mx-auto">
           <div
-            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
+            className="reminder-textfield bg-white mx-auto p-3 fw-bold custom-green text-center mb-4 fs-4"
             style={{ minHeight: "3rem" }}
           >
             {activeLabel ? (
@@ -234,7 +233,7 @@ function Reminders() {
             <div className="row mb-4">
               <div className="col-6">
                 <button
-                  className="btn btn-primary w-100 fw "
+                  className="btn btn-custom-green w-100 fw-bold rounded"
                   onClick={() => handleClick("single")}
                 >
                   Enstaka påminnelser
@@ -242,7 +241,7 @@ function Reminders() {
               </div>
               <div className="col-6">
                 <button
-                  className="btn btn-primary w-100 fw "
+                  className="btn btn-custom-green w-100 fw-bold rounded"
                   onClick={() => handleClick("recurring")}
                 >
                   Återkommande påminnelser
@@ -276,7 +275,7 @@ function Reminders() {
 
                   <div className="d-flex gap-3">
                     <button
-                      className="btn btn-success flex-fill fw-bold"
+                      className="btn btn-custom-green flex-fill fw-bold"
                       onClick={sendReminder}
                     >
                       OK
@@ -419,7 +418,7 @@ function Reminders() {
 
                 <div className="d-flex gap-3">
                   <button
-                    className="btn btn-success flex-fill fw-bold"
+                    className="btn btn-custom-green flex-fill fw-bold"
                     onClick={sendRecurringReminder}
                   >
                     OK

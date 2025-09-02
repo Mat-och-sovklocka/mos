@@ -82,4 +82,17 @@
   margin: 1rem; /* Ger luft runt varje bild */
 }
 
+.custom-green {
+  color: #316e70;
+}
 
+.btn-custom-green {
+  background-color: #316e70 !important;
+  color: white !important;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-custom-green:hover {
+  background-color: #27585a; /* lite mörkare vid hover */
+}
