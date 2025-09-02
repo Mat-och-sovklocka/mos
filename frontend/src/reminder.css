@@ -84,3 +84,15 @@
   text-align: center;
 }
 
+.row + .row {
+  margin-top: 2rem; /* Ger luft mellan bildraderna */
+}
+
+.reminder-textfield {
+  margin-bottom: 2rem; /* Ger luft under textfältet */
+}
+
+.reminder-img {
+  margin: 1rem; /* Ger luft runt varje bild */
+}
+
