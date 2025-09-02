@@ -33,6 +33,10 @@ function Reminders() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [timeSelected, setTimeSelected] = useState(false);
+  const [otherText, setOtherText] = useState("");
+  const reminderLabel =
+  selected === 7 && otherText.trim() !== "" ? otherText : labels[selected];
+
 
   const [selectedDays, setSelectedDays] = useState([]);
   const [repeatInterval, setRepeatInterval] = useState("1");
@@ -65,10 +69,16 @@ function Reminders() {
   };
 
   const sendReminder = () => {
+    if (activeLabel === "Övrigt" && otherText.trim() === "") {
+      alert("Du måste specificera vad som är övrigt.");
+      return;
+    }
+
     const payload = {
-      type: activeLabel,
+      type: activeLabel === "Övrigt" ? otherText : activeLabel,
       date: formatDate(selectedDateTime),
       time: formatTime(selectedDateTime),
+      other: activeLabel === "Övrigt" ? otherText : null,
     };
 
     console.log("Skickar till backend...", payload);
@@ -82,11 +92,24 @@ function Reminders() {
   };
 
   const sendRecurringReminder = () => {
+    if (!selectedDays || selectedDays.length === 0) {
+      alert(
+        "Du måste välja minst en veckodag för att skapa en återkommande påminnelse."
+      );
+      return;
+    }
+
+    if (activeLabel === "Övrigt" && otherText.trim() === "") {
+      alert("Vänligen specificera vad som är 'Övrigt'.");
+      return;
+    }
+
     const payload = {
-      type: activeLabel,
+      type: activeLabel === "Övrigt" ? otherText : activeLabel,
       days: selectedDays,
       interval: repeatInterval,
       times: recurringTimes.map((t) => `${t.hour}:${t.minute}`),
+      other: activeLabel === "Övrigt" ? otherText : null,
     };
 
     console.log("Skickar återkommande påminnelse...", payload);
@@ -106,6 +129,7 @@ function Reminders() {
 
   const resetState = () => {
     setSelectedDateTime(null);
+     setOtherText("");
     setTimeSelected(false);
     setSelected(null);
     setHovered(null);
@@ -138,11 +162,11 @@ function Reminders() {
 
   return (
     <div className="reminders-container container">
-            <h1 className="display-4 text-center mb-3 app-title fw-bold">
-        Påminnelser
+      <h1 className="display-4 text-center mb-3 app-title fw-bold">
+        Allergier och specialkost
       </h1>
 
-      <p className="lead text-muted text-center m-4">
+      <p className="lead text-muted text-center mb-5">
         För musmarkören över bilden för att se de olika typer av påminnelser.
         <br />
         Klicka sedan på den påminnelse du vill ställa.
@@ -152,7 +176,7 @@ function Reminders() {
       <div className="row">
         <div className="col-8 mx-auto">
           <div
-            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-center mb-4 fs-4"
+            className="reminder-textfield bg-white mx-auto p-3 fw-bold text-primary text-center mb-4 fs-4"
             style={{ minHeight: "3rem" }}
           >
             {activeLabel ? (
@@ -189,6 +213,21 @@ function Reminders() {
               </div>
             ))}
           </div>
+
+          {selected === 7 && (
+            <div className="mb-3">
+              <label className="form-label">
+                Specificera vad som är övrigt:
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                value={otherText}
+                onChange={(e) => setOtherText(e.target.value)}
+                placeholder="Exempel: Vattna blommor, ring samtal..."
+              />
+            </div>
+          )}
 
           {/* Knappar */}
           {selected !== null && (
@@ -230,7 +269,7 @@ function Reminders() {
               {timeSelected && (
                 <div className="col-md-6 d-flex flex-column justify-content-start">
                   <div className="border border-success rounded p-3 mb-3 bg-light text-success fw-bold">
-                    Vill du lägga en påminnelse för <u>{activeLabel}</u> den{" "}
+                    Vill du lägga en påminnelse för <u>{reminderLabel}</u> den{" "}
                     <u>{formatDate(selectedDateTime)}</u> klockan{" "}
                     <u>{formatTime(selectedDateTime)}</u>?
                   </div>
@@ -361,7 +400,7 @@ function Reminders() {
               <div className="col-md-6 d-flex flex-column justify-content-start">
                 <div className="border border-info rounded p-3 mb-3 bg-light text-info fw-bold">
                   Vill du lägga en återkommande påminnelse för{" "}
-                  <u>{activeLabel}</u> på{" "}
+                  <u>{reminderLabel}</u> på{" "}
                   <u>{selectedDays?.join(", ") || "inga valda dagar"}</u>{" "}
                   klockan{" "}
                   <u>
