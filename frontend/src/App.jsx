@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
 import Reminders from './Reminders.jsx' // Importera komponenten
 import Home from './Home.jsx';
+
 import Form from './Form.jsx';
-
-
 
 
 function App() {
