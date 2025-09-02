@@ -1,0 +1,75 @@
+.image {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ta bort eventuell bakgrundsfärg */
+.image.allergies,
+.image.home,
+.image.recepies,
+.image.reminders_handle,
+.image.reminders_list,
+.image.statistics {
+  background-color: transparent;
+}
+
+/* Hover-effekt */
+.image:hover {
+  transform: scale(1.05);
+}
+
+
+.label-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #316e70;
+}
+
+
+.text {
+  font-size: 20px;
+  color: #316e70;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.text.show {
+  opacity: 1;
+}
+
+.app-title {
+  color: #316e70; /* din gröna färg */
+  font-weight: 800; /* ännu fetare än standard */
+  text-shadow: 1px 1px 2px #326c6f;
+}
+
+
+
+.home {
+  background-image: url('images/home.png');
+}
+.allergies {
+  background-image: url('images/allergies.png');
+}
+.recepies {
+  background-image: url('images/recepies.png');
+}
+.reminders_handle {
+  background-image: url('images/reminders_handle.png');
+}
+.reminders_list {
+  background-image: url('images/reminders_list.png');
+}
+.statistics {
+  background-image: url('images/statistics.png');
+}
+
+.text.show {
+  opacity: 1;
+}

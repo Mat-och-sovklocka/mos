@@ -1,5 +1,7 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Link } from "react-router-dom";
+import homeIcon from "./images/home.png";
 
 import { useState } from "react";
 import img1 from "./images/img1.png";
@@ -361,9 +363,9 @@ function Reminders() {
                   <u>{selectedDays?.join(", ") || "inga valda dagar"}</u>{" "}
                   klockan{" "}
                   <u>
-                    {recurringTimes.map((t) => `${t.hour}:${t.minute}`).join(
-                      ", "
-                    )}
+                    {recurringTimes
+                      .map((t) => `${t.hour}:${t.minute}`)
+                      .join(", ")}
                   </u>
                   ,{" "}
                   <u>
@@ -395,6 +397,18 @@ function Reminders() {
               </div>
             </div>
           )}
+
+          <div className="row mt-5">
+            <div className="col-12 d-flex justify-content-center">
+              <Link to="/">
+                <img
+                  src={homeIcon}
+                  alt="Tillbaka till startsidan"
+                  style={{ width: "80px", cursor: "pointer" }}
+                />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
