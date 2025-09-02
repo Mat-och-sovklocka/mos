@@ -2,15 +2,19 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css'
 import Reminders from './Reminders.jsx' // Importera komponenten
+
 import Home from './Home.jsx';
 
 import Form from './Form.jsx';
-
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
+    <>
+      <Reminders /> {/* Lägg till komponenten här */}
+    </>
+  )
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />

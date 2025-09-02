@@ -1,5 +1,6 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
 import { Link } from "react-router-dom";
 import homeIcon from "./images/home.png";
 
@@ -32,6 +33,7 @@ function Reminders() {
   const [reminderType, setReminderType] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
+
   const [timeSelected, setTimeSelected] = useState(false);
 
   const [selectedDays, setSelectedDays] = useState([]);
@@ -45,6 +47,21 @@ function Reminders() {
   const activeIndex = selected !== null ? selected : hovered;
   const activeLabel = activeIndex !== null ? labels[activeIndex] : "";
 
+  const handleClick = (type) => {
+    setReminderType(type);
+    if (type === "single") {
+      setShowCalendar(true);
+    } else {
+      setShowCalendar(false);
+      setSelectedDateTime(null);
+    }
+  };
+
+  return (
+    <div className="reminders-container">
+      <h1>Påminnelser</h1>
+      <p>
+        För musmarkören över bilden för att se de olika typer av påminnelser.{" "}
   const handleTimeSelect = (date) => {
     setSelectedDateTime(date);
     setTimeSelected(true);
@@ -142,9 +159,83 @@ function Reminders() {
 
       <p className="lead text-muted text-center mb-5">
         För musmarkören över bilden för att se de olika typer av påminnelser.
+
         <br />
         Klicka sedan på den påminnelse du vill ställa.
       </p>
+
+      <div className="reminder-textfield">{activeLabel}</div>
+
+      <div className="reminders-grid">
+        {images.map((img, i) => {
+          let imgClass = "reminder-img";
+          if (selected !== null) {
+            imgClass += selected === i ? " selected" : " inactive";
+          } else if (hovered === i) {
+            imgClass += " hovered";
+          }
+
+          return (
+            <img
+              key={i}
+              src={img}
+              alt={labels[i]}
+              className={imgClass}
+              onMouseEnter={() => {
+                if (selected === null) setHovered(i);
+              }}
+              onMouseLeave={() => {
+                if (selected === null) setHovered(null);
+              }}
+              onClick={() => {
+                if (selected === null) setSelected(i);
+                else if (selected === i) {
+                  setSelected(null);
+                  setHovered(null);
+                  setReminderType(null);
+                  setShowCalendar(false);
+                  setSelectedDateTime(null);
+                }
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {selected !== null && (
+        <>
+          {/* Knapprad */}
+          <div className="reminder-radio-row d-flex gap-3 mt-4">
+            <button
+              type="button"
+              className="btn btn-primary reminder-btn"
+              onClick={() => handleClick("single")}
+            >
+              Enstaka påminnelser
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-primary reminder-btn"
+              onClick={() => handleClick("recurring")}
+            >
+              Återkommande påminnelser
+            </button>
+          </div>
+
+          <div style={{ marginTop: "2rem" }}>
+            <DatePicker
+              selected={selectedDateTime}
+              onChange={(date) => setSelectedDateTime(date)}
+              showTimeSelect
+              timeIntervals={5} // ändra till 1 för minutprecision
+              timeFormat="HH:mm"
+              dateFormat="Pp"
+              inline
+            />
+          </div>
+        </>
+      )}
 
       {/* Bilder */}
       <div className="row">
