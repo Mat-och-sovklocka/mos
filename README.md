@@ -1,4 +1,4 @@
-# The main repository for the Mat-och-sovklocka project.
+# The main repository for the Mat-och-sovklocka project
 
 ## Project Structure
 
