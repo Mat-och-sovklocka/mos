@@ -4,8 +4,7 @@ import './App.css'
 import Reminders from './Reminders.jsx' // Importera komponenten
 import Home from './Home.jsx';
 
-
-
+import Form from './Form.jsx';
 
 
 function App() {
@@ -16,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/reminders" element={<Reminders />} />
+        <Route path="/form" element={<Form />} />
       </Routes>
     </Router>
   );
