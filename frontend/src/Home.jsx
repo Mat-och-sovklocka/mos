@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   const items = [
+
     { className: "allergies", label: "Allergier och specialkost", link: "/form" },
     { className: "home", label: "Home" },
     { className: "recepies", label: "Matförslag" },
