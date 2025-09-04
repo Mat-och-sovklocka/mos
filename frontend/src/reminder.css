@@ -39,23 +39,6 @@
   pointer-events: none;
 }
 
-.reminder-textfield {
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  background: #fff;
-  width: 700px;
-  margin: 2rem auto 2rem auto;
-  padding: 1rem;
-  min-height: 3rem;
-  box-sizing: border-box;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #333;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .reminder-radio-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -76,22 +59,52 @@
   margin-right: 0.5em;
 }
 
-.reminder-btn {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-}
+
 
 .row + .row {
   margin-top: 2rem; /* Ger luft mellan bildraderna */
 }
 
 .reminder-textfield {
-  margin-bottom: 2rem; /* Ger luft under textfältet */
-  color: #316e70 !important;
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  transition: all 0.3s ease;
 }
+
+/* Skalbar text med clamp */
+.reminder-label {
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Extra små skärmar */
+@media (max-width: 480px) {
+  .reminder-textfield {
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Stora skärmar */
+@media (min-width: 1024px) {
+  .reminder-textfield {
+    max-width: 800px;
+  }
+}
+
+
 
 .reminder-img {
   margin: 1rem; /* Ger luft runt varje bild */
@@ -106,8 +119,30 @@
   color: white !important;
   border: none;
   transition: background-color 0.3s ease;
+
+  width: 100%;              /* Nytt: fyll hela flex-utrymmet */
+  min-width: 0;         /* Behåll minsta bredd */
+  height: 48px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
+
 .btn-custom-green:hover {
-  background-color: #27585a; /* lite mörkare vid hover */
+  background-color: #27585a !important;
 }
+
+.col-6 {
+  min-width: 0; /* Låt flex-kolumner krympa med */
+}
+.d-flex {
+  min-width: 0; /* Säkerställ rätt flex på radnivå */
+}
+

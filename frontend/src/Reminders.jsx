@@ -3,11 +3,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
 import homeIcon from "./images/home.png";
 
-
-import { Link } from "react-router-dom";
-import homeIcon from "./images/home.png";
-
-
 import { useState } from "react";
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
@@ -168,17 +163,20 @@ function Reminders() {
   return (
     <div className="reminders-container container">
       <h1 className="display-4 text-center mb-3 app-title fw-bold">
-        Allergier och specialkost
+        Lägg påminnelser
       </h1>
 
       <p className="lead text-muted text-center mb-5">
         För musmarkören över bilden för att se de olika typer av påminnelser.
-
         <br />
         Klicka sedan på den påminnelse du vill ställa.
       </p>
 
-      <div className="reminder-textfield">{activeLabel}</div>
+      <div className="reminder-textfield">
+        <span className="reminder-label">
+          {activeLabel || "\u00A0" /* icke-brytande mellanslag */}
+        </span>
+      </div>
 
       <div className="reminders-grid">
         {images.map((img, i) => {
@@ -216,83 +214,9 @@ function Reminders() {
         })}
       </div>
 
-      {selected !== null && (
-        <>
-          {/* Knapprad */}
-          <div className="reminder-radio-row d-flex gap-3 mt-4">
-            <button
-              type="button"
-              className="btn btn-primary reminder-btn"
-              onClick={() => handleClick("single")}
-            >
-              Enstaka påminnelser
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-primary reminder-btn"
-              onClick={() => handleClick("recurring")}
-            >
-              Återkommande påminnelser
-            </button>
-          </div>
-
-          <div style={{ marginTop: "2rem" }}>
-            <DatePicker
-              selected={selectedDateTime}
-              onChange={(date) => setSelectedDateTime(date)}
-              showTimeSelect
-              timeIntervals={5} // ändra till 1 för minutprecision
-              timeFormat="HH:mm"
-              dateFormat="Pp"
-              inline
-            />
-          </div>
-        </>
-      )}
-
       {/* Bilder */}
       <div className="row">
         <div className="col-8 mx-auto">
-          <div
-            className="reminder-textfield bg-white mx-auto p-3 fw-bold custom-green text-center mb-4 fs-4"
-            style={{ minHeight: "3rem" }}
-          >
-            {activeLabel ? (
-              activeLabel
-            ) : (
-              <span style={{ visibility: "hidden" }}>placeholder</span>
-            )}
-          </div>
-          <div className="row mb-4">
-            {images.map((img, i) => (
-              <div
-                key={i}
-                className="col-6 col-sm-4 col-md-3 d-flex justify-content-center"
-              >
-                <img
-                  src={img}
-                  alt={labels[i]}
-                  className={`reminder-img ${
-                    selected !== null
-                      ? selected === i
-                        ? "selected"
-                        : "inactive"
-                      : hovered === i
-                      ? "hovered"
-                      : ""
-                  }`}
-                  onMouseEnter={() => selected === null && setHovered(i)}
-                  onMouseLeave={() => selected === null && setHovered(null)}
-                  onClick={() => {
-                    if (selected === null) setSelected(i);
-                    else if (selected === i) resetState();
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
           {selected === 7 && (
             <div className="mb-3">
               <label className="form-label">
@@ -310,23 +234,35 @@ function Reminders() {
 
           {/* Knappar */}
           {selected !== null && (
-            <div className="row mb-4">
-              <div className="col-6">
+            <div
+              className="row mb-4"
+              style={{ width: "100%", display: "flex" }}
+            >
+                 {" "}
+              <div className="col-6 d-flex" style={{ minWidth: 0 }}>
+                     {" "}
                 <button
-                  className="btn btn-custom-green w-100 fw-bold rounded"
+                  className="btn btn-custom-green fw-bold rounded flex-grow-1"
+                  style={{ minWidth: 0 }}
                   onClick={() => handleClick("single")}
                 >
-                  Enstaka påminnelser
+                          Enstaka påminnelser      {" "}
                 </button>
+                   {" "}
               </div>
-              <div className="col-6">
+                 {" "}
+              <div className="col-6 d-flex" style={{ minWidth: 0 }}>
+                     {" "}
                 <button
-                  className="btn btn-custom-green w-100 fw-bold rounded"
+                  className="btn btn-custom-green fw-bold rounded flex-grow-1"
+                  style={{ minWidth: 0 }}
                   onClick={() => handleClick("recurring")}
                 >
-                  Återkommande påminnelser
+                          Återkommande påminnelser      {" "}
                 </button>
+                   {" "}
               </div>
+               {" "}
             </div>
           )}
 
