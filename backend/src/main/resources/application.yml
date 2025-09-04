@@ -4,8 +4,10 @@ spring:
     username: apl
     password: apl
   jpa:
-    hibernate.ddl-auto: validate   # let Flyway own schema
-    properties.hibernate.jdbc.time_zone: UTC
+    hibernate:
+      ddl-auto: validate   # let Flyway own schema
+    properties:
+      hibernate.jdbc.time_zone: UTC
   flyway:
     enabled: true
     locations: classpath:db/migration
