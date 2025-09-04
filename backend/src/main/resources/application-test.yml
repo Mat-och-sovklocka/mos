@@ -12,3 +12,10 @@ spring:
   h2:
     console:
       enabled: true
+  security:
+    user:
+      name: user
+      password: password
+      roles: USER
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
