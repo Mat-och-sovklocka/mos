@@ -1,10 +1,12 @@
 package com.attendo.mos.controller;
 
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,13 +31,14 @@ import lombok.RequiredArgsConstructor;
  * @param req the request body containing the details for the new resource
  * @return ResponseEntity containing the created resource and the location
  *         header
+ * REST controller for managing reminders.
+ * Handles HTTP requests for creating and retrieving reminders.
  */
 @RestController
 @RequestMapping("/api/v1/reminders")
 @RequiredArgsConstructor
 public class ReminderController {
     private final ReminderService service;
-
     // Swagger annotations
     @Operation(summary = "Create a reminder", description = "Create a new reminder with time, category, and optional note.")
     @ApiResponses({
@@ -50,6 +53,13 @@ public class ReminderController {
                     """)))
     })
 
+    /**
+     * Creates a new reminder.
+     *
+     * @param req the request body containing reminder details, validated
+     * @return ResponseEntity containing the created ReminderDto and the location
+     *         header
+     */
     @PostMapping
     public ResponseEntity<ReminderDto> create(@Valid @RequestBody CreateReminderRequest req) {
         ReminderDto created = service.create(req);
