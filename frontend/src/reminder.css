@@ -320,14 +320,17 @@
 }
 
 .ok-button {
-  background-color: #4CAF50; /* Samma gröna färg som titeln */
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  margin-right: 10px;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: #28a745; /* grön bakgrund */
+  border: none;               /* ta bort kantlinje */
+  padding: 0.5rem 1rem;       /* lite luft runt texten */
+  border-radius: 4px;         /* rundade hörn */
+  cursor: pointer;            /* pekaren blir hand */
 }
+
+.ok-button:hover {
+  background-color: #218838; /* mörkare grön vid hover */
+}
+
 
 .cancel-button {
   background-color: #f44336; /* Röd färg */
@@ -419,10 +422,7 @@ input[type="text"] {
   color: white;
 }
 
-.form-buttons button[type="button"] {
-  background-color: #f44336;
-  color: white;
-}
+
 
 .time-input-group {
   margin-top: 1rem;
@@ -488,12 +488,16 @@ input[type="text"] {
   min-width: 280px;
 }
 
-.note-column {
-  flex: 1 1 300px;
-  min-width: 280px;
-  display: flex;
-  flex-direction: column;
+.note-column textarea {
+  background-color: #fff; /* Vit bakgrund */
+  color: #333;            /* Mörk text */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.6rem;
+  font-size: 1rem;
+  resize: vertical;
 }
+
 
 .note-column label {
   font-weight: bold;
