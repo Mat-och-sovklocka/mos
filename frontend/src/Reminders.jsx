@@ -45,11 +45,34 @@ function Reminders() {
   const [customReminderText, setCustomReminderText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [reminderNote, setReminderNote] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [reminderTimes, setReminderTimes] = useState([""]);
+  const [confirmationText, setConfirmationText] = useState("");
 
   useEffect(() => {
     setReminderType(null);
     setSelectedDateTime(null);
   }, [selectedIndex]);
+
+  const toggleDay = (day) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
+  const addReminderTime = () => {
+    setReminderTimes((prev) => [...prev, ""]);
+  };
+
+  const updateReminderTime = (index, value) => {
+    setReminderTimes((prev) =>
+      prev.map((time, i) => (i === index ? value : time))
+    );
+  };
+
+  const removeReminderTime = (index) => {
+    setReminderTimes((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleClick = (index) => {
     setSelectedIndex(index === selectedIndex ? null : index);
@@ -87,8 +110,8 @@ function Reminders() {
 
     // Här kan du skicka payload till backend om du vill
     // t.ex. axios.post("/api/reminders", payload)
-      // Visa payload i en alert för debugging
-  alert(JSON.stringify(payload, null, 2));
+    // Visa payload i en alert för debugging
+    alert(JSON.stringify(payload, null, 2));
 
     // Återställ allt efter bekräftelse
     setSelectedIndex(null);
@@ -106,6 +129,18 @@ function Reminders() {
     setReminderNote("");
     setSelectedDateTime(null);
   };
+
+  function läggTillTid() {
+    const tidInput = document.getElementById("tid-input");
+    const tid = tidInput.value;
+    if (tid) {
+      const lista = document.getElementById("tider-lista");
+      const li = document.createElement("li");
+      li.textContent = tid;
+      lista.appendChild(li);
+      tidInput.value = "";
+    }
+  }
 
   function renderCustomReminderInput(
     customReminderText,
@@ -186,6 +221,7 @@ function Reminders() {
               >
                 Enstaka påminnelser
               </button>
+
               <button
                 className="reminder-button"
                 onClick={() => handleReminderType("recurring")}
@@ -193,6 +229,144 @@ function Reminders() {
                 Återkommande påminnelser
               </button>
             </div>
+
+            {reminderType === "once" && (
+              <div className="once-reminder-form">
+                {/* Formulär för enstaka påminnelse */}
+              </div>
+            )}
+
+            {reminderType === "recurring" && (
+              <div className="reminder-layout">
+                <div className="form-column">
+                  <section className="reminder-form">
+                    <div className="day-selector">
+                      {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map(
+                        (day, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => toggleDay(day)}
+                            className={`day-button ${
+                              selectedDays.includes(day) ? "active" : ""
+                            }`}
+                          >
+                            {day}
+                          </button>
+                        )
+                      )}
+                    </div>
+
+                    {selectedDays.map((day) => (
+                      <div key={day} className="day-block">
+                        {reminderTimes[day]?.map((time, index) => (
+                          <div key={index} className="time-row">
+                            <input
+                              type="time"
+                              value={time}
+                              onChange={(e) => {
+                                const newTime = e.target.value;
+                                setReminderTimes((prev) => ({
+                                  ...prev,
+                                  [day]: prev[day].map((t, i) =>
+                                    i === index ? newTime : t
+                                  ),
+                                }));
+                              }}
+                              className="time-input"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReminderTimes((prev) => ({
+                                  ...prev,
+                                  [day]: prev[day].filter(
+                                    (_, i) => i !== index
+                                  ),
+                                }));
+                              }}
+                              className="delete-btn"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+
+                    <div className="time-input-group">
+                      <label>Tider:</label>
+                      {reminderTimes.map((time, index) => (
+                        <div key={index} className="time-row">
+                          <input
+                            type="time"
+                            value={time}
+                            onChange={(e) =>
+                              updateReminderTime(index, e.target.value)
+                            }
+                            className="time-input"
+                          />
+                          {index === 0 ? (
+                            <button
+                              type="button"
+                              onClick={addReminderTime}
+                              className="add-time-btn"
+                            >
+                              ➕
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => removeReminderTime(index)}
+                              className="delete-btn"
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="confirmation-label">
+                      <label htmlFor="confirmation-text">
+                        Notering:
+                      </label>
+                      <input
+                        type="text"
+                        id="confirmation-text"
+                        name="confirmation-text"
+                        placeholder="t.ex. Ta medicin"
+                        value={customReminderText}
+                        onChange={(e) => setCustomReminderText(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="form-buttons">
+                      <button type="submit">OK</button>
+                      <button
+                        type="button"
+                        onClick={() => setReminderType(null)}
+                      >
+                        Avbryt
+                      </button>
+                    </div>
+                  </section>
+                  {/* Din befintliga formulärkod här */}
+                  {/* T.ex. dagval, time-pickers, etc */}
+                </div>
+
+                <div className="note-column">
+                  
+                  <textarea
+                    id="confirmationText"
+                    value={confirmationText}
+                    onChange={(e) => setConfirmationText(e.target.value)}
+                    placeholder="Skriv en sammanfattning eller notering..."
+                    rows={6}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -269,9 +443,6 @@ function Reminders() {
             )}
           </div>
         )}
-
-
-        
       </div>
     </div>
   );
