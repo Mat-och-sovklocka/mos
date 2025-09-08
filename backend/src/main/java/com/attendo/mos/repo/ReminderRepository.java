@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
-    List<Reminder> findByUserIdOrderByTimeAsc(UUID userId);
+    List<Reminder> findByUser_IdOrderByTimeAsc(UUID userId);
 }

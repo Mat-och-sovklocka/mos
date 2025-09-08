@@ -8,6 +8,7 @@ import com.attendo.mos.repo.ReminderRepository;
 import com.attendo.mos.repo.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,4 +33,17 @@ public class ReminderService {
     r = reminders.save(r);
     return new ReminderDto(r.getId(), r.getTime(), r.getCategory(), r.getNote(), r.getCreatedAt());
   }
+
+  // ReminderService.java
+  public List<ReminderDto> getReminders(UUID userId) {
+    return reminders.findByUser_IdOrderByTimeAsc(userId).stream()
+        .map(r -> new ReminderDto(
+            r.getId(),
+            r.getTime(),
+            r.getCategory(),
+            r.getNote(),
+            r.getCreatedAt()))
+        .toList();
+  }
+
 }

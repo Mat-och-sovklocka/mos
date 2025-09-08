@@ -6,11 +6,14 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import org.hibernate.annotations.UuidGenerator;
+
 @Entity
 @Table(name = "meal_requirement")
 public class MealRequirement {
     @Id
     @GeneratedValue
+    @UuidGenerator
     private UUID id;
 
     @ManyToOne(optional = false)

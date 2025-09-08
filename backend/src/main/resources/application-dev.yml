@@ -3,6 +3,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/mos
     username: mos
     password: mos
+    security:
+      user:
+        name: admin
+        password: admin
   jpa:
     hibernate:
       ddl-auto: validate

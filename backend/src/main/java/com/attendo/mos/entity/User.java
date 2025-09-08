@@ -6,12 +6,15 @@ import lombok.Data;
 import java.time.*;
 import java.util.UUID;
 
+import org.hibernate.annotations.UuidGenerator;
+
 @Entity
 @Data
 @Table(name = "app_user")
 public class User {
     @Id
     @GeneratedValue
+    @UuidGenerator
     private UUID id;
 
     @Column(nullable = false, unique = true)

@@ -6,11 +6,15 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import org.hibernate.annotations.UuidGenerator;
+
 @Entity
 @Table(name = "reminder")
 public class Reminder {
     @Id
     @GeneratedValue
+    @UuidGenerator
+
     private UUID id;
 
     @ManyToOne(optional = false)
