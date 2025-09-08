@@ -7,8 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-import java.net.URI;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +22,6 @@ import com.attendo.mos.dto.ReminderDto;
 import com.attendo.mos.service.ReminderService;
 
 import jakarta.validation.Valid;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * Handles HTTP POST requests to create a new resource.
@@ -35,10 +36,13 @@ import lombok.RequiredArgsConstructor;
  * Handles HTTP requests for creating and retrieving reminders.
  */
 @RestController
-@RequestMapping("/api/v1/reminders")
-@RequiredArgsConstructor
+@RequestMapping("/api/users/{userId}/reminders")
 public class ReminderController {
     private final ReminderService service;
+    
+    public ReminderController(ReminderService service) {
+        this.service = service;
+    }
     // Swagger annotations
     @Operation(summary = "Create a reminder", description = "Create a new reminder with time, category, and optional note.")
     @ApiResponses({
@@ -53,17 +57,10 @@ public class ReminderController {
                     """)))
     })
 
-    /**
-     * Creates a new reminder.
-     *
-     * @param req the request body containing reminder details, validated
-     * @return ResponseEntity containing the created ReminderDto and the location
-     *         header
-     */
     @PostMapping
-    public ResponseEntity<ReminderDto> create(@Valid @RequestBody CreateReminderRequest req) {
-        ReminderDto created = service.create(req);
-        URI location = URI.create("/api/v1/reminders/" + created.id());
-        return ResponseEntity.created(location).body(created);
+    public ResponseEntity<ReminderDto> create(@PathVariable UUID userId,
+            @RequestBody @Valid CreateReminderRequest req) {
+        var dto = service.addReminder(userId, req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 }
