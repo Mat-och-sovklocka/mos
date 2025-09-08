@@ -1,23 +1,33 @@
-create extension if not exists "uuid-ossp";
+-- Enable UUIDs via pgcrypto (safe to re-run)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-create table app_user (
-  id uuid primary key default uuid_generate_v4(),
-  email text not null unique,
-  display_name text,
-  password_hash text,
-  created_at timestamptz not null default now()
+-- Users
+CREATE TABLE IF NOT EXISTS app_user (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         VARCHAR(255) UNIQUE NOT NULL,
+  display_name  VARCHAR(255)      NOT NULL,
+  password_hash VARCHAR(255)      NOT NULL,
+  created_at    TIMESTAMPTZ       NOT NULL DEFAULT now()
 );
 
-create type reminder_category as enum ('MEDICATION','MEAL');
-
-create table reminder (
-  id uuid primary key default uuid_generate_v4(),
-  user_id uuid not null references app_user(id) on delete cascade,
-  time timestamptz not null,
-  category reminder_category not null,
-  note text,
-  created_at timestamptz not null default now()
+-- Reminders
+CREATE TABLE IF NOT EXISTS reminder (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  time_at    TIMESTAMPTZ NOT NULL,
+  category   VARCHAR(40) NOT NULL,   -- MEDICATION | MEAL
+  note       TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX IF NOT EXISTS idx_reminder_user_id ON reminder(user_id);
+CREATE INDEX IF NOT EXISTS idx_reminder_time_at ON reminder(time_at);
 
--- indexes you’ll actually feel
-create index idx_reminder_user_time on reminder(user_id, time);
+-- Meal requirements
+CREATE TABLE IF NOT EXISTS meal_requirement (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  type       VARCHAR(40) NOT NULL,   -- VEGETARIAN | VEGAN | ...
+  notes      TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_mealreq_user_id ON meal_requirement(user_id);
