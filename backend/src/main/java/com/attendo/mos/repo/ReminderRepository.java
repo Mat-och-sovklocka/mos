@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
     List<Reminder> findByUser_IdOrderByTimeAsc(UUID userId);
+    void deleteByIdAndUser_Id(UUID id, UUID userId);
 }

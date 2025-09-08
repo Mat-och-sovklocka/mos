@@ -46,4 +46,12 @@ public class ReminderService {
         .toList();
   }
 
+  public void deleteReminder(UUID userId, UUID reminderId) {
+    Reminder r = reminders.findById(reminderId)
+        .filter(rem -> rem.getUser().getId().equals(userId))
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Reminder not found for user " + userId));
+    reminders.delete(r);
+  }
+
 }
