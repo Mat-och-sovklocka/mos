@@ -33,7 +33,6 @@ public class Reminder {
 
     private String note;
 
-    @Column(nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC);
 
     @Column(nullable = false, length = 20)
