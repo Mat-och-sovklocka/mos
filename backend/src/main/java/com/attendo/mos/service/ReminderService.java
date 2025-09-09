@@ -3,6 +3,7 @@ package com.attendo.mos.service;
 import com.attendo.mos.dto.Category;
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
+import com.attendo.mos.dto.ReminderResponse;
 import com.attendo.mos.entity.Reminder;
 import com.attendo.mos.repo.ReminderRepository;
 import com.attendo.mos.repo.UserRepository;
@@ -65,15 +66,23 @@ public class ReminderService {
   }
 
   // ReminderService.java
-  public List<ReminderDto> getReminders(UUID userId) {
-    return reminders.findByUser_IdOrderByTimeAsc(userId).stream()
-        .map(r -> new ReminderDto(
-            r.getId(),
-            r.getTime(),
-            r.getCategory(),
-            r.getNote(),
-            r.getCreatedAt(), null, null))
-        .toList();
+  public List<ReminderResponse> getReminders(UUID userId) {
+    return reminders.listForUser(userId).stream().map(r -> {
+      List<String> days = null, times = null;
+      if ("recurring".equalsIgnoreCase(r.getType()) && r.getRecurrence() != null) {
+        days = (List<String>) r.getRecurrence().getOrDefault("days", List.of());
+        times = (List<String>) r.getRecurrence().getOrDefault("times", List.of());
+      }
+      return new ReminderResponse(
+          r.getId(),
+          r.getType(),
+          r.getCategory().name(), // or keep your mapping if you localize
+          r.getNote(),
+          "once".equalsIgnoreCase(r.getType()) ? r.getTime() : null,
+          days,
+          times,
+          r.getCreatedAt());
+    }).toList();
   }
 
   public void deleteReminder(UUID userId, UUID reminderId) {

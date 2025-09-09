@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
+import com.attendo.mos.dto.ReminderResponse;
 import com.attendo.mos.service.ReminderService;
 
 import jakarta.validation.Valid;
@@ -56,7 +57,7 @@ public class ReminderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
     @GetMapping
-    public List<ReminderDto> get(@PathVariable UUID userId) {
+    public List<ReminderResponse> get(@PathVariable UUID userId) {
         return service.getReminders(userId);
     }
 
