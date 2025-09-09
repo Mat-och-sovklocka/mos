@@ -1,5 +1,5 @@
 # Java 17 + Maven, good for dev (runs mvn inside the container)
-FROM maven:3.9-eclipse-temurin-17
+FROM maven:3.9-eclipse-temurin-21
 
 # Workdir inside the container
 WORKDIR /app

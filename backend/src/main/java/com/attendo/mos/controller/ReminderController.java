@@ -23,22 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
+import com.attendo.mos.dto.ReminderResponse;
 import com.attendo.mos.service.ReminderService;
 
 import jakarta.validation.Valid;
 
-/**
- * Handles HTTP POST requests to create a new resource.
- * <p>
- * This method processes the incoming request body, creates a new entity,
- * and returns a response with the created entity and its location.
- *
- * @param req the request body containing the details for the new resource
- * @return ResponseEntity containing the created resource and the location
- *         header
- * REST controller for managing reminders.
- * Handles HTTP requests for creating and retrieving reminders.
- */
 @RestController
 @RequestMapping("/api/users/{userId}/reminders")
 public class ReminderController {
@@ -68,7 +57,7 @@ public class ReminderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
     @GetMapping
-    public List<ReminderDto> get(@PathVariable UUID userId) {
+    public List<ReminderResponse> get(@PathVariable UUID userId) {
         return service.getReminders(userId);
     }
 
