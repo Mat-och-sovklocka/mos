@@ -1,0 +1,2 @@
+ALTER TABLE reminder
+ALTER COLUMN time_at DROP NOT NULL;

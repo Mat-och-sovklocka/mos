@@ -10,6 +10,9 @@ services:
       - ./backend:/app
     environment:
       - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mos
+      - SPRING_DATASOURCE_USERNAME=mos
+      - SPRING_DATASOURCE_PASSWORD=mos
     command: mvn spring-boot:run
     depends_on:
       - db
@@ -39,6 +42,12 @@ services:
       POSTGRES_DB: mos
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mos -d mos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
   db_data:
