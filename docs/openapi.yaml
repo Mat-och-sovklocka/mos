@@ -1,0 +1,144 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /api/users/{userId}/reminders:
+    get:
+      tags:
+      - reminder-controller
+      operationId: get
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReminderDto"
+    post:
+      tags:
+      - reminder-controller
+      summary: Create a reminder
+      description: "Create a new reminder with time, category, and optional note."
+      operationId: create
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReminderRequest"
+        required: true
+      responses:
+        "400":
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                type: string
+                example:
+                  status: 400
+                  error: Bad Request
+                  message: time must be now or future (±5m)
+                  path: /api/v1/reminders
+        "201":
+          description: Reminder created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReminderDto"
+  /api/users/{userId}/reminders/{reminderId}:
+    delete:
+      tags:
+      - reminder-controller
+      operationId: delete
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: reminderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        "204":
+          description: No Content
+components:
+  schemas:
+    CreateReminderRequest:
+      required:
+      - category
+      - time
+      type: object
+      properties:
+        time:
+          type: string
+          format: date-time
+        category:
+          type: string
+          enum:
+          - MEDICATION
+          - MEAL
+          - OTHER
+        note:
+          maxLength: 280
+          minLength: 0
+          type: string
+    ReminderDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        time:
+          type: string
+          format: date-time
+        category:
+          type: string
+          enum:
+          - MEDICATION
+          - MEAL
+          - OTHER
+        note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
