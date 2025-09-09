@@ -4,9 +4,12 @@ import com.attendo.mos.dto.Category;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Map;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "reminder")
@@ -33,7 +36,30 @@ public class Reminder {
     @Column(nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC);
 
+    @Column(nullable = false, length = 20)
+    private String type = "once"; // "once" | "recurring"
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> recurrence; // null for once
+
     // getters/setters
+    public String getType() {
+        return type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Map<String, Object> getRecurrence() {
+        return recurrence;
+    }
+
+    public void setRecurrence(Map<String, Object> recurrence) {
+        this.recurrence = recurrence;
+    }
+
     public UUID getId() {
         return id;
     }
