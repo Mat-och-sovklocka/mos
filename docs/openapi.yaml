@@ -101,6 +101,59 @@ paths:
                   type: object
         "204":
           description: No Content
+  /api/users/{userId}/meal-requirements:
+    get:
+      tags:
+      - meal-requirement-controller
+      operationId: getMealRequirements
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealRequirementsResponse"
+    post:
+      tags:
+      - meal-requirement-controller
+      summary: Set meal requirements
+      description: Set meal requirements for a user. Replaces all existing requirements.
+      operationId: setMealRequirements
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealRequirementsRequest"
+        required: true
+      responses:
+        "201":
+          description: Meal requirements set successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealRequirementsResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
 components:
   schemas:
     CreateReminderRequest:
@@ -138,6 +191,34 @@ components:
           - MEAL
           - OTHER
         note:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    MealRequirementsRequest:
+      type: object
+      required:
+        - requirements
+      properties:
+        requirements:
+          type: array
+          items:
+            type: string
+          example: ["Laktosfri", "Diabetesanpassad"]
+    MealRequirementsResponse:
+      type: object
+      properties:
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealRequirementDto'
+    MealRequirementDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        requirement:
           type: string
         createdAt:
           type: string
