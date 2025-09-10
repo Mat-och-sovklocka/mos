@@ -15,7 +15,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=mos
     command: mvn spring-boot:run
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
