@@ -86,5 +86,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Session summaries and temporary documentation
+SESSION_SUMMARY.md
+*_SUMMARY.md
+
 # Keep files
 .gitkeep
