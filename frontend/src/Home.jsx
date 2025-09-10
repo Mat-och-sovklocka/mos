@@ -15,7 +15,7 @@ const Home = () => {
       label: "Lägg påminnelser",
       link: "/reminders",
     },
-    { className: "reminders_list", label: "Påminnelselista" },
+    { className: "reminders_list", label: "Påminnelselista", link: "/reminderlist" },
     { className: "statistics", label: "Statistik" },
   ];
 
