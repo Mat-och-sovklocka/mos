@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class MealRequirementController {
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
     @PostMapping
+    @Transactional
     public ResponseEntity<MealRequirementsResponse> setMealRequirements(
             @PathVariable UUID userId,
             @RequestBody MealRequirementsRequest request) {
