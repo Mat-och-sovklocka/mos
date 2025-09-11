@@ -3,11 +3,11 @@
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: pointer; /* valfritt, ger visuell feedback */
+  cursor: pointer;
 }
 
 .reminder-card:hover {
@@ -15,7 +15,7 @@
   transform: translateY(-2px);
 }
 
-
+/* === Rubrik === */
 .reminder-header h3 {
   font-size: 1.2rem;
   font-weight: bold;
@@ -26,11 +26,10 @@
 /* === Innehållsrad === */
 .reminder-body {
   display: flex;
-  flex-wrap: nowrap; /* 👈 förhindrar radbrytning */
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: flex-start;
 }
-
 
 /* === Info-kolumn === */
 .reminder-info {
@@ -45,11 +44,11 @@
 
 /* === Ikon-kolumn === */
 .reminder-actions {
-  flex: 0 0 auto;
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
   justify-content: flex-end;
-  align-self: flex-start;
+  margin-top: 8px;
 }
 
 /* === Visa mer-länk === */
@@ -60,18 +59,22 @@
   margin-left: 6px;
 }
 
+/* === Filler för layoutjustering === */
 .note-filler {
-  height: 24px; /* justera efter behov */
+  height: 24px;
 }
 
+/* === Formulärcontainer === */
 .edit-form-container {
-  max-width: 800px;
+  max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto 16px;
   padding: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fdfdfd;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .edit-form-container form {
@@ -87,9 +90,145 @@
   border-radius: 4px;
 }
 
-.edit-form-container button {
-  padding: 8px 12px;
-  font-size: 0.9rem;
+/* Bara “Spara”/“Avbryt” i button-row */
+.edit-form-container .button-row button {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #316c6f;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+/* Den grå “Avbryt”-knapp som står i button-row */
+.edit-form-container .button-row button[type="button"] {
+  background-color: #aaa;
+}
+
+
+.edit-form-container button[type="button"] {
+  background-color: #aaa;
+}
+
+
+
+
+/* === Dagväljare === */
+
+
+.day-button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  color: #333;
+  cursor: pointer;
+}
+.day-button.selected {
+  background-color: #316c6f;
+  color: white;
+  border-color: #316c6f;
+  box-shadow: 0 0 4px rgba(49, 108, 111, 0.6);
+  transition: box-shadow 0.2s ease;
+}
+
+
+/* === Overlay och modal === */
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+}
+
+.fixed-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* === Färgkodning per kategori === */
+.meal-card {
+  background-color: #fff3e0; /* ljusorange */
+}
+
+.medication-card {
+  background-color: #fbe9e7; /* ljusröd */
+}
+
+.exercise-card {
+  background-color: #e8f5e9; /* ljusgrön */
+}
+
+.sleep-card {
+  background-color: #ede7f6; /* lavendel */
+}
+
+.cleaning-card {
+  background-color: #f3e5f5; /* ljuslila */
+}
+
+.shower-card {
+  background-color: #e3f2fd; /* ljusblågrå */
+}
+
+.meeting-card {
+  background-color: #e0f7fa; /* ljusblå */
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.form-row.two-columns {
+  flex-direction: row;
+  gap: 2px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 🔑 för att undvika att fältet växer utanför */
+}
+
+.form-group input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.button-row {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.form-group label {
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.button-row button {
+  flex: 1;
+  padding: 4px;
+  font-size: 1rem;
   border: none;
   border-radius: 4px;
   background-color: #316c6f;
@@ -97,43 +236,121 @@
   cursor: pointer;
 }
 
-.edit-form-container button[type="button"] {
+.button-row button[type="button"] {
   background-color: #aaa;
 }
 
-.day-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
 
-.day-button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
+.button-row button {
+  display: block;
+  width: 100%;
+  padding: 6px;
+  font-size: 1rem;
+  border: none;
   border-radius: 4px;
-  background-color: #eee;
-  color: #333;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.day-button.selected {
   background-color: #316c6f;
   color: white;
-  border-color: #316c6f;
+  cursor: pointer;
+  margin-bottom: 6px;
+  box-sizing: border-box;
 }
+
+
+.time-button {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+
+.time-button:hover {
+  background-color: #d0e0e0;
+}
+
+
+.day-selector,
+.time-selector {
+  display: flex;
+  flex-wrap: nowrap;       /* 🔄 ändra från wrap till nowrap */
+  gap: 8px;
+  overflow-x: auto;        /* 🔄 tillåter scroll om det blir trångt */
+  margin-bottom: 12px;     /* behåll eller justera efter behov */
+  padding-bottom: 4px;     /* valfritt för lite luft under raden */
+}
+
+.time-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.time-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.time-entry input[type="time"] {
+  flex-grow: 1;
+  padding: 4px;
+  font-size: 1rem;
+}
+
+.icon-wrapper button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #c00;
+  padding: 4px;
+}
+
+.icon-wrapper button:hover {
+  color: #a00;
+  transform: scale(1.1);
+}
+
 
 
 /* === Mobilanpassning === */
 @media (max-width: 600px) {
+  .reminder-card {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+
   .reminder-body {
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .reminder-actions {
-    justify-content: flex-start;
-    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  .reminder-actions svg {
+    font-size: 1.5rem;
+  }
+
+  .edit-form-container {
+    max-width: 90vw;
+    padding: 1rem;
+  }
+
+  .edit-form-container input,
+  .edit-form-container button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .two-columns {
+    flex-direction: column;
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 8px;
   }
 }
