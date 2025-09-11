@@ -110,32 +110,9 @@
   background-color: #aaa;
 }
 
-
 .edit-form-container button[type="button"] {
   background-color: #aaa;
 }
-
-
-
-
-/* === Dagväljare === */
-
-
-.day-button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  background-color: #eee;
-  color: #333;
-  cursor: pointer;
-}
-.day-button.selected {
-  background-color: #316c6f;
-  color: white;
-  border-color: #316c6f;
-  box-shadow: 0 0 4px rgba(49, 108, 111, 0.6);
-  transition: box-shadow 0.2s ease;
-}
-
 
 /* === Overlay och modal === */
 .form-overlay {
@@ -213,7 +190,6 @@
   box-sizing: border-box;
 }
 
-
 .button-row {
   display: flex;
   gap: 16px;
@@ -240,7 +216,6 @@
   background-color: #aaa;
 }
 
-
 .button-row button {
   display: block;
   width: 100%;
@@ -255,27 +230,24 @@
   box-sizing: border-box;
 }
 
-
 .time-button {
   padding: 4px 10px;
   font-size: 0.85rem;
   white-space: nowrap;
 }
 
-
 .time-button:hover {
   background-color: #d0e0e0;
 }
 
-
 .day-selector,
 .time-selector {
   display: flex;
-  flex-wrap: nowrap;       /* 🔄 ändra från wrap till nowrap */
+  flex-wrap: nowrap; /* 🔄 ändra från wrap till nowrap */
   gap: 8px;
-  overflow-x: auto;        /* 🔄 tillåter scroll om det blir trångt */
-  margin-bottom: 12px;     /* behåll eller justera efter behov */
-  padding-bottom: 4px;     /* valfritt för lite luft under raden */
+  overflow-x: auto; /* 🔄 tillåter scroll om det blir trångt */
+  margin-bottom: 12px; /* behåll eller justera efter behov */
+  padding-bottom: 4px; /* valfritt för lite luft under raden */
 }
 
 .time-list {
@@ -311,7 +283,26 @@
   transform: scale(1.1);
 }
 
+/* === Dagväljare === */
 
+/* Ej vald dag – ljusgrå */
+.day-button {
+  padding: 6px 12px;
+  border: 1px solid #eee;
+  background-color: #eee;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Vald dag – stark grön */
+.day-button.selected {
+  background-color: #28a745; /* Bootstrap-grön */
+  color: white;
+  border-color: #28a745;
+  font-weight: bold;
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
 
 /* === Mobilanpassning === */
 @media (max-width: 600px) {
@@ -325,14 +316,16 @@
     gap: 0.5rem;
   }
 
-  .reminder-actions {
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 12px;
+  @media (max-width: 600px) {
+    .reminder-actions {
+      width: 100%;
+      justify-content: flex-end;
+      margin-top: auto; /* trycker ner ikonerna till botten */
+    }
   }
 
   .reminder-actions svg {
-    font-size: 1.5rem;
+    font-size: 1rem;
   }
 
   .edit-form-container {

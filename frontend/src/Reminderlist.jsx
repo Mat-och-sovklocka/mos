@@ -6,16 +6,12 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 const ReminderList = () => {
   const [data, setData] = useState(reminderData);
   const [expandedNoteId, setExpandedNoteId] = useState(null);
-  const cardRefs = useRef([]);
   const [editingId, setEditingId] = useState(null);
-  const onceReminders = data.filter((r) => r.type === "once");
-  const recurringReminders = data.filter((r) => r.type === "recurring");
-  const currentReminder = data.find((r) => r.id === editingId);
-
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedTimes, setSelectedTimes] = useState([]);
-  const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
+  const cardRefs = useRef([]);
 
+  const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
   const categoryClassMap = {
     Måltid: "meal-card",
     Medicin: "medication-card",
@@ -25,145 +21,147 @@ const ReminderList = () => {
     Dusch: "shower-card",
     Möte: "meeting-card",
   };
+
+  const onceReminders = data.filter((r) => r.type === "once");
+  const recurringReminders = data.filter((r) => r.type === "recurring");
+  const currentReminder = data.find((r) => r.id === editingId);
+
+  // 🛠 Central “skicka till backend”-trigger
   useEffect(() => {
-    const rem = data.find((r) => r.id === editingId);
-    if (rem?.type === "recurring") {
-      const fullToShort = {
-        Måndag: "Mån",
-        Tisdag: "Tis",
-        Onsdag: "Ons",
-        Torsdag: "Tor",
-        Fredag: "Fre",
-        Lördag: "Lör",
-        Söndag: "Sön",
-      };
-      const mapped = (rem.days || [])
-        .map((full) => fullToShort[full])
-        .filter(Boolean);
-      setSelectedDays(mapped);
-      setSelectedTimes(rem.times || []);
-    } else {
-      setSelectedDays([]);
-      setSelectedTimes([]);
+    if (data !== reminderData) {
+      alert(
+        "Skickar uppdaterad lista till backend:\n\n" +
+          JSON.stringify(data, null, 2)
+      );
     }
-  }, [editingId]);
-
-  const heights = cardRefs.current.map((ref) => ref?.offsetHeight || 0);
-  const maxHeight = Math.max(...heights);
-  cardRefs.current.forEach((ref) => {
-    if (ref) ref.style.height = `${maxHeight}px`;
-  });
-
-  const isMobile = window.innerWidth < 600;
-
-  if (!isMobile) {
-    const heights = cardRefs.current.map((ref) => ref?.offsetHeight || 0);
-    const maxHeight = Math.max(...heights);
-    cardRefs.current.forEach((ref) => {
-      if (ref) ref.style.height = `${maxHeight}px`;
-    });
-  } else {
-    // Återställ höjd på mobil
-    cardRefs.current.forEach((ref) => {
-      if (ref) ref.style.height = "auto";
-    });
-  }
-
-  const updateTime = (index, newTime) => {
-    setSelectedTimes((prev) => {
-      const updated = [...prev];
-      updated[index] = newTime;
-      return updated;
-    });
-  };
-
-  const removeTime = (index) => {
-    setSelectedTimes((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const addTime = () => {
-    setSelectedTimes((prev) => [...prev, ""]);
-  };
-
-  const getCategoryClass = (category) => categoryClassMap[category] || "";
-
-  // Dynamisk höjdsynkning
-  useEffect(() => {
-    if (cardRefs.current.length === 0) return;
-
-    const heights = cardRefs.current.map((ref) => ref?.offsetHeight || 0);
-    const maxHeight = Math.max(...heights);
-
-    cardRefs.current.forEach((ref) => {
-      if (ref) ref.style.height = `${maxHeight}px`;
-    });
   }, [data]);
 
-  const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("sv-SE");
+  // Mappa fullständiga dag-namn → korta när man öppnar edit för recurring
+  useEffect(() => {
+    if (!currentReminder || currentReminder.type !== "recurring") {
+      setSelectedDays([]);
+      setSelectedTimes([]);
+      return;
+    }
 
-  const toggleDay = (day) => {
-    setSelectedDays(
-      (prev) =>
-        prev.includes(day)
-          ? prev.filter((d) => d !== day) // avmarkera
-          : [...prev, day] // markera ny
-    );
-  };
+    const fullToShort = {
+      Måndag: "Mån",
+      Tisdag: "Tis",
+      Onsdag: "Ons",
+      Torsdag: "Tor",
+      Fredag: "Fre",
+      Lördag: "Lör",
+      Söndag: "Sön",
+    };
 
-  const formatTime = (dateStr) =>
-    new Date(dateStr).toLocaleTimeString("sv-SE", {
+    // Gör om till array om det är en sträng
+    const daysArray = Array.isArray(currentReminder.days)
+      ? currentReminder.days
+      : currentReminder.days.split(",").map((d) => d.trim());
+
+    setSelectedDays(daysArray.map((full) => fullToShort[full]).filter(Boolean));
+
+    setSelectedTimes(currentReminder.times || []);
+  }, [editingId]);
+
+  // Synka höjder på kort
+  useEffect(() => {
+    if (cardRefs.current.length === 0) return;
+    const heights = cardRefs.current.map((r) => r?.offsetHeight || 0);
+    const maxHeight = Math.max(...heights);
+    cardRefs.current.forEach((r) => {
+      if (r) r.style.height = `${maxHeight}px`;
+    });
+  }, [data, window.innerWidth]);
+
+  // Hjälpfunktioner
+  const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
+  const formatTime = (iso) =>
+    new Date(iso).toLocaleTimeString("sv-SE", {
       hour: "2-digit",
       minute: "2-digit",
     });
+  const toggleNote = (id) =>
+    setExpandedNoteId((prev) => (prev === id ? null : id));
+  const toggleDay = (day) =>
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  const updateTime = (idx, val) =>
+    setSelectedTimes((prev) => {
+      const arr = [...prev];
+      arr[idx] = val;
+      return arr;
+    });
+  const removeTime = (idx) =>
+    setSelectedTimes((prev) => prev.filter((_, i) => i !== idx));
+  const addTime = () => setSelectedTimes((prev) => [...prev, ""]);
 
-  const toggleNote = (id) => {
-    setExpandedNoteId(expandedNoteId === id ? null : id);
+  // Handlers
+  const handleDeleteOnce = (id) => {
+    const rem = data.find((r) => r.id === id);
+    if (
+      window.confirm(
+        `Ta bort enstaka påminnelse?\n\nKategori: ${
+          rem.category
+        }\nDatum: ${formatDate(rem.dateTime)}\nTid: ${formatTime(
+          rem.dateTime
+        )}\n${rem.note || ""}`
+      )
+    ) {
+      setData((prev) => prev.filter((r) => r.id !== id));
+    }
   };
 
-  const handleDeleteClick = (reminder) => {
-    const confirmText = `
-Vill du ta bort denna påminnelse?
-
-Kategori: ${reminder.category}
-${
-  reminder.type === "once"
-    ? `Datum: ${formatDate(reminder.dateTime)}\nTid: ${formatTime(
-        reminder.dateTime
-      )}`
-    : `Dagar: ${reminder.days?.join(", ")}\nTider: ${reminder.times?.join(
-        ", "
-      )}`
-}
-${reminder.note ? `Notering: ${reminder.note}` : ""}
-`;
-
-    if (window.confirm(confirmText)) {
-      const updatedData = data.filter((r) => r.id !== reminder.id);
-      setData(updatedData);
-
-      console.log("Skickar till backend:", {
-        deletedReminderId: reminder.id,
-        updatedReminders: updatedData,
-      });
+  const handleDeleteRecurring = (id) => {
+    const rem = data.find((r) => r.id === id);
+    if (
+      window.confirm(
+        `Ta bort återkommande påminnelse?\n\nKategori: ${
+          rem.category
+        }\nDagar: ${rem.days.join(", ")}\nTider: ${rem.times.join(", ")}\n${
+          rem.note || ""
+        }`
+      )
+    ) {
+      setData((prev) => prev.filter((r) => r.id !== id));
     }
   };
 
   const handleEditSubmit = (e, id) => {
     e.preventDefault();
     const form = e.target;
-
     const updatedReminder = {
       id,
+      type: "once",
+      category: currentReminder.category,
       dateTime: `${form.date.value}T${form.time.value}`,
       note: form.note.value,
-      category: onceReminders.find((r) => r.id === id)?.category || "Okänd",
     };
+    setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
+    setEditingId(null);
+  };
 
-    const updatedReminders = onceReminders.map((r) =>
-      r.id === id ? updatedReminder : r
-    );
-
-    setOnceReminders(updatedReminders);
+  const handleRecurringSubmit = (e, id) => {
+    e.preventDefault();
+    const shortToFull = {
+      Mån: "Måndag",
+      Tis: "Tisdag",
+      Ons: "Onsdag",
+      Tor: "Torsdag",
+      Fre: "Fredag",
+      Lör: "Lördag",
+      Sön: "Söndag",
+    };
+    const updatedReminder = {
+      id,
+      type: "recurring",
+      category: currentReminder.category,
+      days: selectedDays.map((s) => shortToFull[s]),
+      times: selectedTimes.filter((t) => t),
+      note: e.target.note.value,
+    };
+    setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
     setEditingId(null);
   };
 
@@ -171,120 +169,101 @@ ${reminder.note ? `Notering: ${reminder.note}` : ""}
     <div className="reminder-page">
       <h1 className="reminder-title">Påminnelselista</h1>
 
+      {/* Enstaka */}
       <section className="reminder-section">
         <h2>Enstaka påminnelser</h2>
-        {onceReminders.map((reminder, index) => (
+        {onceReminders.map((rem, i) => (
           <div
-            key={reminder.id}
-            ref={(el) => (cardRefs.current[index] = el)}
-            className={`reminder-card ${getCategoryClass(reminder.category)}`}
+            key={rem.id}
+            ref={(el) => (cardRefs.current[i] = el)}
+            className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
-            {/* Rad 1: Rubrik */}
             <div className="reminder-header">
-              <h3>{reminder.category}</h3>
+              <h3>{rem.category}</h3>
             </div>
-
-            {/* Rad 2: Info + Ikoner */}
             <div className="reminder-body">
               <div className="reminder-info">
                 <p>
-                  <strong>Datum:</strong> {formatDate(reminder.dateTime)}
+                  <strong>Datum:</strong> {formatDate(rem.dateTime)}
                 </p>
                 <p>
-                  <strong>Tid:</strong> {formatTime(reminder.dateTime)}
+                  <strong>Tid:</strong> {formatTime(rem.dateTime)}
                 </p>
-                {reminder.note && (
+                {rem.note && (
                   <p>
                     <strong>Notering:</strong>{" "}
-                    {expandedNoteId === reminder.id || reminder.note.length < 80
-                      ? reminder.note
-                      : `${reminder.note.slice(0, 80)}... `}
-                    {reminder.note.length >= 80 && (
+                    {expandedNoteId === rem.id || rem.note.length < 80
+                      ? rem.note
+                      : rem.note.slice(0, 80) + "... "}
+                    {rem.note.length >= 80 && (
                       <span
                         className="toggle-note"
-                        onClick={() => toggleNote(reminder.id)}
+                        onClick={() => toggleNote(rem.id)}
                       >
-                        {expandedNoteId === reminder.id
-                          ? "Visa mindre"
-                          : "Visa mer"}
+                        {expandedNoteId === rem.id ? "Visa mindre" : "Visa mer"}
                       </span>
                     )}
                   </p>
                 )}
               </div>
               <div className="reminder-actions">
-                <FaEdit onClick={() => setEditingId(reminder.id)} />
-                <FaTrash onClick={() => handleDeleteClick(reminder)} />
+                <FaEdit onClick={() => setEditingId(rem.id)} />
+                <FaTrash onClick={() => handleDeleteOnce(rem.id)} />
               </div>
             </div>
           </div>
         ))}
       </section>
 
+      {/* Återkommande */}
       <section className="reminder-section">
         <h2>Återkommande påminnelser</h2>
-        {recurringReminders.map((reminder, index) => (
+        {recurringReminders.map((rem, i) => (
           <div
-            key={reminder.id}
-            ref={(el) => (cardRefs.current[onceReminders.length + index] = el)}
-            className={`reminder-card ${getCategoryClass(reminder.category)}`}
+            key={rem.id}
+            ref={(el) => (cardRefs.current[onceReminders.length + i] = el)}
+            className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
-            {/* Rad 1: Rubrik */}
             <div className="reminder-header">
-              <h3>{reminder.category}</h3>
+              <h3>{rem.category}</h3>
             </div>
-
-            {/* Rad 2: Info + Ikoner */}
             <div className="reminder-body">
               <div className="reminder-info">
                 <p>
-                  <strong>Dagar:</strong> {reminder.days?.join(", ") || "–"}
+                  <strong>Dagar:</strong> {rem.days.join(", ")}
                 </p>
                 <p>
-                  <strong>Tider:</strong> {reminder.times?.join(", ") || "–"}
+                  <strong>Tider:</strong> {rem.times.join(", ")}
                 </p>
-                {reminder.note && (
+                {rem.note && (
                   <p>
-                    <strong>Notering:</strong>{" "}
-                    {expandedNoteId === reminder.id || reminder.note.length < 80
-                      ? reminder.note
-                      : `${reminder.note.slice(0, 80)}... `}
-                    {reminder.note.length >= 80 && (
-                      <span
-                        className="toggle-note"
-                        onClick={() => toggleNote(reminder.id)}
-                      >
-                        {expandedNoteId === reminder.id
-                          ? "Visa mindre"
-                          : "Visa mer"}
-                      </span>
-                    )}
+                    <strong>Notering:</strong> {rem.note}
                   </p>
                 )}
               </div>
               <div className="reminder-actions">
-                <FaEdit onClick={() => setEditingId(reminder.id)} />
-                <FaTrash onClick={() => handleDeleteClick(reminder)} />
+                <FaEdit onClick={() => setEditingId(rem.id)} />
+                <FaTrash onClick={() => handleDeleteRecurring(rem.id)} />
               </div>
             </div>
           </div>
         ))}
       </section>
 
-      {/* 🔒 Global overlay + formulär */}
+      {/* Overlay + formulär för enstaka */}
       {currentReminder?.type === "once" && (
         <>
           <div className="form-overlay" onClick={() => setEditingId(null)} />
           <div className="edit-form-container fixed-form">
-            <form onSubmit={(e) => handleEditSubmit(e, editingId)}>
-              {/* Datum och Tid */}
+            <form onSubmit={(e) => handleEditSubmit(e, currentReminder.id)}>
+              {/* Datum + Tid */}
               <div className="form-row two-columns">
                 <div className="form-group">
                   <label htmlFor="date">Datum:</label>
                   <input
-                    type="date"
                     id="date"
                     name="date"
+                    type="date"
                     defaultValue={currentReminder.dateTime.slice(0, 10)}
                     required
                   />
@@ -292,28 +271,25 @@ ${reminder.note ? `Notering: ${reminder.note}` : ""}
                 <div className="form-group">
                   <label htmlFor="time">Tid:</label>
                   <input
-                    type="time"
                     id="time"
                     name="time"
+                    type="time"
                     defaultValue={currentReminder.dateTime.slice(11, 16)}
                     required
                   />
                 </div>
               </div>
-
               {/* Notering */}
               <div className="form-row">
                 <label htmlFor="note">Notering:</label>
                 <input
-                  type="text"
                   id="note"
                   name="note"
+                  type="text"
                   defaultValue={currentReminder.note}
                   placeholder="Redigera notering"
                 />
               </div>
-
-              {/* Knappar */}
               <div className="button-row">
                 <button type="submit">Spara</button>
                 <button type="button" onClick={() => setEditingId(null)}>
@@ -325,11 +301,14 @@ ${reminder.note ? `Notering: ${reminder.note}` : ""}
         </>
       )}
 
+      {/* Overlay + formulär för återkommande */}
       {currentReminder?.type === "recurring" && (
         <>
           <div className="form-overlay" onClick={() => setEditingId(null)} />
           <div className="edit-form-container fixed-form">
-            <form onSubmit={(e) => handleRecurringSubmit(e, editingId)}>
+            <form
+              onSubmit={(e) => handleRecurringSubmit(e, currentReminder.id)}
+            >
               {/* Dagar */}
               <div className="form-row">
                 <label>Dagar:</label>
@@ -343,52 +322,51 @@ ${reminder.note ? `Notering: ${reminder.note}` : ""}
                       }`}
                       onClick={() => toggleDay(day)}
                     >
-                      {selectedDays.includes(day) ? "✓ " : ""}
                       {day}
                     </button>
                   ))}
                 </div>
               </div>
-
               {/* Tider */}
-              <div className="time-list">
-                {selectedTimes.map((time, index) => (
-                  <div key={index} className="time-entry">
-                    <input
-                      type="time"
-                      value={time}
-                      onChange={(e) => updateTime(index, e.target.value)}
-                    />
-                    <div className="icon-wrapper">
+              <div className="form-row">
+                <label>Tider:</label>
+                <div className="time-list">
+                  {selectedTimes.map((time, idx) => (
+                    <div key={idx} className="time-entry">
+                      <input
+                        type="time"
+                        value={time}
+                        onChange={(e) => updateTime(idx, e.target.value)}
+                      />
                       <button
                         type="button"
-                        onClick={() => removeTime(index)}
+                        onClick={() => removeTime(idx)}
                         title="Ta bort tid"
                       >
-                        🗑
+                        <FaTrash />
                       </button>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                  <button
+                    type="button"
+                    className="add-time-button"
+                    onClick={addTime}
+                  >
+                    + Lägg till tid
+                  </button>
+                </div>
               </div>
-
-              <button type="button" onClick={addTime}>
-                + Lägg till tid
-              </button>
-
               {/* Notering */}
               <div className="form-row">
                 <label htmlFor="note">Notering:</label>
                 <input
-                  type="text"
                   id="note"
                   name="note"
+                  type="text"
                   defaultValue={currentReminder.note}
                   placeholder="Redigera notering"
                 />
               </div>
-
-              {/* Knappar */}
               <div className="button-row">
                 <button type="submit">OK</button>
                 <button type="button" onClick={() => setEditingId(null)}>
