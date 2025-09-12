@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
 dist
 dist-ssr
@@ -16,6 +17,9 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .idea
+*.iws
+*.iml
+*.ipr
 .DS_Store
 *.suo
 *.ntvs*
@@ -23,29 +27,68 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore keep files everywhere
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Spring Boot
+*.jar
+*.war
+*.ear
+*.class
+application-*.properties
+application-*.yml
+application-*.yaml
+!application.properties
+!application.yml
+!application.yaml
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database/
+db_data/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# IDE
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Session summaries and temporary documentation
+SESSION_SUMMARY.md
+*_SUMMARY.md
+
+# Keep files
 .gitkeep
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?

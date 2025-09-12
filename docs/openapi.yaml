@@ -101,44 +101,88 @@ paths:
                   type: object
         "204":
           description: No Content
-components:
-  schemas:
-    CreateReminderRequest:
+
+  /api/users/{userId}/meal-requirements:
+    get:
+      tags:
+      - meal-requirement-controller
+      operationId: getMealRequirements
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealRequirementsResponse"
+    post:
+      tags:
+      - meal-requirement-controller
+      summary: Set meal requirements
+      description: Set meal requirements for a user. Replaces all existing requirements.
+      operationId: setMealRequirements
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealRequirementsRequest"
+        required: true
+      responses:
+        "201":
+          description: Meal requirements set successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealRequirementsResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+
+
+    MealRequirementsRequest:
+      type: object
       required:
-      - category
-      - time
+        - requirements
+      properties:
+        requirements:
+          type: array
+          items:
+            type: string
+          example: ["Laktosfri", "Diabetesanpassad"]
+    MealRequirementsResponse:
       type: object
       properties:
-        time:
-          type: string
-          format: date-time
-        category:
-          type: string
-          enum:
-          - MEDICATION
-          - MEAL
-          - OTHER
-        note:
-          maxLength: 280
-          minLength: 0
-          type: string
-    ReminderDto:
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealRequirementDto'
+    MealRequirementDto:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        time:
-          type: string
-          format: date-time
-        category:
-          type: string
-          enum:
-          - MEDICATION
-          - MEAL
-          - OTHER
-        note:
+        requirement:
           type: string
         createdAt:
           type: string
           format: date-time
+
