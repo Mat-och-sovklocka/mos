@@ -101,6 +101,7 @@ paths:
                   type: object
         "204":
           description: No Content
+
   /api/users/{userId}/meal-requirements:
     get:
       tags:
@@ -154,47 +155,8 @@ paths:
                 type: object
                 additionalProperties:
                   type: object
-components:
-  schemas:
-    CreateReminderRequest:
-      required:
-      - category
-      - time
-      type: object
-      properties:
-        time:
-          type: string
-          format: date-time
-        category:
-          type: string
-          enum:
-          - MEDICATION
-          - MEAL
-          - OTHER
-        note:
-          maxLength: 280
-          minLength: 0
-          type: string
-    ReminderDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        time:
-          type: string
-          format: date-time
-        category:
-          type: string
-          enum:
-          - MEDICATION
-          - MEAL
-          - OTHER
-        note:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
+
+
     MealRequirementsRequest:
       type: object
       required:
@@ -223,3 +185,4 @@ components:
         createdAt:
           type: string
           format: date-time
+
