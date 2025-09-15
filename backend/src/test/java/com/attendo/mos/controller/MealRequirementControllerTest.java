@@ -1,7 +1,6 @@
 package com.attendo.mos.controller;
 
 import com.attendo.mos.dto.MealRequirementsRequest;
-import com.attendo.mos.dto.MealRequirementsResponse;
 import com.attendo.mos.entity.MealRequirement;
 import com.attendo.mos.entity.User;
 import com.attendo.mos.repo.MealRequirementRepository;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

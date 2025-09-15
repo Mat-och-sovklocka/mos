@@ -3,9 +3,6 @@ package com.attendo.mos.dto;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
 
 public record CreateReminderRequest(
         String type, // "once" | "recurring"
