@@ -9,7 +9,7 @@ const Home = () => {
 
     { className: "allergies", label: "Allergier och specialkost", link: "/form" },
     { className: "home", label: "Home" },
-    { className: "recepies", label: "Matförslag" },
+    { className: "recepies", label: "Matförslag", link: "/mealsuggestions" },
     {
       className: "reminders_handle",
       label: "Lägg påminnelser",
