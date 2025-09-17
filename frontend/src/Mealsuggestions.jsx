@@ -171,18 +171,37 @@ const Mealsuggestions = () => {
   const [favorites, setFavorites] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [showFavorites, setShowFavorites] = useState(false) // Favoriter visas inte direkt
+  const [showingFirstSet, setShowingFirstSet] = useState(true) // För att växla mellan första och andra uppsättningen recept
+  const [allSearchResults, setAllSearchResults] = useState([]) // Spara alla sökresultat
   
   const recipesPerPage = 5
   const totalPages = Math.ceil((showFavorites ? favorites : recipes).length / recipesPerPage)
   
-  // Hämta kostpreferenser
+  // BACKEND_INTEGRATION: Hämta användarens kostpreferenser från backend
+  // GET /api/users/preferences
+  // Response: Array<string>
   useEffect(() => {
+    // TODO: Ersätt denna mock med ett riktigt API-anrop
+    // fetch('/api/users/preferences')
+    //   .then(response => response.json())
+    //   .then(data => setDietaryPreferences(data))
+    //   .catch(error => console.error('Kunde inte hämta kostpreferenser:', error));
+
     const mockDietaryPreferences = ['Vegetarisk', 'Glutenfri', 'Laktosfri']
     setDietaryPreferences(mockDietaryPreferences)
   }, [])
 
-  // Mock-data för favoriter
+  // BACKEND_INTEGRATION: Hämta användarens sparade favoritrecept från backend
+  // GET /api/favorites
+  // Response: Array<Recipe>
   useEffect(() => {
+    // TODO: Ersätt denna mock med ett riktigt API-anrop
+    // fetch('/api/favorites')
+    //   .then(response => response.json())
+    //   .then(data => setFavorites(data))
+    //   .catch(error => console.error('Kunde inte hämta favoritrecept:', error));
+
+    // Mock-data som simulerar response från API
     const mockFavorites = [
       {
         id: 1,
@@ -251,7 +270,7 @@ const Mealsuggestions = () => {
       {
         id: 3,
         title: "Vegetarisk lasagne",
-        defaultServings: 6,
+        defaultServings: 2,
         cookingTime: "60 minuter",
         ingredients: [
           { item: "lasagneplattor", amount: 12, unit: "st" },
@@ -430,43 +449,328 @@ const Mealsuggestions = () => {
     setFavorites(mockFavorites);
   }, [])
 
-  // Hantera sökning efter recept
+  // BACKEND_INTEGRATION: Sök efter recept som matchar både söktermen och användarens kostpreferenser
+  // 1. SÖKNING AV RECEPT
+  // POST /api/recipes/search
+  // Request body: {
+  //   query: string,          // Användarens söktext, t.ex. "pasta"
+  //   preferences: string[],  // Array med kostpreferenser, t.ex. ["Vegetarisk", "Glutenfri"]
+  //   page?: number,         // Sidnummer för paginering (optional)
+  //   pageSize?: number      // Antal resultat per sida (optional)
+  // }
+  // Response: {
+  //   success: boolean,
+  //   data: {
+  //     recipes: Array<{
+  //       id: number,
+  //       title: string,
+  //       defaultServings: number,
+  //       cookingTime: string,
+  //       ingredients: Array<{
+  //         item: string,
+  //         amount: number,
+  //         unit: string
+  //       }>,
+  //       instructions: Array<string>,
+  //       tips?: string
+  //     }>,
+  //     totalResults: number,
+  //     currentPage: number,
+  //     totalPages: number
+  //   }
+  // }
+  //
+  // Exempel på API-anrop:
+  // fetch('/api/recipes/search', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({
+  //     query: searchQuery,
+  //     preferences: dietaryPreferences,
+  //     page: currentPage,
+  //     pageSize: recipesPerPage
+  //   })
+  // })
+  //   .then(response => response.json())
+  //   .then(data => {
+  //     if (data.success) {
+  //       setRecipes(data.data.recipes);
+  //       setTotalPages(data.data.totalPages);
+  //       setCurrentPage(data.data.currentPage);
+  //     } else {
+  //       console.error('Sökningen misslyckades:', data.error);
+  //       // Visa eventuellt ett felmeddelande för användaren
+  //     }
+  //   })
+  //   .catch(error => {
+  //     console.error('Fel vid sökning:', error);
+  //     // Visa eventuellt ett felmeddelande för användaren
+  //   });
+
   const handleSearch = () => {
     if (!searchQuery.trim()) return
+    
+    // Dölj favoriter och rensa sökfältet efter sökning
+    setShowFavorites(false)
+    setSearchQuery('')
 
-    // Mock-sökresultat
-    const mockSearchResult = [{
-      id: 100,
-      title: "Krämig pasta med kyckling och soltorkade tomater",
-      defaultServings: 2,
-      cookingTime: "30 minuter",
-      ingredients: [
-        { item: "pasta (penne eller fusilli)", amount: 400, unit: "g" },
-        { item: "kycklingfilé", amount: 600, unit: "g" },
-        { item: "soltorkade tomater", amount: 100, unit: "g" },
-        { item: "vitlöksklyftor", amount: 3, unit: "st" },
-        { item: "grädde", amount: 3, unit: "dl" },
-        { item: "crème fraiche", amount: 2, unit: "dl" },
-        { item: "riven parmesan", amount: 1, unit: "dl" },
-        { item: "färsk basilika", amount: 1, unit: "kruka" },
-        { item: "olivolja", amount: 2, unit: "msk" },
-        { item: "salt", amount: 1, unit: "tsk" },
-        { item: "svartpeppar", amount: 0.5, unit: "tsk" }
-      ],
-      instructions: [
-        "Koka upp saltat vatten i en stor kastrull och koka pastan enligt anvisningarna på förpackningen.",
-        "Skär kycklingen i jämna bitar, ca 2x2 cm. Krydda med salt och peppar.",
-        "Finhacka vitlöken och skär de soltorkade tomaterna i mindre bitar.",
-        "Värm olivolja i en stor stekpanna på medelhög värme. Stek kycklingen i 5-6 minuter tills den är genomstekt.",
-        "Tillsätt vitlök och soltorkade tomater, stek under omrörning i 2 minuter.",
-        "Häll i grädde och crème fraiche. Låt småkoka i 3-4 minuter.",
-        "Tillsätt riven parmesan och rör om tills den smält.",
-        "Blanda i den nykokta pastan och vänd runt så att såsen täcker all pasta.",
-        "Smaka av med salt och peppar.",
-        "Garnera med färsk basilika och servera direkt med extra parmesan vid sidan av."
-      ],
-      tips: "För en grönare variant kan du tillsätta färsk spenat eller blancherad broccoli i slutet."
-    }]
+    // TODO: Ersätt denna mock med riktigt API-anrop enligt ovan specifikation
+    // const searchData = {
+    //   query: searchQuery,
+    //   preferences: dietaryPreferences
+    // };
+    
+    // fetch('/api/recipes/search', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(searchData)
+    // })
+    //   .then(response => {
+    //     if (!response.ok) throw new Error('Sökningen misslyckades');
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     setRecipes(data);
+    //     setCurrentPage(1);
+    //     setShowFavorites(false);
+    //   })
+    //   .catch(error => console.error('Fel vid sökning:', error));
+
+    // TODO: Ersätt denna mock med ett riktigt API-anrop
+    // const searchParams = new URLSearchParams({
+    //   query: searchQuery,
+    //   preferences: dietaryPreferences.join(',')
+    // });
+    
+    // fetch(`/api/recipes/search?${searchParams}`)
+    //   .then(response => {
+    //     if (!response.ok) {
+    //       throw new Error('Sökningen misslyckades');
+    //     }
+    //     return response.json();
+    //   })
+    //   .then(data => {
+    //     setRecipes(data);
+    //     setCurrentPage(1);
+    //     setShowFavorites(false);
+    //   })
+    //   .catch(error => {
+    //     console.error('Fel vid sökning:', error);
+    //     // Här kan vi hantera fel, t.ex. visa ett felmeddelande för användaren
+    //   });
+
+    // Mock-data som simulerar response från API - Två uppsättningar av 5 recept
+    const allMockResults = [
+      {
+        id: 100,
+        title: "Krämig pasta med kyckling och soltorkade tomater",
+        defaultServings: 2,
+        cookingTime: "30 minuter",
+        ingredients: [
+          { item: "pasta (penne eller fusilli)", amount: 400, unit: "g" },
+          { item: "kycklingfilé", amount: 600, unit: "g" },
+          { item: "soltorkade tomater", amount: 100, unit: "g" },
+          { item: "vitlöksklyftor", amount: 3, unit: "st" },
+          { item: "grädde", amount: 3, unit: "dl" },
+          { item: "crème fraiche", amount: 2, unit: "dl" },
+          { item: "riven parmesan", amount: 1, unit: "dl" },
+          { item: "färsk basilika", amount: 1, unit: "kruka" },
+          { item: "olivolja", amount: 2, unit: "msk" }
+        ],
+        instructions: [
+          "Koka upp saltat vatten och koka pastan enligt anvisningarna.",
+          "Skär kycklingen i jämna bitar, krydda med salt och peppar.",
+          "Stek kycklingen tills den är genomstekt.",
+          "Tillsätt övriga ingredienser och låt småkoka.",
+          "Blanda med pastan och servera."
+        ],
+        tips: "Tillsätt gärna färsk spenat i slutet för extra färg och näring."
+      },
+      {
+        id: 101,
+        title: "Kyckling Tikka Masala",
+        defaultServings: 2,
+        cookingTime: "45 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 800, unit: "g" },
+          { item: "yoghurt", amount: 2, unit: "dl" },
+          { item: "garam masala", amount: 2, unit: "msk" },
+          { item: "krossade tomater", amount: 400, unit: "g" },
+          { item: "grädde", amount: 2, unit: "dl" }
+        ],
+        instructions: [
+          "Marinera kycklingen i yoghurt och kryddor.",
+          "Stek kycklingen tills den får färg.",
+          "Tillsätt tomater och grädde, låt småkoka.",
+          "Servera med ris och nanbröd."
+        ],
+        tips: "Dubbla gärna kryddmängden för extra smak."
+      },
+      {
+        id: 102,
+        title: "Asiatisk kycklingsoppa",
+        defaultServings: 2,
+        cookingTime: "35 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 500, unit: "g" },
+          { item: "risnudlar", amount: 200, unit: "g" },
+          { item: "ingefära", amount: 50, unit: "g" },
+          { item: "kokosmjölk", amount: 400, unit: "ml" }
+        ],
+        instructions: [
+          "Koka upp buljong med ingefära.",
+          "Tillsätt kyckling och låt sjuda.",
+          "Lägg i nudlar och kokosmjölk.",
+          "Servera med färska örter."
+        ],
+        tips: "Tillsätt chili för extra hetta."
+      },
+      {
+        id: 103,
+        title: "Kycklingwraps med avokado",
+        defaultServings: 2,
+        cookingTime: "25 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 600, unit: "g" },
+          { item: "tortillabröd", amount: 8, unit: "st" },
+          { item: "avokado", amount: 2, unit: "st" },
+          { item: "rödlök", amount: 1, unit: "st" }
+        ],
+        instructions: [
+          "Stek kycklingen med kryddor.",
+          "Mosa avokadon med lime och vitlök.",
+          "Fyll tortillabröden.",
+          "Servera direkt."
+        ],
+        tips: "Förbered guacamolen precis innan servering."
+      },
+      {
+        id: 104,
+        title: "Grillad citronkyckling",
+        defaultServings: 2,
+        cookingTime: "40 minuter",
+        ingredients: [
+          { item: "kycklinglårfilé", amount: 800, unit: "g" },
+          { item: "citron", amount: 2, unit: "st" },
+          { item: "vitlöksklyftor", amount: 4, unit: "st" },
+          { item: "rosmarin", amount: 2, unit: "kvistar" }
+        ],
+        instructions: [
+          "Marinera kycklingen i citron och örter.",
+          "Grilla eller stek tills genomstekt.",
+          "Låt vila några minuter.",
+          "Servera med pressad citron."
+        ],
+        tips: "Fungerar perfekt att förbereda dagen innan."
+      },
+      // Andra uppsättningen (visas när man klickar på "Fler förslag")
+      {
+        id: 105,
+        title: "Kyckling Teriyaki",
+        defaultServings: 2,
+        cookingTime: "30 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 600, unit: "g" },
+          { item: "teriyakisås", amount: 1, unit: "dl" },
+          { item: "ris", amount: 4, unit: "dl" },
+          { item: "broccoli", amount: 300, unit: "g" }
+        ],
+        instructions: [
+          "Koka riset enligt anvisningar.",
+          "Stek kycklingen i teriyakisås.",
+          "Ångkoka broccolin.",
+          "Servera allt tillsammans."
+        ],
+        tips: "Strö över sesamfrön före servering."
+      },
+      {
+        id: 106,
+        title: "Krämig kycklinggryta",
+        defaultServings: 2,
+        cookingTime: "45 minuter",
+        ingredients: [
+          { item: "kycklinglårfilé", amount: 700, unit: "g" },
+          { item: "champinjoner", amount: 250, unit: "g" },
+          { item: "grädde", amount: 3, unit: "dl" },
+          { item: "timjan", amount: 2, unit: "msk" }
+        ],
+        instructions: [
+          "Bryn kycklingen väl.",
+          "Tillsätt svamp och kryddor.",
+          "Häll i grädde och låt småkoka.",
+          "Servera med potatis."
+        ],
+        tips: "Rör ned lite senap i såsen för extra smak."
+      },
+      {
+        id: 107,
+        title: "BBQ Kyckling",
+        defaultServings: 2,
+        cookingTime: "35 minuter",
+        ingredients: [
+          { item: "kycklingvingar", amount: 1000, unit: "g" },
+          { item: "BBQ-sås", amount: 2, unit: "dl" },
+          { item: "vitlökspulver", amount: 1, unit: "msk" },
+          { item: "paprikapulver", amount: 1, unit: "msk" }
+        ],
+        instructions: [
+          "Krydda kycklingen ordentligt.",
+          "Grilla eller baka i ugn.",
+          "Pensla med BBQ-sås.",
+          "Servera med coleslaw."
+        ],
+        tips: "Marinera gärna över natten för bästa smak."
+      },
+      {
+        id: 108,
+        title: "Caesarsallad med kyckling",
+        defaultServings: 2,
+        cookingTime: "25 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 500, unit: "g" },
+          { item: "romansallad", amount: 2, unit: "st" },
+          { item: "krutonger", amount: 100, unit: "g" },
+          { item: "parmesanost", amount: 50, unit: "g" }
+        ],
+        instructions: [
+          "Grilla kycklingen och skär i skivor.",
+          "Blanda salladen.",
+          "Tillsätt dressing och krutonger.",
+          "Toppa med parmesan."
+        ],
+        tips: "Gör egen caesardressing för bästa resultat."
+      },
+      {
+        id: 109,
+        title: "Kycklingcurry",
+        defaultServings: 2,
+        cookingTime: "40 minuter",
+        ingredients: [
+          { item: "kycklingfilé", amount: 600, unit: "g" },
+          { item: "kokosmjölk", amount: 400, unit: "ml" },
+          { item: "currypasta", amount: 2, unit: "msk" },
+          { item: "bambuskott", amount: 200, unit: "g" }
+        ],
+        instructions: [
+          "Fräs currypastan.",
+          "Tillsätt kyckling och kokosmjölk.",
+          "Låt småkoka tills klart.",
+          "Servera med jasminris."
+        ],
+        tips: "Använd röd eller grön currypasta efter smak."
+      }
+    ];
+
+    // Återställ till första uppsättningen vid ny sökning
+    setShowingFirstSet(true);
+    
+    // Spara alla resultat och visa första fem
+    setAllSearchResults(allMockResults);
+    setRecipes(allMockResults.slice(0, 5));
     
     setRecipes(mockSearchResult)
     setCurrentPage(1)
@@ -493,15 +797,67 @@ const Mealsuggestions = () => {
     };
   }
 
-  // Hantera favoriter
+  // BACKEND_INTEGRATION: Hantera favoriter
+  // Två separata endpoints för att lägga till och ta bort favoriter:
+  //
+  // 1. LÄGG TILL FAVORIT
+  // POST /api/favorites/add
+  // Request body: { 
+  //   recipeId: number,
+  //   recipe: {
+  //     title: string,
+  //     defaultServings: number,
+  //     cookingTime: string,
+  //     ingredients: Array<{
+  //       item: string,
+  //       amount: number,
+  //       unit: string
+  //     }>,
+  //     instructions: Array<string>,
+  //     tips?: string
+  //   }
+  // }
+  // Response: 
+  // - Success: { success: true, message: "Favorit sparad" }
+  // - Error: { success: false, error: string }
+  //
+  // 2. TA BORT FAVORIT
+  // DELETE /api/favorites/{recipeId}
+  // Response:
+  // - Success: { success: true, message: "Favorit borttagen" }
+  // - Error: { success: false, error: string }
+  
   const handleToggleFavorite = (recipe) => {
     const isFavorite = favorites.some(fav => fav.id === recipe.id)
     
     if (isFavorite) {
-      // Ta bort från favoriter
+      // BACKEND_INTEGRATION: Ta bort från favoriter
+      // SKICKAR: Endast recept-ID i URL:en
+      // API: DELETE /api/favorites/{recipeId}
+      // Exempel: DELETE /api/favorites/123
+      //
+      // TODO: Implementera API-anrop för att ta bort favorit
+      // fetch(`/api/favorites/${recipe.id}`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   }
+      // })
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     if (data.success) {
+      //       // Uppdatera frontend state först efter lyckat API-anrop
+      //       setFavorites(prev => prev.filter(fav => fav.id !== recipe.id));
+      //     } else {
+      //       console.error('Kunde inte ta bort favorit:', data.error);
+      //     }
+      //   })
+      //   .catch(error => console.error('Fel vid borttagning av favorit:', error));
+
+      // Temporär implementation tills backend är klar
       setFavorites(prev => prev.filter(fav => fav.id !== recipe.id))
     } else {
-      // Konvertera ingredienser om de är i strängformat
+      // Förbereder receptet för att läggas till i favoriter
       const processedRecipe = {
         ...recipe,
         defaultServings: recipe.defaultServings || 2,
@@ -509,7 +865,70 @@ const Mealsuggestions = () => {
           typeof ingredient === 'string' ? parseIngredientString(ingredient) : ingredient
         )
       }
-      // Lägg till i favoriter
+
+      // BACKEND_INTEGRATION: Lägg till i favoriter
+      // SKICKAR: Helt receptobjekt med följande struktur:
+      // {
+      //   "recipeId": number,
+      //   "recipe": {
+      //     "title": string,
+      //     "defaultServings": number,
+      //     "cookingTime": string,
+      //     "ingredients": [
+      //       {
+      //         "item": string,
+      //         "amount": number,
+      //         "unit": string
+      //       }
+      //     ],
+      //     "instructions": string[],
+      //     "tips": string
+      //   }
+      // }
+      //
+      // API: POST /api/favorites/add
+      // TODO: Implementera API-anrop för att lägga till favorit
+      // fetch('/api/favorites/add', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     recipeId: recipe.id,
+      //     recipe: processedRecipe
+      //   })
+      // })
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     if (data.success) {
+      //       // Uppdatera frontend state först efter lyckat API-anrop
+      //       setFavorites(prev => [...prev, processedRecipe]);
+      //     } else {
+      //       console.error('Kunde inte lägga till favorit:', data.error);
+      //     }
+      //   })
+      //   .catch(error => console.error('Fel vid tillägg av favorit:', error));
+
+      // Temporär implementation tills backend är klar
+      setFavorites(prev => [...prev, processedRecipe])
+    }
+
+    if (isFavorite) {
+      // STEG 1: Ta bort från favoriter i frontend
+      setFavorites(prev => prev.filter(fav => fav.id !== recipe.id))
+    } else {
+      // STEG 1: Förbereder receptet för att läggas till i favoriter
+      // - Konvertera ingredienser från strängformat till objektformat om det behövs
+      // - Säkerställ att defaultServings finns
+      const processedRecipe = {
+        ...recipe,
+        defaultServings: recipe.defaultServings || 2,
+        ingredients: recipe.ingredients.map(ingredient => 
+          typeof ingredient === 'string' ? parseIngredientString(ingredient) : ingredient
+        )
+      }
+      
+      // STEG 2: Uppdatera frontend state med den nya favoriten
       setFavorites(prev => [...prev, processedRecipe])
     }
   }
@@ -590,6 +1009,22 @@ const Mealsuggestions = () => {
               />
             ))}
           </>
+        )}
+        
+        {/* Knapp för att växla mellan första och andra uppsättningen recept */}
+        {!showFavorites && recipes.length > 0 && allSearchResults.length > 5 && (
+          <button 
+            className="toggle-results-button green-button"
+            onClick={() => {
+              const startIndex = showingFirstSet ? 5 : 0;
+              const endIndex = showingFirstSet ? 10 : 5;
+              setRecipes(allSearchResults.slice(startIndex, endIndex));
+              setShowingFirstSet(!showingFirstSet);
+              setCurrentPage(1); // Återställ paginering vid växling
+            }}
+          >
+            {showingFirstSet ? "Fler förslag" : "Fem första"}
+          </button>
         )}
       </div>
 
