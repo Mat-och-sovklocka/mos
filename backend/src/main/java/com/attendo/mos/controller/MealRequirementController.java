@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users/{userId}/meal-requirements")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MealRequirementController {
     
     private final MealRequirementRepository mealRequirementRepository;
