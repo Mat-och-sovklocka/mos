@@ -30,6 +30,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users/{userId}/reminders")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ReminderController {
     private final ReminderService service;
     
