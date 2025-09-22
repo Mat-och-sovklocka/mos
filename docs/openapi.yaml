@@ -1,16 +1,133 @@
 openapi: 3.0.1
 info:
-  title: OpenAPI definition
-  version: v0
+  title: MOS (Meal and Reminder System) API
+  description: API for managing meal requirements, reminders, and user authentication
+  version: 1.0.0
+  contact:
+    name: MOS Development Team
+    email: dev@mos.example.com
 servers:
 - url: http://localhost:8080
-  description: Generated server url
+  description: Development server
+- url: https://api.mos.example.com
+  description: Production server
 paths:
+  # Authentication endpoints
+  /api/auth/login:
+    post:
+      tags:
+      - authentication
+      summary: User login
+      description: Authenticate a user and return a JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: "admin@mos.test"
+              password: "password123"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              example:
+                token: "eyJhbGciOiJIUzUxMiJ9..."
+                tokenType: "Bearer"
+                userId: "550e8400-e29b-41d4-a716-446655440001"
+                email: "admin@mos.test"
+                displayName: "System Administrator"
+                userType: "ADMIN"
+                expiresAt: "2025-09-23T09:20:54Z"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid email or password"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Validation failed"
+
+  /api/auth/me:
+    get:
+      tags:
+      - authentication
+      summary: Get current user information
+      description: Retrieve details of the authenticated user
+      operationId: getCurrentUser
+      security:
+      - bearerAuth: []
+      responses:
+        "200":
+          description: User information retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfoResponse"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440001"
+                email: "admin@mos.test"
+                displayName: "System Administrator"
+                userType: "ADMIN"
+                isActive: true
+                createdAt: "2025-09-22T09:13:56.743059+00"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/auth/logout:
+    post:
+      tags:
+      - authentication
+      summary: User logout
+      description: Logout the current user (client-side token invalidation)
+      operationId: logout
+      security:
+      - bearerAuth: []
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logout successful"
   /api/users/{userId}/reminders:
     get:
       tags:
-      - reminder-controller
-      operationId: get
+      - reminders
+      summary: Get user reminders
+      description: Retrieve all reminders for a specific user
+      operationId: getReminders
+      security:
+      - bearerAuth: []
       parameters:
       - name: userId
         in: path
@@ -18,6 +135,7 @@ paths:
         schema:
           type: string
           format: uuid
+        description: User ID
       responses:
         "400":
           description: Bad Request
@@ -37,10 +155,12 @@ paths:
                   $ref: "#/components/schemas/ReminderDto"
     post:
       tags:
-      - reminder-controller
+      - reminders
       summary: Create a reminder
       description: "Create a new reminder with time, category, and optional note."
-      operationId: create
+      operationId: createReminder
+      security:
+      - bearerAuth: []
       parameters:
       - name: userId
         in: path
@@ -48,6 +168,7 @@ paths:
         schema:
           type: string
           format: uuid
+        description: User ID
       requestBody:
         content:
           application/json:
@@ -75,8 +196,12 @@ paths:
   /api/users/{userId}/reminders/{reminderId}:
     delete:
       tags:
-      - reminder-controller
-      operationId: delete
+      - reminders
+      summary: Delete a reminder
+      description: Delete a specific reminder by ID
+      operationId: deleteReminder
+      security:
+      - bearerAuth: []
       parameters:
       - name: userId
         in: path
@@ -84,12 +209,14 @@ paths:
         schema:
           type: string
           format: uuid
+        description: User ID
       - name: reminderId
         in: path
         required: true
         schema:
           type: string
           format: uuid
+        description: Reminder ID
       responses:
         "400":
           description: Bad Request
@@ -105,8 +232,12 @@ paths:
   /api/users/{userId}/meal-requirements:
     get:
       tags:
-      - meal-requirement-controller
+      - meal-requirements
+      summary: Get user meal requirements
+      description: Retrieve all meal requirements for a specific user
       operationId: getMealRequirements
+      security:
+      - bearerAuth: []
       parameters:
       - name: userId
         in: path
@@ -114,6 +245,7 @@ paths:
         schema:
           type: string
           format: uuid
+        description: User ID
       responses:
         "200":
           description: OK
@@ -123,10 +255,12 @@ paths:
                 $ref: "#/components/schemas/MealRequirementsResponse"
     post:
       tags:
-      - meal-requirement-controller
+      - meal-requirements
       summary: Set meal requirements
       description: Set meal requirements for a user. Replaces all existing requirements.
       operationId: setMealRequirements
+      security:
+      - bearerAuth: []
       parameters:
       - name: userId
         in: path
@@ -134,6 +268,7 @@ paths:
         schema:
           type: string
           format: uuid
+        description: User ID
       requestBody:
         content:
           application/json:
@@ -156,7 +291,163 @@ paths:
                 additionalProperties:
                   type: object
 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /api/auth/login
 
+  schemas:
+    # Authentication schemas
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "admin@mos.test"
+        password:
+          type: string
+          format: password
+          description: User password
+          example: "password123"
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzUxMiJ9..."
+        tokenType:
+          type: string
+          description: Token type
+          example: "Bearer"
+        userId:
+          type: string
+          format: uuid
+          description: User ID
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        email:
+          type: string
+          format: email
+          description: User email
+          example: "admin@mos.test"
+        displayName:
+          type: string
+          description: User display name
+          example: "System Administrator"
+        userType:
+          type: string
+          enum: [ADMIN, CAREGIVER, RESIDENT]
+          description: User role
+          example: "ADMIN"
+        expiresAt:
+          type: string
+          format: date-time
+          description: Token expiration time
+          example: "2025-09-23T09:20:54Z"
+
+    UserInfoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        email:
+          type: string
+          format: email
+          description: User email
+          example: "admin@mos.test"
+        displayName:
+          type: string
+          description: User display name
+          example: "System Administrator"
+        userType:
+          type: string
+          enum: [ADMIN, CAREGIVER, RESIDENT]
+          description: User role
+          example: "ADMIN"
+        isActive:
+          type: boolean
+          description: Whether user account is active
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2025-09-22T09:13:56.743059+00"
+
+    # User management schemas
+    UserType:
+      type: string
+      enum: [ADMIN, CAREGIVER, RESIDENT]
+      description: User role types
+
+    # Reminder schemas
+    CreateReminderRequest:
+      type: object
+      required:
+        - type
+        - category
+        - dateTime
+      properties:
+        type:
+          type: string
+          description: Reminder type
+          example: "måltider"
+        category:
+          type: string
+          enum: [MEDICATION, MEAL]
+          description: Reminder category
+          example: "MEAL"
+        dateTime:
+          type: string
+          format: date-time
+          description: Reminder date and time
+          example: "2025-09-22T12:00:00Z"
+        note:
+          type: string
+          description: Optional note
+          example: "Lunch reminder"
+
+    ReminderDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Reminder ID
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        time:
+          type: string
+          format: date-time
+          description: Reminder time
+          example: "2025-09-22T12:00:00Z"
+        category:
+          type: string
+          enum: [MEDICATION, MEAL]
+          description: Reminder category
+          example: "MEAL"
+        note:
+          type: string
+          description: Reminder note
+          example: "Lunch reminder"
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2025-09-22T09:13:56.743059+00"
+
+    # Meal requirement schemas
     MealRequirementsRequest:
       type: object
       required:
