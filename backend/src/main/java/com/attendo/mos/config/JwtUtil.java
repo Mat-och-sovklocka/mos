@@ -43,27 +43,30 @@ public class JwtUtil {
 
     public UUID getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
         
         return UUID.fromString(claims.getSubject());
     }
 
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
         
         return claims.get("email", String.class);
     }
 
     public UserType getUserTypeFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
         
         String userTypeStr = claims.get("userType", String.class);
         return UserType.valueOf(userTypeStr);
@@ -72,8 +75,9 @@ public class JwtUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token);
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -82,9 +86,10 @@ public class JwtUtil {
 
     public OffsetDateTime getExpirationFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
         
         return OffsetDateTime.ofInstant(claims.getExpiration().toInstant(), ZoneOffset.UTC);
     }
