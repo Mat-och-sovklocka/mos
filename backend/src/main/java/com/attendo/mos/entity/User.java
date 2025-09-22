@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.*;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -35,13 +34,6 @@ public class User {
     
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
-    
-    @ManyToOne
-    @JoinColumn(name = "assigned_caregiver_id")
-    private User assignedCaregiver;
-    
-    @OneToMany(mappedBy = "assignedCaregiver")
-    private List<User> assignedResidents;
     
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
