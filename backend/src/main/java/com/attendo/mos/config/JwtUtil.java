@@ -3,6 +3,7 @@ package com.attendo.mos.config;
 import com.attendo.mos.dto.UserType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -89,6 +90,7 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+
         
         return OffsetDateTime.ofInstant(claims.getExpiration().toInstant(), ZoneOffset.UTC);
     }

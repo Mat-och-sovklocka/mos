@@ -6,7 +6,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 // config/SecurityDevConfig.java - dev config
 
-
 // DISABLED - Using JwtSecurityConfig instead
 //@Configuration
 //@Profile("dev")
