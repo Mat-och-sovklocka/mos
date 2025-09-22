@@ -36,6 +36,13 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
     
+    @ManyToOne
+    @JoinColumn(name = "assigned_caregiver_id")
+    private User assignedCaregiver;
+    
+    @OneToMany(mappedBy = "assignedCaregiver")
+    private List<User> assignedResidents;
+    
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
 }
