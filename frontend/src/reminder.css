@@ -849,5 +849,25 @@ body,
 
 .ok-button:disabled:hover {
   background-color: #cccccc;
->>>>>>> f8eb024 (Små ändringar som gör att beteendet blir samma för enstaka och återkommnade påminnelser när man klickar på avbryt)
+}
+
+.home-icon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  cursor: pointer;
+  color: #316c6f;
+  transition: color 0.3s ease;
+  z-index: 1000;  /* Säkerställ att ikonen visas ovanpå annat innehåll */
+}
+
+.home-icon:hover {
+  color: #254d4f;
+  transform: scale(1.1);  /* Lägg till en liten hover-effekt */
+}
+
+/* Justera container för att ge plats för ikonen */
+.reminders-container {
+    position: relative;
+    padding-top: 20px;
 }
