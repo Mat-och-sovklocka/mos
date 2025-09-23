@@ -792,9 +792,62 @@ body,
     flex-direction: column;
   }
 
+<<<<<<< HEAD
   .confirmation-column {
     margin-left: 0 !important;
     left: 0 !important;
     position: static !important;
   }
+=======
+.confirmation-buttons .ok-button:hover {
+    background-color: #218838;
+}
+
+.confirmation-buttons .cancel-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.confirmation-buttons .cancel-button:hover {
+    background-color: #c82333;
+}
+
+.reminder-form .day-button {
+    padding: 8px 12px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: #eee;
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.reminder-form .day-button:hover {
+    border-color: #007bff;
+    background-color: #eee;
+    color: #333;
+}
+
+.reminder-form .day-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.reminder-form .day-button.active:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.ok-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.ok-button:disabled:hover {
+  background-color: #cccccc;
+>>>>>>> f8eb024 (Små ändringar som gör att beteendet blir samma för enstaka och återkommnade påminnelser när man klickar på avbryt)
 }
