@@ -8,6 +8,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
+  width: 100%;
 }
 
 .reminder-card:hover {
@@ -199,6 +200,7 @@
 .form-group label {
   margin-bottom: 4px;
   font-weight: 500;
+  text-align: left; 
 }
 
 .button-row button {
@@ -346,4 +348,30 @@
     flex-direction: column;
     gap: 8px;
   }
+}
+
+@media (max-width: 768px) {
+    .reminder-section {
+        max-width: 98%;  /* Increased from 95% to 98% */
+        padding: 0 5px;  /* Reduced padding to use more screen space */
+    }
+
+    .reminder-card {
+        padding: 1rem;
+        font-size: 1rem;
+        margin-bottom: 1.2rem;
+    }
+}
+
+/* Lägg till överst i filen */
+.reminder-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.reminder-section {
+    max-width: 70%;  /* Increased from 50% to 70% */
+    margin: 0 auto;
+    padding: 0 15px;
 }

@@ -20,8 +20,8 @@ const Home = () => {
   ];
 
   return (
-    <div className="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center">
-      <h1 className="display-4 text-center mb-5 app-title fw-bold">
+    <div className="container-fluid min-vh-100 d-flex flex-column justify-content-start align-items-center pt-5">
+      <h1 className="display-4 text-center mb-5 app-title fw-bold mt-4">
         Mat och sov appen
       </h1>
 

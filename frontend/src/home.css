@@ -47,6 +47,7 @@
   color: #316e70; /* din gröna färg */
   font-weight: 800; /* ännu fetare än standard */
   text-shadow: 1px 1px 2px #326c6f;
+  margin-top: -100px;  /* Justera detta värde för att få önskad position */
 }
 
 
