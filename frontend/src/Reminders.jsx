@@ -181,6 +181,10 @@ function Reminders() {
     setCustomReminderText("");
     setReminderNote("");
     setSelectedDateTime(null);
+    setRecurringNote("");
+    setSelectedDays([]);
+    setReminderTimes([""]);
+    setErrorMessage("");
   };
 
   function läggTillTid() {
@@ -365,6 +369,7 @@ function Reminders() {
                       <button
                         type="button"
                         className="ok-button"
+                        disabled={selectedDays.length === 0 || reminderTimes.length === 0 || !reminderTimes[0]}
                         onClick={() => {
                           handleRecurringReminderConfirm();
                           resetRecurringForm();
@@ -375,10 +380,7 @@ function Reminders() {
                       <button
                         type="button"
                         className="cancel-button"
-                        onClick={() => {
-                          setReminderType(null);
-                          resetRecurringForm();
-                        }}
+                        onClick={handleCancelReminder}
                       >
                         Avbryt
                       </button>
@@ -388,12 +390,14 @@ function Reminders() {
 
                 {/* Sammanfattning */}
                 <div className="note-column">
-                  <label>Sammanfattning:</label>
-                  <div className="confirmation-summary">
-                    {confirmationSummary.split("\n").map((line, index) => (
-                      <p key={index}>{line}</p>
-                    ))}
-                  </div>
+                  <h3 className="confirmation-title">Sammanfattning</h3>
+                  {selectedDays.length > 0 && reminderTimes.length > 0 && (
+                    <div className="confirmation-summary">
+                      {confirmationSummary.split("\n").map((line, index) => (
+                        <p key={index}>{line}</p>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
