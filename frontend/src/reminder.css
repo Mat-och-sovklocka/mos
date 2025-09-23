@@ -773,83 +773,28 @@ body,
     font-size: 1rem;
     font-weight: 500;
     text-align: center;
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .custom-reminder-block input {
+    width: 260px; /* Matcha knappbredd */
+    max-width: 100%;
+    padding: 10px;
+    border: 2px solid #316c6f;
+    border-radius: 6px;
+    font-size: 16px;
+  }
 }
 
-/* Specifika färger för knapparna */
-.confirmation-buttons .ok-button {
-    background-color: #28a745;
-    color: white;
-}
+@media (max-width: 768px) {
+  .picker-layout {
+    flex-direction: column;
+  }
 
-.confirmation-buttons .ok-button:hover {
-    background-color: #218838;
-}
-
-.confirmation-buttons .cancel-button {
-    background-color: #dc3545;
-    color: white;
-}
-
-.confirmation-buttons .cancel-button:hover {
-    background-color: #c82333;
-}
-
-.reminder-form .day-button {
-    padding: 8px 12px;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    background-color: #eee;
-    color: #333;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 13px;
-    transition: all 0.2s ease;
-}
-
-.reminder-form .day-button:hover {
-    border-color: #007bff;
-    background-color: #eee;
-    color: #333;
-}
-
-.reminder-form .day-button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.reminder-form .day-button.active:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-.ok-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.ok-button:disabled:hover {
-  background-color: #cccccc;
-}
-
-.home-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-  color: #316c6f;
-  transition: color 0.3s ease;
-  z-index: 1000;  /* Säkerställ att ikonen visas ovanpå annat innehåll */
-}
-
-.home-icon:hover {
-  color: #254d4f;
-  transform: scale(1.1);  /* Lägg till en liten hover-effekt */
-}
-
-/* Justera container för att ge plats för ikonen */
-.reminders-container {
-    position: relative;
-    padding-top: 20px;
+  .confirmation-column {
+    margin-left: 0 !important;
+    left: 0 !important;
+    position: static !important;
+  }
 }
