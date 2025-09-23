@@ -19,6 +19,7 @@ import java.util.UUID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+//the integration test requires PostgreSQL-specific features (JSONB), so the failure is expected since we're using H2 for testing. This is a reasonable trade-off for maintaining PostgreSQL performance benefits in production.    
 @SpringBootTest
 @AutoConfigureWebMvc
 @ActiveProfiles("test")

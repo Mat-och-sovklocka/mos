@@ -1,5 +1,6 @@
 package com.attendo.mos.entity;
 
+import com.attendo.mos.dto.UserType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,4 +26,15 @@ public class User {
     private String passwordHash;
     @Column(nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+    
+    // User management fields
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false, length = 20)
+    private UserType userType = UserType.RESIDENT;
+    
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+    
+    @Column(name = "last_login_at")
+    private OffsetDateTime lastLoginAt;
 }
