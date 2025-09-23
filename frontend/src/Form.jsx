@@ -125,7 +125,7 @@ const Form = () => {
 
   return (
     <div>
-      <h1 className="display-4 text-center mb-3 app-title fw-bold">
+      <h1 className="reminder-title">
         Allergier och specialkost
       </h1>
 

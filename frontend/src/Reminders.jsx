@@ -4,6 +4,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
+import { useNavigate, Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
 
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
@@ -13,10 +16,12 @@ import img5 from "./images/img5.png";
 import img6 from "./images/img6.png";
 import img7 from "./images/img7.png";
 import img8 from "./images/img8.png";
+import homeIcon from "./images/home.png";
 
 registerLocale("sv", sv);
 
 function Reminders() {
+  const navigate = useNavigate();
   const images = [
     { src: img1, alt: "img1" },
     { src: img2, alt: "img2" },
@@ -477,6 +482,18 @@ function Reminders() {
             )}
           </div>
         )}
+      </div>
+
+      <div className="row mt-5">
+        <div className="col-12 d-flex justify-content-center">
+          <Link to="/">
+            <img
+              src={homeIcon}
+              alt="Tillbaka till startsidan"
+              style={{ width: "80px", cursor: "pointer" }}
+            />
+          </Link>
+        </div>
       </div>
     </div>
   );
