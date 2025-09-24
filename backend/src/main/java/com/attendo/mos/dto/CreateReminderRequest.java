@@ -1,12 +1,13 @@
 package com.attendo.mos.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-
 public record CreateReminderRequest(
-        String type, // "once" | "recurring"
-        String category, // e.g. "Meals"
+        @NotBlank(message = "Type is required") String type, // "once" | "recurring"
+        @NotBlank(message = "Category is required") String category, // e.g. "måltider", "medicin", "medication", "meal"
         OffsetDateTime dateTime, // present when type=once
         List<String> days, // ["Ons","Tor"] when type=recurring
         List<String> times, // ["11:11"] when type=recurring

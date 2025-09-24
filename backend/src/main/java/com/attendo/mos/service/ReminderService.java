@@ -21,10 +21,16 @@ public class ReminderService {
   private final ReminderRepository reminders;
   private final UserRepository users;
   private static final Map<String, Category> CATEGORY_MAP = Map.of(
+      // Swedish
       "måltider", Category.MEAL,
-      "maltdier", Category.MEAL, // sloppy fallback if accents drop
+      "maltdier", Category.MEAL, // fallback if accents drop
       "medicin", Category.MEDICATION,
-      "medication", Category.MEDICATION);
+      // English
+      "meal", Category.MEAL,
+      "meals", Category.MEAL,
+      "medication", Category.MEDICATION,
+      "medicine", Category.MEDICATION,
+      "other", Category.OTHER);
       
   private Category mapCategory(String raw) {
     if (raw == null)
