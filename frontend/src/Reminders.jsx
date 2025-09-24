@@ -5,8 +5,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
 import { useNavigate, Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
 
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
@@ -61,19 +59,18 @@ function Reminders() {
     const summary = [];
 
     if (selectedDays.length > 0) {
-      summary.push(`Valda dagar: ${selectedDays.join(", ")}`);
+        summary.push(`Valda dagar: ${selectedDays.join(", ")}`);
     }
 
-    if (reminderTimes.length > 0) {
-      summary.push(`Tider: ${reminderTimes.join(", ")}`);
+    if (reminderTimes.length > 0 && reminderTimes[0] !== "") {
+        summary.push(`Tider: ${reminderTimes.join(", ")}`);
     }
 
-    if (customReminderText.trim() !== "") {
-      summary.push(`Notering: ${customReminderText}`);
-    }
+    // Uppdatera noteringen direkt, även om den är tom
+    summary.push(`Notering: "${recurringNote}"`);
 
     setConfirmationSummary(summary.join("\n"));
-  }, [selectedDays, reminderTimes, customReminderText]);
+  }, [selectedDays, reminderTimes, recurringNote]);  // Se till att recurringNote är med i dependencies
 
   useEffect(() => {
     setReminderType(null);
@@ -89,27 +86,102 @@ function Reminders() {
     setRecurringNote("");
   };
 
-  const handleRecurringReminderConfirm = () => {
-    const reminderPayload = {
-      type: reminderType,
-      category:
-        labels[selectedIndex] === "Övrigt" && customReminderText
-          ? customReminderText
-          : labels[selectedIndex],
-      days: selectedDays,
-      times: reminderTimes,
-      note: recurringNote,
+  // För enstaka påminnelser
+  const handleConfirmReminder = async () => {
+    const payload = {
+        type: "once",
+        category: labels[selectedIndex] === "Övrigt" && customReminderText
+            ? customReminderText
+            : labels[selectedIndex],
+        dateTime: selectedDateTime.toISOString(),
+        days: [],
+        times: [],
+        note: reminderNote.trim() || null
     };
 
-    alert("Påminnelse skapad:\n\n" + JSON.stringify(reminderPayload, null, 2));
+    // Add debug logs
+    console.log('Endpoint:', 'http://192.168.0.214:3000/api/users/550e8400-e29b-41d4-a716-446655440001/reminders');
+    console.log('Payload being sent:', payload);
 
-    // Senare: skicka till backend
-    // fetch("/api/reminders", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(reminderPayload),
-    // });
-  };
+    try {
+        const userId = "550e8400-e29b-41d4-a716-446655440001";
+        const response = await fetch(`http://192.168.0.214:3000/api/users/${userId}/reminders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)  // Remove userId from payload since it's in the URL
+        });
+
+        if (!response.ok) {
+            console.log('Response status:', response.status);
+            console.log('Response status text:', response.statusText);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Success response:', data);
+        alert("Påminnelse har skapats!");
+
+        // Reset form after successful creation
+        setSelectedIndex(null);
+        setReminderType(null);
+        setSelectedDateTime(null);
+        setReminderNote("");
+        setCustomReminderText("");
+        setErrorMessage("");
+    } catch (error) {
+        console.error('Detailed error:', error);
+        alert("Ett fel uppstod när påminnelsen skulle skapas.");
+    }
+};
+
+  // För återkommande påminnelser
+  const handleRecurringReminderConfirm = async () => {
+    const payload = {
+        type: "recurring",
+        category: labels[selectedIndex] === "Övrigt" && customReminderText
+            ? customReminderText
+            : labels[selectedIndex],
+        dateTime: null,  // Null för återkommande
+        days: selectedDays,
+        times: reminderTimes.filter(time => time !== ""),  // Filtrera bort tomma tider
+        note: recurringNote.trim() || null
+    };
+
+    try {
+        const userId = "550e8400-e29b-41d4-a716-446655440001"; // Lägg till userId
+        const response = await fetch(`http://192.168.0.214:3000/api/users/${userId}/reminders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)  // Remove userId from payload since it's in the URL
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Påminnelse skapad:', data);
+        alert("Påminnelse har skapats!");
+
+        // Återställ formuläret
+        setSelectedIndex(null);
+        setReminderType(null);
+        setCustomReminderText("");
+        setErrorMessage("");
+        setRecurringNote("");
+        setSelectedDays([]);
+        setReminderTimes([""]);
+        setConfirmationSummary("");
+    } catch (error) {
+        console.error('Error:', error);
+        alert("Ett fel uppstod när påminnelsen skulle skapas.");
+    }
+};
 
   const toggleDay = (day) => {
     setSelectedDays((prev) =>
@@ -154,31 +226,6 @@ function Reminders() {
     setReminderType(type);
   };
 
-  const handleConfirmReminder = () => {
-    console.log("handleConfirmReminder körs");
-    const payload = {
-      type: reminderType,
-      category:
-        labels[selectedIndex] === "Övrigt" && customReminderText
-          ? customReminderText
-          : labels[selectedIndex],
-      dateTime: selectedDateTime.toISOString(),
-      note: reminderNote.trim() || null,
-    };
-
-    // Här kan du skicka payload till backend om du vill
-    // t.ex. axios.post("/api/reminders", payload)
-    // Visa payload i en alert för debugging
-    alert(JSON.stringify(payload, null, 2));
-
-    // Återställ allt efter bekräftelse
-    setSelectedIndex(null);
-    setReminderType(null);
-    setSelectedDateTime(null);
-    setReminderNote("");
-    setCustomReminderText("");
-    setErrorMessage("");
-  };
 
   const handleCancelReminder = () => {
     setSelectedIndex(null);
@@ -396,13 +443,11 @@ function Reminders() {
                 {/* Sammanfattning */}
                 <div className="note-column">
                   <h3 className="confirmation-title">Sammanfattning</h3>
-                  {selectedDays.length > 0 && reminderTimes.length > 0 && (
-                    <div className="confirmation-summary">
+                  <div className="confirmation-summary">
                       {confirmationSummary.split("\n").map((line, index) => (
-                        <p key={index}>{line}</p>
+                          <p key={index}>{line}</p>
                       ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             )}

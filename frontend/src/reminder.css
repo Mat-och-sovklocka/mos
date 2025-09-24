@@ -846,27 +846,39 @@ body,
   opacity: 0.7;
 }
 
-.ok-button:disabled:hover {
-  background-color: #cccccc;
+/* Ta bort style för .home-icon och .home-icon:hover eftersom de inte används längre */
+
+/* Remove previous .row.mt-5 styles and replace with these */
+.row.mt-5 {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 3rem;
+    background: none;
 }
 
-.home-icon {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  cursor: pointer;
-  color: #316c6f;
-  transition: color 0.3s ease;
-  z-index: 1000;  /* Säkerställ att ikonen visas ovanpå annat innehåll */
+.row.mt-5 .col-12 {
+    display: flex;
+    justify-content: center;
+    background: none;
 }
 
-.home-icon:hover {
-  color: #254d4f;
-  transform: scale(1.1);  /* Lägg till en liten hover-effekt */
+.row.mt-5 a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
 }
 
-/* Justera container för att ge plats för ikonen */
-.reminders-container {
-    position: relative;
-    padding-top: 20px;
+.row.mt-5 img {
+    width: 80px;
+    cursor: pointer;
+    background: none;
+    transform-origin: center;
+}
+
+.row.mt-5 img:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
 }
