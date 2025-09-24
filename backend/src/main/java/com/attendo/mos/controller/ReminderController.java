@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -53,10 +54,22 @@ public class ReminderController {
     })
 
     @PostMapping
-    public ResponseEntity<ReminderDto> create(@PathVariable UUID userId,
+    public ResponseEntity<?> create(@PathVariable UUID userId,
             @RequestBody @Valid CreateReminderRequest req) {
-        var dto = service.addReminder(userId, req);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        try {
+            var dto = service.addReminder(userId, req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "Bad Request",
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "error", "Internal Server Error",
+                "message", "Failed to create reminder"
+            ));
+        }
     }
     @GetMapping
     public List<ReminderResponse> get(@PathVariable UUID userId) {
