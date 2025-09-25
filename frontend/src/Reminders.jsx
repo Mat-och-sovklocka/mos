@@ -42,6 +42,17 @@ function Reminders() {
     "Övrigt",
   ];
 
+  const categoryMapping = {
+    Måltider: "MEAL",
+    Medicinintag: "MEDICATION",
+    "Rörelse/Pauser": "EXERCISE",
+    "Vila/Sömn": "REST",
+    Möte: "MEETING",
+    Dusch: "SHOWER",
+    Städning: "CLEANING",
+    Övrigt: "OTHER",
+  };
+
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [reminderType, setReminderType] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
@@ -52,25 +63,25 @@ function Reminders() {
   const [reminderTimes, setReminderTimes] = useState([""]);
   const [confirmationSummary, setConfirmationSummary] = useState("");
   const [recurringNote, setRecurringNote] = useState("");
-  const summaryNote = reminderType === "recurring" ? recurringNote : customReminderText;
-
+  const summaryNote =
+    reminderType === "recurring" ? recurringNote : customReminderText;
 
   useEffect(() => {
     const summary = [];
 
     if (selectedDays.length > 0) {
-        summary.push(`Valda dagar: ${selectedDays.join(", ")}`);
+      summary.push(`Valda dagar: ${selectedDays.join(", ")}`);
     }
 
     if (reminderTimes.length > 0 && reminderTimes[0] !== "") {
-        summary.push(`Tider: ${reminderTimes.join(", ")}`);
+      summary.push(`Tider: ${reminderTimes.join(", ")}`);
     }
 
     // Uppdatera noteringen direkt, även om den är tom
     summary.push(`Notering: "${recurringNote}"`);
 
     setConfirmationSummary(summary.join("\n"));
-  }, [selectedDays, reminderTimes, recurringNote]);  // Se till att recurringNote är med i dependencies
+  }, [selectedDays, reminderTimes, recurringNote]); // Se till att recurringNote är med i dependencies
 
   useEffect(() => {
     setReminderType(null);
@@ -89,99 +100,121 @@ function Reminders() {
   // För enstaka påminnelser
   const handleConfirmReminder = async () => {
     const payload = {
-        type: "once",
-        category: labels[selectedIndex] === "Övrigt" && customReminderText
-            ? customReminderText
-            : labels[selectedIndex],
-        dateTime: selectedDateTime.toISOString(),
-        days: [],
-        times: [],
-        note: reminderNote.trim() || null
+      type: "once",
+      category:
+        labels[selectedIndex] === "Övrigt" && customReminderText
+          ? "OTHER"
+          : categoryMapping[labels[selectedIndex]],
+      dateTime: selectedDateTime.toISOString(),
+      days: [],
+      times: [],
+      note: reminderNote.trim() || null,
     };
 
     // Add debug logs
-    console.log('Endpoint:', 'http://192.168.0.214:3000/api/users/550e8400-e29b-41d4-a716-446655440001/reminders');
-    console.log('Payload being sent:', payload);
+    console.log(
+      "Endpoint:",
+      "http://192.168.0.214:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders"
+    );
+    console.log("Payload being sent:", payload);
 
     try {
-        const userId = "550e8400-e29b-41d4-a716-446655440001";
-        const response = await fetch(`http://192.168.0.214:3000/api/users/${userId}/reminders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)  // Remove userId from payload since it's in the URL
+      // Get token or login first
+      let token = localStorage.getItem("token");
+      if (!token) {
+        token = await login();
+      }
+
+      const userId = "550e8400-e29b-41d4-a716-446655440004"; // Uppdaterat till korrekt användar-ID
+      const response = await fetch(`/api/users/${userId}/reminders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        // Add this block to see the actual error message from the server
+        const errorText = await response.text();
+        console.log("Server error details:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorMessage: errorText,
         });
+        throw new Error(`Server error: ${errorText}`);
+      }
 
-        if (!response.ok) {
-            console.log('Response status:', response.status);
-            console.log('Response status text:', response.statusText);
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      const data = await response.json();
+      console.log("Success response:", data);
+      alert("Påminnelse har skapats!");
 
-        const data = await response.json();
-        console.log('Success response:', data);
-        alert("Påminnelse har skapats!");
-
-        // Reset form after successful creation
-        setSelectedIndex(null);
-        setReminderType(null);
-        setSelectedDateTime(null);
-        setReminderNote("");
-        setCustomReminderText("");
-        setErrorMessage("");
+      // Reset form after successful creation
+      setSelectedIndex(null);
+      setReminderType(null);
+      setSelectedDateTime(null);
+      setReminderNote("");
+      setCustomReminderText("");
+      setErrorMessage("");
     } catch (error) {
-        console.error('Detailed error:', error);
-        alert("Ett fel uppstod när påminnelsen skulle skapas.");
+      console.error("Detailed error:", error);
+      alert(`Ett fel uppstod: ${error.message}`);
     }
-};
+  };
 
   // För återkommande påminnelser
   const handleRecurringReminderConfirm = async () => {
     const payload = {
-        type: "recurring",
-        category: labels[selectedIndex] === "Övrigt" && customReminderText
-            ? customReminderText
-            : labels[selectedIndex],
-        dateTime: null,  // Null för återkommande
-        days: selectedDays,
-        times: reminderTimes.filter(time => time !== ""),  // Filtrera bort tomma tider
-        note: recurringNote.trim() || null
+      type: "recurring",
+      category:
+        labels[selectedIndex] === "Övrigt" && customReminderText
+          ? "OTHER"
+          : categoryMapping[labels[selectedIndex]],
+      dateTime: null, // Null för återkommande
+      days: selectedDays,
+      times: reminderTimes.filter((time) => time !== ""), // Filtrera bort tomma tider
+      note: recurringNote.trim() || null,
     };
 
     try {
-        const userId = "550e8400-e29b-41d4-a716-446655440001"; // Lägg till userId
-        const response = await fetch(`http://192.168.0.214:3000/api/users/${userId}/reminders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)  // Remove userId from payload since it's in the URL
-        });
+      let token = localStorage.getItem("token");
+      if (!token) {
+        token = await login();
+      }
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      const userId = "550e8400-e29b-41d4-a716-446655440004"; // Uppdaterat till korrekt användar-ID
+      const response = await fetch(`/api/users/${userId}/reminders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-        const data = await response.json();
-        console.log('Påminnelse skapad:', data);
-        alert("Påminnelse har skapats!");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-        // Återställ formuläret
-        setSelectedIndex(null);
-        setReminderType(null);
-        setCustomReminderText("");
-        setErrorMessage("");
-        setRecurringNote("");
-        setSelectedDays([]);
-        setReminderTimes([""]);
-        setConfirmationSummary("");
+      const data = await response.json();
+      console.log("Påminnelse skapad:", data);
+      alert("Påminnelse har skapats!");
+
+      // Återställ formuläret
+      setSelectedIndex(null);
+      setReminderType(null);
+      setCustomReminderText("");
+      setErrorMessage("");
+      setRecurringNote("");
+      setSelectedDays([]);
+      setReminderTimes([""]);
+      setConfirmationSummary("");
     } catch (error) {
-        console.error('Error:', error);
-        alert("Ett fel uppstod när påminnelsen skulle skapas.");
+      console.error("Error:", error);
+      alert("Ett fel uppstod när påminnelsen skulle skapas.");
     }
-};
+  };
 
   const toggleDay = (day) => {
     setSelectedDays((prev) =>
@@ -225,7 +258,6 @@ function Reminders() {
     setErrorMessage("");
     setReminderType(type);
   };
-
 
   const handleCancelReminder = () => {
     setSelectedIndex(null);
@@ -285,9 +317,39 @@ function Reminders() {
     setErrorMessage("");
   }
 
+  async function login() {
+    try {
+        const loginData = {
+            email: "resident1@mos.test",
+            password: "password123"
+        };
+
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Login failed: ${errorText}`);
+        }
+
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        return data.token;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
+    }
+  }
+
   return (
     <div className="reminders-container">
-      <h1 className="reminder-title">Lägg till påminnelser</h1>
+      <h1 className="reminder-title">Lägg till påminnelserna</h1>
       <div className="image-grid">
         <div className="row row-spacing">
           {images.map((image, index) => {
@@ -421,7 +483,11 @@ function Reminders() {
                       <button
                         type="button"
                         className="ok-button"
-                        disabled={selectedDays.length === 0 || reminderTimes.length === 0 || !reminderTimes[0]}
+                        disabled={
+                          selectedDays.length === 0 ||
+                          reminderTimes.length === 0 ||
+                          !reminderTimes[0]
+                        }
                         onClick={() => {
                           handleRecurringReminderConfirm();
                           resetRecurringForm();
@@ -444,9 +510,9 @@ function Reminders() {
                 <div className="note-column">
                   <h3 className="confirmation-title">Sammanfattning</h3>
                   <div className="confirmation-summary">
-                      {confirmationSummary.split("\n").map((line, index) => (
-                          <p key={index}>{line}</p>
-                      ))}
+                    {confirmationSummary.split("\n").map((line, index) => (
+                      <p key={index}>{line}</p>
+                    ))}
                   </div>
                 </div>
               </div>
