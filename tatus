@@ -1,0 +1,64 @@
+[33m7bf93ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32melizaisgettinungry[m[33m)[m fixat reaktivitet vid påminnelselistan
+[33me185944[m det fungerar att skapa nya påminnelser som skickas till backend
+[33m5ad0062[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/elizaisgettinungry[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m små ändringar i gränssnittet och ett försök att kommunicera med backe… (#47)
+[33m17839cf[m Meal suggestions favourites (#46)
+[33mebac216[m Moresmallfixes (#45)
+[33m4c172a3[m mindre inkompletta ändringar
+[33mc127c7c[m Små ändringar som gör att beteendet blir samma för enstaka och återkommnade påminnelser när man klickar på avbryt
+[33m34097ec[m ändrigar i layouten rörande främst reaktiviteten rörande påminnelser
+[33m77f7d41[m mindre inkompletta ändringar
+[33m735aba8[m Små ändringar som gör att beteendet blir samma för enstaka och återkommnade påminnelser när man klickar på avbryt
+[33m8116945[m ändrigar i layouten rörande främst reaktiviteten rörande påminnelser
+[33mf4ad0ba[m Moresmallfixes (#44)
+[33m869373d[m Moresmallfixes (#43)
+[33m3b9ae3b[m Moresmallfixes (#42)
+[33mf83e137[m Moresmallfixes (#41)
+[33m51ad21b[m Moresmallfixes (#40)
+[33m68fc5e8[m Fixes to pom.xml to configure the Maven clean plugin (#39)
+[33m208e02a[m Meal suggestions favourites (#38)
+[33meeb2912[m Add dev profile to JwtAuthenticationFilter and JwtUtil; implement uni… (#37)
+[33m7339b70[m Users (#36)
+[33me975db7[m Users (#34)
+[33md5cf459[m Users (#33)
+[33m7795071[m Users (#32)
+[33md8c91d9[m Ecs 70 meal suggestions (#31)
+[33m3ed3909[m Ecs 70 meal suggestions (#30)
+[33mbe73a52[m Fixes to pom.xml to configure the Maven clean plugin (#29)
+[33m82aedfc[m mindre fix mest för dokumentation (#28)
+[33m4470863[m Mealsuggestions (#27)
+[33m314699d[m Ecs 73 be fetching meal suggestions api (#26)
+[33ma3efe7c[m Reminder list (#25)
+[33me4cb9e4[m Ecs 61 add meal req (#24)
+[33m260fd69[m Ecs 61 add meal req (#23)
+[33m9568e8a[m Bump vite from 7.1.2 to 7.1.5 in /frontend in the npm_and_yarn group across 1 directory (#22)
+[33m108e898[m Ecs 75 change endpoint for adding reminders (#21)
+[33m2ba91ef[m Reminder notes (#20)
+[33m8b7e9fb[m Flyway (#19)
+[33mb7d6620[m Ecs 29 user can create a reminder backend (#18)
+[33m749db46[m Other rem (#17)
+[33mb712af1[m Other rem (#16)
+[33m292231c[m Ecs 29 user can create a reminder backend (#15)
+[33mea352b8[m Ecs 29 user can create a reminder with time and category medication or meal  (#14)
+[33m56472e3[m fixed jsx bugs
+[33me367d32[m Re-added link to form component
+[33m36b9efa[m Structuring (#13)
+[33m9ab9228[m Startsida (#12)
+[33me9ca68e[m Form (#11)
+[33m86295e4[m Reminders (#10)
+[33m43c34a9[m Merging staging into main, we don't need them separate anymore (#9)
+[33m7ec3c20[m Dockerfiles (#7)
+[33m1430846[m Dockerfiles (#6)
+[33mba44978[m Dockerfiles (#5)
+[33m4fa50d4[m Docker compose (#4)
+[33m9bebd94[m Basic config with bootstrap (#3)
+[33mbe500c5[m Update .gitignore
+[33mde7b13c[m Update README.md
+[33mb3300cc[m Update README.md
+[33m507028f[m Update README.md
+[33m106442e[m Update README.md
+[33m0804a1d[m Update README.md
+[33m4982656[m chore: add .gitkeep files to preserve folder structure
+[33m79829f1[m basic configuration with Boostrap (#1)
+[33m1324863[m chore: add base repo structure with frontend/backend/docs folders (#2)
+[33m894c33a[m updated README with repository structure diagram
+[33m7c7e868[m Create README.md

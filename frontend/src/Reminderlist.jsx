@@ -3,6 +3,35 @@ import reminderData from "./reminder-data.json";
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+// First, add login function outside component
+async function login() {
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: "resident1@mos.test",
+        password: "password123",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Login failed: ${errorText}`);
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.userId);
+    return data.token;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+}
+
 const ReminderList = () => {
   const [data, setData] = useState(reminderData);
   const [expandedNoteId, setExpandedNoteId] = useState(null);
@@ -13,13 +42,13 @@ const ReminderList = () => {
 
   const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
   const categoryClassMap = {
-    Måltid: "meal-card",
-    Medicin: "medication-card",
-    Träning: "exercise-card",
-    Sömn: "sleep-card",
-    Städning: "cleaning-card",
-    Dusch: "shower-card",
-    Möte: "meeting-card",
+    MEAL: "meal-card",
+    MEDICATION: "medication-card",
+    EXERCISE: "exercise-card",
+    REST: "sleep-card",
+    CLEANING: "cleaning-card",
+    SHOWER: "shower-card",
+    MEETING: "meeting-card",
   };
 
   const onceReminders = data.filter((r) => r.type === "once");
@@ -73,6 +102,41 @@ const ReminderList = () => {
       if (r) r.style.height = `${maxHeight}px`;
     });
   }, [data, window.innerWidth]);
+
+  // Hämtar påminnelser från backend
+  useEffect(() => {
+    const fetchReminders = async () => {
+      try {
+        let token = localStorage.getItem("token");
+        if (!token) {
+          token = await login();
+        }
+
+        const userId = "550e8400-e29b-41d4-a716-446655440004";
+        console.log("Fetching reminders for user:", userId);
+
+        const response = await fetch(`/api/users/${userId}/reminders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${errorText}`);
+        }
+
+        const reminders = await response.json();
+        console.log("Fetched reminders:", reminders);
+        setData(reminders);
+      } catch (error) {
+        console.error("Error fetching reminders:", error);
+      }
+    };
+
+    fetchReminders();
+  }, []);
 
   // Hjälpfunktioner
   const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
