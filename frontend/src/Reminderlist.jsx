@@ -1,10 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
-import reminderData from "./reminder-data.json";
+// import reminderData from "./reminder-data.json"; // Kommenterad mock-data
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+// Alltid samma admin-login
+async function login() {
+  try {
+    const loginData = {
+      email: "resident1@mos.test",
+      password: "password123",
+    };
+
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Login failed: ${errorText}`);
+    }
+
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.userId);
+    return data.token;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+}
+
+// Byt till resident-userId
+const RESIDENT_USER_ID = "550e8400-e29b-41d4-a716-446655440004";
+
 const ReminderList = () => {
-  const [data, setData] = useState(reminderData);
+  // const [data, setData] = useState(reminderData); // Kommenterad mock-initiering
+  const [data, setData] = useState([]); // Starta med tom array istället
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
@@ -13,13 +48,23 @@ const ReminderList = () => {
 
   const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
   const categoryClassMap = {
-    Måltid: "meal-card",
-    Medicin: "medication-card",
-    Träning: "exercise-card",
-    Sömn: "sleep-card",
-    Städning: "cleaning-card",
-    Dusch: "shower-card",
-    Möte: "meeting-card",
+    MEAL: "meal-card",
+    MEDICATION: "medication-card",
+    EXERCISE: "exercise-card",
+    REST: "sleep-card",
+    CLEANING: "cleaning-card",
+    SHOWER: "shower-card",
+    MEETING: "meeting-card",
+  };
+  const categoryToLabel = {
+    MEAL: "Måltider",
+    MEDICATION: "Medicinintag",
+    EXERCISE: "Rörelse/Pauser",
+    REST: "Vila/Sömn",
+    MEETING: "Möte",
+    SHOWER: "Dusch",
+    CLEANING: "Städning",
+    OTHER: "Övrigt",
   };
 
   const onceReminders = data.filter((r) => r.type === "once");
@@ -28,12 +73,12 @@ const ReminderList = () => {
 
   // 🛠 Central “skicka till backend”-trigger
   useEffect(() => {
-    if (data !== reminderData) {
-      alert(
-        "Skickar uppdaterad lista till backend:\n\n" +
-          JSON.stringify(data, null, 2)
-      );
-    }
+    // if (data !== reminderData) {
+    //   alert(
+    //     "Skickar uppdaterad lista till backend:\n\n" +
+    //       JSON.stringify(data, null, 2)
+    //   );
+    // }
   }, [data]);
 
   // Mappa fullständiga dag-namn → korta när man öppnar edit för recurring
@@ -73,6 +118,45 @@ const ReminderList = () => {
       if (r) r.style.height = `${maxHeight}px`;
     });
   }, [data, window.innerWidth]);
+
+  // Hämtar påminnelser från backend
+  useEffect(() => {
+    const fetchReminders = async () => {
+      try {
+        let token = localStorage.getItem("token");
+        let userId = localStorage.getItem("userId");
+
+        if (!token || !userId) {
+          token = await login();
+          userId = RESIDENT_USER_ID;
+          localStorage.setItem("userId", RESIDENT_USER_ID);
+        }
+
+        // Tvinga alltid resident-userId
+        userId = RESIDENT_USER_ID;
+        localStorage.setItem("userId", RESIDENT_USER_ID);
+
+        const response = await fetch(`/api/users/${userId}/reminders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${errorText}`);
+        }
+
+        const reminders = await response.json();
+        setData(reminders);
+      } catch (error) {
+        console.error("Error fetching reminders:", error);
+      }
+    };
+
+    fetchReminders();
+  }, []);
 
   // Hjälpfunktioner
   const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
@@ -179,7 +263,7 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{rem.category}</h3>
+              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -225,7 +309,7 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{rem.category}</h3>
+              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
