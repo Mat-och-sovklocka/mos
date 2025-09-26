@@ -76,7 +76,7 @@ const Login = () => {
         <div className="login-footer">
           <p>Demo credentials:</p>
           <p><strong>Admin:</strong> admin@mos.test / password123</p>
-          <p><strong>Resident:</strong> resident@mos.test / password123</p>
+          <p><strong>Resident:</strong> resident1@mos.test / password123</p>
         </div>
       </div>
     </div>
