@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"; // Lägg till useEffect här
 import { Link } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./form.css";
 
@@ -19,6 +20,7 @@ const kostAlternativ = [
 ];
 
 const Form = () => {
+  const { user, getAuthHeaders } = useAuth();
   const [valdaKost, setValdaKost] = useState([]);
   const [annatText, setAnnatText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -27,10 +29,14 @@ const Form = () => {
   // Hämta sparade preferenser när komponenten monteras
   useEffect(() => {
     const fetchRequirements = async () => {
+      if (!user) return; // Don't fetch if user is not logged in
+      
       try {
-        const userId = "11111111-1111-1111-1111-111111111111"; // Hårdkodad för test
         const response = await fetch(
-          `http://localhost:8080/api/users/${userId}/meal-requirements`
+          `/api/users/${user.id}/meal-requirements`,
+          {
+            headers: getAuthHeaders()
+          }
         );
 
         if (!response.ok) {
@@ -63,7 +69,7 @@ const Form = () => {
     };
 
     fetchRequirements();
-  }, []); // Tom dependency array betyder att detta körs en gång när komponenten monteras
+  }, [user, getAuthHeaders]); // Re-fetch when user changes
 
   const hanteraCheckbox = (kost) => {
     setValdaKost((prev) =>
@@ -95,14 +101,11 @@ const Form = () => {
     };
 
     try {
-      const userId = "11111111-1111-1111-1111-111111111111"; // Hårdkodad för test
       const response = await fetch(
-        `http://localhost:8080/api/users/${userId}/meal-requirements`,
+        `/api/users/${user.id}/meal-requirements`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getAuthHeaders(),
           body: JSON.stringify(requestData),
         }
       );

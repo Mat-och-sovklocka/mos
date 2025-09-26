@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Component
-@Profile("dev")
+// @Profile("dev")  // Temporarily removed for debugging
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;

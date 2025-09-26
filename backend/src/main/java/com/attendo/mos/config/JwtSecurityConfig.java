@@ -13,7 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@Profile("dev")
+// @Profile("dev")  // Temporarily removed for debugging
 public class JwtSecurityConfig {
 
     private final JwtUtil jwtUtil;
