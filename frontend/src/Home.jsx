@@ -2,10 +2,13 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
 import { Link } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
 
 
 const Home = () => {
+  const { user, logout } = useAuth();
+  
   const items = [
 
     { className: "allergies", label: "Allergier och specialkost", link: "/form" },
@@ -22,6 +25,21 @@ const Home = () => {
 
   return (
     <div className="container-fluid min-vh-100 d-flex flex-column justify-content-start align-items-center pt-5">
+      {/* User Info and Logout */}
+      <div className="d-flex justify-content-between align-items-center w-100 mb-3 px-3">
+        <div className="user-info">
+          <span className="text-muted">Welcome, </span>
+          <strong>{user?.displayName || user?.email}</strong>
+          <span className="badge bg-primary ms-2">{user?.userType}</span>
+        </div>
+        <button 
+          onClick={logout}
+          className="btn btn-outline-danger btn-sm"
+        >
+          Logout
+        </button>
+      </div>
+      
       <h1 className="display-4 text-center mb-5 app-title fw-bold mt-4">
         Mat och sov appen
       </h1>

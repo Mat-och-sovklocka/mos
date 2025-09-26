@@ -1,5 +1,8 @@
 ### Test UPDATE Reminder Functionality
 ### Make sure the backend is running on localhost:8080
+@token = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc1ODg5MjMzNywiZXhwIjoxNzU4OTc4NzM3fQ.LYh2tY-iWZV8rHtDk6bRYCMYnC1b07YbFNpyJVgyPIYSnYzlK9SQtTRHnDME3aVAZJ2fRJprnSWGhwK6OpCFlw
+
+@reminderId = 87e8004f-dcb6-4e75-bb06-cd38342eec94
 
 ### 1. Login to get a token
 POST http://localhost:8080/api/auth/login
@@ -27,7 +30,7 @@ Content-Type: application/json
 }
 
 ### 4. Update the reminder (replace {reminderId} with actual ID from step 2)
-PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/{reminderId}
+PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/{{reminderId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
