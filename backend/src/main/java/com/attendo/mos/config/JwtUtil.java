@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Component
-@Profile("dev")
+// @Profile("dev")  // Temporarily removed for debugging
 public class JwtUtil {
 
     @Value("${jwt.secret:mySecretKey}")
