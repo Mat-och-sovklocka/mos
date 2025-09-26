@@ -6,9 +6,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',        // From main branch (mobile testing)
     port: 3000,             // From main branch (mobile testing)
+    hmr: false,             // Disable HMR to stop WebSocket errors
     proxy: {                // From elizaisgettinungry branch
       '/api': {
-        target: 'http://192.168.0.214:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path,
