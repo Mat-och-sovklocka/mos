@@ -4,6 +4,7 @@ import com.attendo.mos.dto.Category;
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
 import com.attendo.mos.dto.ReminderResponse;
+import com.attendo.mos.dto.UpdateReminderRequest;
 import com.attendo.mos.entity.Reminder;
 import com.attendo.mos.repo.ReminderRepository;
 import com.attendo.mos.repo.UserRepository;
@@ -76,8 +77,12 @@ public class ReminderService {
     return reminders.listForUser(userId).stream().map(r -> {
       List<String> days = null, times = null;
       if ("recurring".equalsIgnoreCase(r.getType()) && r.getRecurrence() != null) {
-        days = (List<String>) r.getRecurrence().getOrDefault("days", List.of());
-        times = (List<String>) r.getRecurrence().getOrDefault("times", List.of());
+        @SuppressWarnings("unchecked")
+        List<String> daysList = (List<String>) r.getRecurrence().getOrDefault("days", List.of());
+        @SuppressWarnings("unchecked")
+        List<String> timesList = (List<String>) r.getRecurrence().getOrDefault("times", List.of());
+        days = daysList;
+        times = timesList;
       }
       return new ReminderResponse(
           r.getId(),
@@ -97,6 +102,51 @@ public class ReminderService {
         .orElseThrow(() -> new IllegalArgumentException(
             "Reminder not found for user " + userId));
     reminders.delete(r);
+  }
+
+  public ReminderDto updateReminder(UUID userId, UUID reminderId, UpdateReminderRequest req) {
+    Reminder r = reminders.findById(reminderId)
+        .filter(rem -> rem.getUser().getId().equals(userId))
+        .orElseThrow(() -> new IllegalArgumentException(
+            "Reminder not found for user " + userId));
+
+    // Update fields only if provided (partial update)
+    if (req.type() != null) {
+      r.setType(req.type());
+    }
+    
+    if (req.category() != null) {
+      r.setCategory(mapCategory(req.category()));
+    }
+    
+    if (req.note() != null) {
+      r.setNote(req.note());
+    }
+
+    // Handle time/recurrence based on type
+    String currentType = r.getType();
+    if (req.type() != null) {
+      currentType = req.type();
+    }
+
+    if ("once".equalsIgnoreCase(currentType)) {
+      if (req.dateTime() != null) {
+        r.setTime(req.dateTime());
+      }
+      r.setRecurrence(null);
+    } else if ("recurring".equalsIgnoreCase(currentType)) {
+      r.setTime(null);
+      Map<String, Object> rec = new HashMap<>();
+      rec.put("days", req.days() != null ? req.days() : 
+          (r.getRecurrence() != null ? r.getRecurrence().getOrDefault("days", List.of()) : List.of()));
+      rec.put("times", req.times() != null ? req.times() : 
+          (r.getRecurrence() != null ? r.getRecurrence().getOrDefault("times", List.of()) : List.of()));
+      r.setRecurrence(rec);
+    }
+
+    r = reminders.save(r);
+    return new ReminderDto(r.getId(), r.getTime(), r.getCategory(), r.getNote(),
+        r.getCreatedAt(), r.getType(), r.getRecurrence());
   }
 
 }
