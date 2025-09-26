@@ -28,31 +28,31 @@ const Login = () => {
       <div className="login-card">
         <div className="login-header">
           <h1>MOS</h1>
-          <p>Meal and Reminder System</p>
+          <p>Mat och sovklocka</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">E-post</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Ange din e-post"
               required
               disabled={loading}
             />
           </div>
           
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Lösenord</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Ange ditt lösenord"
               required
               disabled={loading}
             />
@@ -69,14 +69,14 @@ const Login = () => {
             className="login-button"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Loggar in...' : 'Logga in'}
           </button>
         </form>
         
         <div className="login-footer">
-          <p>Demo credentials:</p>
+          <p>Demo-uppgifter:</p>
           <p><strong>Admin:</strong> admin@mos.test / password123</p>
-          <p><strong>Resident:</strong> resident1@mos.test / password123</p>
+          <p><strong>Beware:</strong> resident1@mos.test / password123</p>
         </div>
       </div>
     </div>
