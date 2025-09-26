@@ -1,0 +1,81 @@
+### Variables
+@baseUrl = http://localhost:8080/api
+@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc1ODgxMDgyNiwiZXhwIjoxNzU4ODk3MjI2fQ.s5tUCigG-VuYzeQHYWyyrP8tacuQ4kTMIOu4iizmGYP4V7dGytZ9ne0mFZAvYwvOn6O07uzWDWrtWqNbYOvkaw
+@caregiverToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDIiLCJlbWFpbCI6ImNhcmVnaXZlckBtb3MudGVzdCIsInVzZXJUeXBlIjoiQ0FSRUdJVkVSIiwiaWF0IjoxNzU4NzMxMTAwLCJleHAiOjE3NTg4MTc1MDB9.example
+@residentToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDQiLCJlbWFpbCI6InJlc2lkZW50MUBtb3MudGVzdCIsInVzZXJUeXBlIjoiUkVTSURFTlQiLCJpYXQiOjE3NTg3MzExMDAsImV4cCI6MTc1ODgxNzUwMH0.example
+
+### Test Users
+@adminId = 550e8400-e29b-41d4-a716-446655440001
+@caregiverId = 550e8400-e29b-41d4-a716-446655440002
+@residentId = 550e8400-e29b-41d4-a716-446655440004
+
+### 1. Login as Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@mos.test",
+  "password": "password123"
+}
+
+### 2. Get Current User Info
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{adminToken}}
+
+### 3. Create Reminder (Admin)
+POST {{baseUrl}}/users/{{adminId}}/reminders
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "type": "once",
+  "category": "meal",
+  "dateTime": "2024-01-25T12:00:00Z",
+  "note": "Test reminder from admin"
+}
+
+### 4. Create Reminder (Caregiver for Resident)
+POST {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "type": "daily",
+  "category": "medication",
+  "dateTime": "2024-01-25T08:00:00Z",
+  "note": "Morning medication"
+}
+
+### 5. Get Reminders for User
+GET {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{caregiverToken}}
+
+### 6. Create Meal Requirement
+POST {{baseUrl}}/users/{{residentId}}/meal-requirements
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "type": "VEGETARIAN",
+  "notes": "No meat, but fish is okay"
+}
+
+### 7. Get Meal Requirements
+GET {{baseUrl}}/users/{{residentId}}/meal-requirements
+Authorization: Bearer {{caregiverToken}}
+
+### 8. Test Invalid Category (should fail)
+POST {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "type": "once",
+  "category": "lunch",
+  "dateTime": "2024-01-25T12:00:00Z",
+  "note": "This should fail"
+}
+
+### Test admin accessing resident data
+GET {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{adminToken}}
