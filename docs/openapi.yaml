@@ -194,6 +194,96 @@ paths:
               schema:
                 $ref: "#/components/schemas/ReminderDto"
   /api/users/{userId}/reminders/{reminderId}:
+    put:
+      tags:
+      - reminders
+      summary: Update a reminder
+      description: Update an existing reminder with new time, category, or note
+      operationId: updateReminder
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: User ID
+      - name: reminderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Reminder ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReminderRequest"
+            examples:
+              updateOnceReminder:
+                summary: Update a one-time reminder
+                value:
+                  type: "once"
+                  category: "medicin"
+                  dateTime: "2025-09-27T14:30:00Z"
+                  note: "Updated medication reminder"
+              updateRecurringReminder:
+                summary: Update a recurring reminder
+                value:
+                  type: "recurring"
+                  category: "måltider"
+                  days: ["Mon", "Wed", "Fri"]
+                  times: ["08:00", "12:00", "18:00"]
+                  note: "Updated meal reminders"
+              partialUpdate:
+                summary: Partial update (only note)
+                value:
+                  note: "Just updating the note"
+      responses:
+        "200":
+          description: Reminder updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReminderDto"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440001"
+                time: "2025-09-27T14:30:00Z"
+                category: "MEDICATION"
+                note: "Updated medication reminder"
+                createdAt: "2025-09-26T12:00:00Z"
+                type: "once"
+                recurrence: null
+        "400":
+          description: Invalid input or reminder not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+                  message:
+                    type: string
+                    example: "Reminder not found for user"
+        "404":
+          description: Reminder not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not Found"
+                  message:
+                    type: string
+                    example: "Reminder not found"
     delete:
       tags:
       - reminders
@@ -418,6 +508,41 @@ components:
           type: string
           description: Optional note
           example: "Lunch reminder"
+
+    UpdateReminderRequest:
+      type: object
+      description: Request body for updating a reminder (all fields optional for partial updates)
+      properties:
+        type:
+          type: string
+          enum: ["once", "recurring"]
+          description: Reminder type
+          example: "once"
+        category:
+          type: string
+          description: Reminder category (Swedish or English)
+          example: "medicin"
+        dateTime:
+          type: string
+          format: date-time
+          description: Reminder date and time (for once type)
+          example: "2025-09-27T14:30:00Z"
+        days:
+          type: array
+          items:
+            type: string
+          description: Days of the week for recurring reminders
+          example: ["Mon", "Wed", "Fri"]
+        times:
+          type: array
+          items:
+            type: string
+          description: Times for recurring reminders
+          example: ["08:00", "12:00", "18:00"]
+        note:
+          type: string
+          description: Optional note
+          example: "Updated reminder note"
 
     ReminderDto:
       type: object

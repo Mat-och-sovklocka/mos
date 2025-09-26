@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
 import com.attendo.mos.dto.ReminderResponse;
+import com.attendo.mos.dto.UpdateReminderRequest;
 import com.attendo.mos.service.ReminderService;
 
 import jakarta.validation.Valid;
@@ -80,6 +82,38 @@ public class ReminderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID userId, @PathVariable UUID reminderId) {
         service.deleteReminder(userId, reminderId);
+    }
+
+    @Operation(summary = "Update a reminder", description = "Update an existing reminder with new time, category, or note.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Reminder updated", content = @Content(schema = @Schema(implementation = ReminderDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(example = """
+                        {
+                          "status": 400,
+                          "error": "Bad Request",
+                          "message": "Reminder not found for user",
+                          "path": "/api/users/{userId}/reminders/{reminderId}"
+                        }
+                    """))),
+            @ApiResponse(responseCode = "404", description = "Reminder not found")
+    })
+    @PutMapping("/{reminderId}")
+    public ResponseEntity<?> update(@PathVariable UUID userId, @PathVariable UUID reminderId,
+            @RequestBody @Valid UpdateReminderRequest req) {
+        try {
+            var dto = service.updateReminder(userId, reminderId, req);
+            return ResponseEntity.ok(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "Bad Request",
+                "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "error", "Internal Server Error",
+                "message", "Failed to update reminder"
+            ));
+        }
     }
 
 }
