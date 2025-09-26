@@ -8,4 +8,13 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
   },
+  // Ensure proper handling of static files
+  publicDir: 'public',
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
+  }
 })
