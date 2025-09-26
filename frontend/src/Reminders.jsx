@@ -91,7 +91,7 @@ function Reminders() {
   const resetRecurringForm = () => {
     setSelectedDays([]); // Rensa dagar
     setReminderTimes([""]); // Rensa tider
-    setExtraTimePickers([]); // Rensa extra tidpickers
+    // setExtraTimePickers([]); // TA BORT DENNA RAD!
     setCustomReminderText(""); // Rensa notering
     setReminderNote(""); // Om du har separat note-state
     setRecurringNote("");
@@ -99,12 +99,24 @@ function Reminders() {
 
   // För enstaka påminnelser
   const handleConfirmReminder = async () => {
+    if (selectedIndex === null || !labels[selectedIndex]) {
+      setErrorMessage("Du måste välja en kategori.");
+      return;
+    }
+
+    const category =
+      labels[selectedIndex] === "Övrigt" && customReminderText
+        ? "OTHER"
+        : categoryMapping[labels[selectedIndex]];
+
+    // Debug-logg
+    console.log("selectedIndex:", selectedIndex);
+    console.log("label:", labels[selectedIndex]);
+    console.log("category:", category);
+
     const payload = {
       type: "once",
-      category:
-        labels[selectedIndex] === "Övrigt" && customReminderText
-          ? "OTHER"
-          : categoryMapping[labels[selectedIndex]],
+      category,
       dateTime: selectedDateTime.toISOString(),
       days: [],
       times: [],
@@ -125,7 +137,7 @@ function Reminders() {
         token = await login();
       }
 
-      const userId = "550e8400-e29b-41d4-a716-446655440004"; // Uppdaterat till korrekt användar-ID
+      const userId = localStorage.getItem("userId");// Uppdaterat till korrekt användar-ID
       const response = await fetch(`/api/users/${userId}/reminders`, {
         method: "POST",
         headers: {
@@ -164,16 +176,30 @@ function Reminders() {
   };
 
   // För återkommande påminnelser
+  const RESIDENT_USER_ID = "550e8400-e29b-41d4-a716-446655440004"; // boendens userId
+
   const handleRecurringReminderConfirm = async () => {
+    if (selectedIndex === null || !labels[selectedIndex]) {
+      setErrorMessage("Du måste välja en kategori.");
+      return;
+    }
+
+    const category =
+      labels[selectedIndex] === "Övrigt" && customReminderText
+        ? "OTHER"
+        : categoryMapping[labels[selectedIndex]];
+
+    // Debug-logg
+    console.log("selectedIndex:", selectedIndex);
+    console.log("label:", labels[selectedIndex]);
+    console.log("category:", category);
+
     const payload = {
       type: "recurring",
-      category:
-        labels[selectedIndex] === "Övrigt" && customReminderText
-          ? "OTHER"
-          : categoryMapping[labels[selectedIndex]],
-      dateTime: null, // Null för återkommande
+      category,
+      dateTime: null,
       days: selectedDays,
-      times: reminderTimes.filter((time) => time !== ""), // Filtrera bort tomma tider
+      times: reminderTimes.filter((time) => time !== ""),
       note: recurringNote.trim() || null,
     };
 
@@ -183,8 +209,8 @@ function Reminders() {
         token = await login();
       }
 
-      const userId = "550e8400-e29b-41d4-a716-446655440004"; // Uppdaterat till korrekt användar-ID
-      const response = await fetch(`/api/users/${userId}/reminders`, {
+      // Använd boendens userId i endpointen!
+      const response = await fetch(`/api/users/${RESIDENT_USER_ID}/reminders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -237,13 +263,12 @@ function Reminders() {
   };
 
   const handleClick = (index) => {
-    setSelectedIndex(index === selectedIndex ? null : index);
+    setSelectedIndex(index); // Alltid välj det du klickar på
     setReminderType(null);
     setSelectedDateTime(null);
-    setCustomReminderText(""); // Rensa inputfältet om du vill
-    setErrorMessage(""); // 🧼 Rensa felmeddelandet
-    setReminderNote(""); // 🧼 Rensar noteringen
-    setSelectedDateTime(null);
+    setCustomReminderText("");
+    setErrorMessage("");
+    setReminderNote("");
   };
 
   const handleReminderType = (type) => {
@@ -319,37 +344,38 @@ function Reminders() {
 
   async function login() {
     try {
-        const loginData = {
-            email: "resident1@mos.test",
-            password: "password123"
-        };
+      const loginData = {
+        email: "caregiver2@mos.test",
+        password: "password123"
+      };
 
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(loginData)
-        });
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginData)
+      });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Login failed: ${errorText}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Login failed: ${errorText}`);
+      }
 
-        const data = await response.json();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.userId);
-        return data.token;
+      const data = await response.json();
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      return data.token;
     } catch (error) {
-        console.error('Login error:', error);
-        throw error;
+      console.error('Login error:', error);
+      throw error;
     }
   }
 
   return (
     <div className="reminders-container">
       <h1 className="reminder-title">Lägg till påminnelserna</h1>
+      
       <div className="image-grid">
         <div className="row row-spacing">
           {images.map((image, index) => {
@@ -373,227 +399,220 @@ function Reminders() {
             );
           })}
         </div>
-
-        {selectedIndex !== null && (
-          <div className="reminder-actions">
-            {labels[selectedIndex] === "Övrigt" &&
-              renderCustomReminderInput(
-                customReminderText,
-                setCustomReminderText,
-                setErrorMessage
-              )}
-
-            {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-            <div className="reminder-buttons-row">
-              <button
-                className="reminder-button"
-                onClick={() => handleReminderType("once")}
-              >
-                Enstaka påminnelser
-              </button>
-
-              <button
-                className="reminder-button"
-                onClick={() => handleReminderType("recurring")}
-              >
-                Återkommande påminnelser
-              </button>
-            </div>
-
-            {reminderType === "once" && (
-              <div className="once-reminder-form">
-                {/* Formulär för enstaka påminnelse */}
-              </div>
-            )}
-
-            {reminderType === "recurring" && (
-              <div className="reminder-layout">
-                <div className="form-column">
-                  <section className="reminder-form">
-                    {/* Dagval */}
-                    <div className="day-selector">
-                      {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map(
-                        (day, index) => (
-                          <button
-                            key={index}
-                            type="button"
-                            onClick={() => toggleDay(day)}
-                            className={`day-button ${
-                              selectedDays.includes(day) ? "active" : ""
-                            }`}
-                          >
-                            {day}
-                          </button>
-                        )
-                      )}
-                    </div>
-
-                    {/* Tider – alltid minst en */}
-                    <div className="time-input-group">
-                      <label>Tider:</label>
-                      {(reminderTimes.length > 0 ? reminderTimes : [""]).map(
-                        (time, index) => (
-                          <div key={index} className="time-row">
-                            <input
-                              type="time"
-                              value={time}
-                              onChange={(e) =>
-                                updateReminderTime(index, e.target.value)
-                              }
-                              className="time-input"
-                            />
-                            {index === 0 ? (
-                              <button
-                                type="button"
-                                onClick={addReminderTime}
-                                className="add-time-btn"
-                              >
-                                ➕
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => removeReminderTime(index)}
-                                className="delete-btn"
-                              >
-                                🗑️
-                              </button>
-                            )}
-                          </div>
-                        )
-                      )}
-                    </div>
-
-                    {/* Notering */}
-                    <div className="confirmation-label">
-                      <label htmlFor="recurring-note">Notering:</label>
-                      <input
-                        type="text"
-                        id="recurring-note"
-                        name="recurring-note"
-                        placeholder="t.ex. Ta medicin"
-                        value={recurringNote}
-                        onChange={(e) => setRecurringNote(e.target.value)}
-                      />
-                    </div>
-
-                    {/* Knappar */}
-                    <div className="form-buttons">
-                      <button
-                        type="button"
-                        className="ok-button"
-                        disabled={
-                          selectedDays.length === 0 ||
-                          reminderTimes.length === 0 ||
-                          !reminderTimes[0]
-                        }
-                        onClick={() => {
-                          handleRecurringReminderConfirm();
-                          resetRecurringForm();
-                        }}
-                      >
-                        OK
-                      </button>
-                      <button
-                        type="button"
-                        className="cancel-button"
-                        onClick={handleCancelReminder}
-                      >
-                        Avbryt
-                      </button>
-                    </div>
-                  </section>
-                </div>
-
-                {/* Sammanfattning */}
-                <div className="note-column">
-                  <h3 className="confirmation-title">Sammanfattning</h3>
-                  <div className="confirmation-summary">
-                    {confirmationSummary.split("\n").map((line, index) => (
-                      <p key={index}>{line}</p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {reminderType === "once" && (
-          <div className="picker-layout">
-            <div className="picker-inputs">
-              <div className="form-group">
-                <label>Välj dag och tid för påminnelsen:</label>
-                <DatePicker
-                  selected={selectedDateTime}
-                  onChange={(date) => setSelectedDateTime(date)}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  timeIntervals={15}
-                  dateFormat="yyyy-MM-dd HH:mm"
-                  placeholderText="Klicka för att välja"
-                  locale="sv"
-                  minDate={new Date()}
-                  withPortal
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="reminderNote">Notering:</label>
-                <textarea
-                  id="reminderNote"
-                  value={reminderNote}
-                  onChange={(e) => setReminderNote(e.target.value)}
-                  placeholder="Skriv en notering..."
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Bekräftelse + knappar visas endast om datum är valt */}
-            {selectedDateTime && (
-              <div className="confirmation-column">
-                <label>
-                  Vill du lägga en <strong>enstaka</strong> påminnelse
-                  <br />
-                  för{" "}
-                  <strong>
-                    {labels[selectedIndex] === "Övrigt" && customReminderText
-                      ? customReminderText
-                      : labels[selectedIndex]}
-                  </strong>{" "}
-                  den{" "}
-                  <strong>
-                    {selectedDateTime.toLocaleString("sv-SE", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
-                  </strong>
-                  {reminderNote && (
-                    <>
-                      {" "}
-                      med noteringen: "<em>{reminderNote}</em>"
-                    </>
-                  )}
-                </label>
-
-                <div className="confirmation-buttons">
-                  <button className="ok-button" onClick={handleConfirmReminder}>
-                    OK
-                  </button>
-                  <button
-                    className="cancel-button"
-                    onClick={handleCancelReminder}
-                  >
-                    Avbryt
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
+
+      {selectedIndex !== null && (
+        <div className="reminder-actions">
+          {labels[selectedIndex] === "Övrigt" &&
+            renderCustomReminderInput(
+              customReminderText,
+              setCustomReminderText,
+              setErrorMessage
+            )}
+
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          <div className="reminder-buttons-row">
+            <button
+              className="reminder-button"
+              onClick={() => handleReminderType("once")}
+            >
+              Enstaka påminnelser
+            </button>
+
+            <button
+              className="reminder-button"
+              onClick={() => handleReminderType("recurring")}
+            >
+              Återkommande påminnelser
+            </button>
+          </div>
+        </div>
+      )}
+
+      {reminderType === "once" && (
+        <div className="picker-layout">
+          <div className="picker-inputs">
+            <div className="form-group">
+              <label>Välj dag och tid för påminnelsen:</label>
+              <DatePicker
+                selected={selectedDateTime}
+                onChange={(date) => setSelectedDateTime(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                dateFormat="yyyy-MM-dd HH:mm"
+                placeholderText="Klicka för att välja"
+                locale="sv"
+                minDate={new Date()}
+                withPortal
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reminderNote">Notering:</label>
+              <textarea
+                id="reminderNote"
+                value={reminderNote}
+                onChange={(e) => setReminderNote(e.target.value)}
+                placeholder="Skriv en notering..."
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* Bekräftelse + knappar visas endast om datum är valt */}
+          {selectedDateTime && (
+            <div className="confirmation-column">
+              <label>
+                Vill du lägga en <strong>enstaka</strong> påminnelse
+                <br />
+                för{" "}
+                <strong>
+                  {labels[selectedIndex] === "Övrigt" && customReminderText
+                    ? customReminderText
+                    : labels[selectedIndex]}
+                </strong>{" "}
+                den{" "}
+                <strong>
+                  {selectedDateTime.toLocaleString("sv-SE", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                </strong>
+                {reminderNote && (
+                  <>
+                    {" "}
+                    med noteringen: "<em>{reminderNote}</em>"
+                  </>
+                )}
+              </label>
+
+              <div className="confirmation-buttons">
+                <button className="ok-button" onClick={handleConfirmReminder}>
+                  OK
+                </button>
+                <button
+                  className="cancel-button"
+                  onClick={handleCancelReminder}
+                >
+                  Avbryt
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      {reminderType === "recurring" && (
+        <div className="reminder-layout">
+          <div className="form-column">
+            <section className="reminder-form">
+              {/* Dagval */}
+              <div className="day-selector">
+                {["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].map(
+                  (day, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => toggleDay(day)}
+                      className={`day-button ${
+                        selectedDays.includes(day) ? "active" : ""
+                      }`}
+                    >
+                      {day}
+                    </button>
+                  )
+                )}
+              </div>
+
+              {/* Tider – alltid minst en */}
+              <div className="time-input-group">
+                <label>Tider:</label>
+                {(reminderTimes.length > 0 ? reminderTimes : [""]).map(
+                  (time, index) => (
+                    <div key={index} className="time-row">
+                      <input
+                        type="time"
+                        value={time}
+                        onChange={(e) =>
+                          updateReminderTime(index, e.target.value)
+                        }
+                        className="time-input"
+                      />
+                      {index === 0 ? (
+                        <button
+                          type="button"
+                          onClick={addReminderTime}
+                          className="add-time-btn"
+                        >
+                          ➕
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => removeReminderTime(index)}
+                          className="delete-btn"
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+
+              {/* Notering */}
+              <div className="confirmation-label">
+                <label htmlFor="recurring-note">Notering:</label>
+                <input
+                  type="text"
+                  id="recurring-note"
+                  name="recurring-note"
+                  placeholder="t.ex. Ta medicin"
+                  value={recurringNote}
+                  onChange={(e) => setRecurringNote(e.target.value)}
+                />
+              </div>
+
+              {/* Knappar */}
+              <div className="form-buttons">
+                <button
+                  type="button"
+                  className="ok-button"
+                  disabled={
+                    selectedDays.length === 0 ||
+                    reminderTimes.length === 0 ||
+                    !reminderTimes[0]
+                  }
+                  onClick={() => {
+                    handleRecurringReminderConfirm();
+                    resetRecurringForm();
+                  }}
+                >
+                  OK
+                </button>
+                <button
+                  type="button"
+                  className="cancel-button"
+                  onClick={handleCancelReminder}
+                >
+                  Avbryt
+                </button>
+              </div>
+            </section>
+          </div>
+
+          {/* Sammanfattning */}
+          <div className="note-column">
+            <h3 className="confirmation-title">Sammanfattning</h3>
+            <div className="confirmation-summary">
+              {confirmationSummary.split("\n").map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">

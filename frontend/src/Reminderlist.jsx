@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
-import reminderData from "./reminder-data.json";
+// import reminderData from "./reminder-data.json"; // Kommenterad mock-data
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-// First, add login function outside component
+// Alltid samma admin-login
 async function login() {
   try {
+    const loginData = {
+      email: "resident1@mos.test",
+      password: "password123",
+    };
+
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: "resident1@mos.test",
-        password: "password123",
-      }),
+      body: JSON.stringify(loginData),
     });
 
     if (!response.ok) {
@@ -32,8 +34,12 @@ async function login() {
   }
 }
 
+// Byt till resident-userId
+const RESIDENT_USER_ID = "550e8400-e29b-41d4-a716-446655440004";
+
 const ReminderList = () => {
-  const [data, setData] = useState(reminderData);
+  // const [data, setData] = useState(reminderData); // Kommenterad mock-initiering
+  const [data, setData] = useState([]); // Starta med tom array istället
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
@@ -50,6 +56,16 @@ const ReminderList = () => {
     SHOWER: "shower-card",
     MEETING: "meeting-card",
   };
+  const categoryToLabel = {
+    MEAL: "Måltider",
+    MEDICATION: "Medicinintag",
+    EXERCISE: "Rörelse/Pauser",
+    REST: "Vila/Sömn",
+    MEETING: "Möte",
+    SHOWER: "Dusch",
+    CLEANING: "Städning",
+    OTHER: "Övrigt",
+  };
 
   const onceReminders = data.filter((r) => r.type === "once");
   const recurringReminders = data.filter((r) => r.type === "recurring");
@@ -57,12 +73,12 @@ const ReminderList = () => {
 
   // 🛠 Central “skicka till backend”-trigger
   useEffect(() => {
-    if (data !== reminderData) {
-      alert(
-        "Skickar uppdaterad lista till backend:\n\n" +
-          JSON.stringify(data, null, 2)
-      );
-    }
+    // if (data !== reminderData) {
+    //   alert(
+    //     "Skickar uppdaterad lista till backend:\n\n" +
+    //       JSON.stringify(data, null, 2)
+    //   );
+    // }
   }, [data]);
 
   // Mappa fullständiga dag-namn → korta när man öppnar edit för recurring
@@ -108,12 +124,17 @@ const ReminderList = () => {
     const fetchReminders = async () => {
       try {
         let token = localStorage.getItem("token");
-        if (!token) {
+        let userId = localStorage.getItem("userId");
+
+        if (!token || !userId) {
           token = await login();
+          userId = RESIDENT_USER_ID;
+          localStorage.setItem("userId", RESIDENT_USER_ID);
         }
 
-        const userId = "550e8400-e29b-41d4-a716-446655440004";
-        console.log("Fetching reminders for user:", userId);
+        // Tvinga alltid resident-userId
+        userId = RESIDENT_USER_ID;
+        localStorage.setItem("userId", RESIDENT_USER_ID);
 
         const response = await fetch(`/api/users/${userId}/reminders`, {
           headers: {
@@ -128,7 +149,6 @@ const ReminderList = () => {
         }
 
         const reminders = await response.json();
-        console.log("Fetched reminders:", reminders);
         setData(reminders);
       } catch (error) {
         console.error("Error fetching reminders:", error);
@@ -243,7 +263,7 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{rem.category}</h3>
+              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -289,7 +309,7 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{rem.category}</h3>
+              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
