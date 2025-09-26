@@ -2,6 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
 import { Link } from 'react-router-dom';
+import NotificationTest from './components/NotificationTest';
 
 
 const Home = () => {
@@ -41,6 +42,11 @@ const Home = () => {
             <span className="mt-2 text-center label-text">{label}</span>
           </div>
         ))}
+      </div>
+      
+      {/* Notification Test Component */}
+      <div className="container mt-5">
+        <NotificationTest />
       </div>
     </div>
   );

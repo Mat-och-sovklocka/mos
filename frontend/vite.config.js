@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
+ 
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
+    host: '0.0.0.0',        // From main branch (mobile testing)
+    port: 3000,             // From main branch (mobile testing)
+    proxy: {                // From elizaisgettinungry branch
       '/api': {
         target: 'http://192.168.0.214:8080',
         changeOrigin: true,
@@ -17,6 +19,15 @@ export default defineConfig({
             proxyReq.removeHeader('referer');
           });
         }
+      }
+    }
+  },
+  // Ensure proper handling of static files (from main branch)
+  publicDir: 'public',
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html'
       }
     }
   }

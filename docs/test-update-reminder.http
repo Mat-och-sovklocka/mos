@@ -1,0 +1,70 @@
+### Test UPDATE Reminder Functionality
+### Make sure the backend is running on localhost:8080
+
+### 1. Login to get a token
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@mos.test",
+  "password": "password123"
+}
+
+### 2. Get user reminders to find a reminder ID
+GET http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders
+Authorization: Bearer {{token}}
+
+### 3. Create a test reminder first (if none exist)
+POST http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "once",
+  "category": "måltider",
+  "dateTime": "2025-09-27T15:00:00Z",
+  "note": "Test reminder for update"
+}
+
+### 4. Update the reminder (replace {reminderId} with actual ID from step 2)
+PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/{reminderId}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "once",
+  "category": "medicin",
+  "dateTime": "2025-09-27T16:30:00Z",
+  "note": "Updated medication reminder"
+}
+
+### 5. Partial update - only change the note
+PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/{reminderId}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "note": "Just updating the note field"
+}
+
+### 6. Update to recurring reminder
+PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/{reminderId}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "recurring",
+  "category": "måltider",
+  "days": ["Mon", "Wed", "Fri"],
+  "times": ["08:00", "12:00", "18:00"],
+  "note": "Recurring meal reminders"
+}
+
+### 7. Test error case - update non-existent reminder
+PUT http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "note": "This should fail"
+}
