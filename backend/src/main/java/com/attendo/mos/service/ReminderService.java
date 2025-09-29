@@ -21,35 +21,36 @@ import java.util.UUID;
 public class ReminderService {
   private final ReminderRepository reminders;
   private final UserRepository users;
-  private static final Map<String, Category> CATEGORY_MAP = Map.of(
+  private static final Map<String, Category> CATEGORY_MAP = new HashMap<>() {{
       // Swedish
-      "måltider", Category.MEAL,
-      "maltdier", Category.MEAL, // fallback if accents drop
-      "medicinintag", Category.MEDICATION,
-      "medicin", Category.MEDICATION,
-      "rörelse/pauser", Category.EXERCISE,
-      "rorelse/pauser", Category.EXERCISE, // fallback if accents drop
-      "vila/sömn", Category.REST,
-      "vila/somn", Category.REST, // fallback if accents drop
-      "möte", Category.MEETING,
-      "mote", Category.MEETING, // fallback if accents drop
-      "dusch", Category.SHOWER,
-      "städning", Category.CLEANING,
-      "stadning", Category.CLEANING, // fallback if accents drop
-      "övrigt", Category.OTHER,
-      "ovrigt", Category.OTHER, // fallback if accents drop
+      put("måltider", Category.MEAL);
+      put("maltdier", Category.MEAL); // fallback if accents drop
+      put("medicinintag", Category.MEDICATION);
+      put("medicin", Category.MEDICATION);
+      put("rörelse/pauser", Category.EXERCISE);
+      put("rorelse/pauser", Category.EXERCISE); // fallback if accents drop
+      put("vila/sömn", Category.REST);
+      put("vila/somn", Category.REST); // fallback if accents drop
+      put("möte", Category.MEETING);
+      put("mote", Category.MEETING); // fallback if accents drop
+      put("dusch", Category.SHOWER);
+      put("städning", Category.CLEANING);
+      put("stadning", Category.CLEANING); // fallback if accents drop
+      put("övrigt", Category.OTHER);
+      put("ovrigt", Category.OTHER); // fallback if accents drop
       // English
-      "meal", Category.MEAL,
-      "meals", Category.MEAL,
-      "medication", Category.MEDICATION,
-      "medicine", Category.MEDICATION,
-      "exercise", Category.EXERCISE,
-      "rest", Category.REST,
-      "sleep", Category.REST,
-      "meeting", Category.MEETING,
-      "shower", Category.SHOWER,
-      "cleaning", Category.CLEANING,
-      "other", Category.OTHER);
+      put("meal", Category.MEAL);
+      put("meals", Category.MEAL);
+      put("medication", Category.MEDICATION);
+      put("medicine", Category.MEDICATION);
+      put("exercise", Category.EXERCISE);
+      put("rest", Category.REST);
+      put("sleep", Category.REST);
+      put("meeting", Category.MEETING);
+      put("shower", Category.SHOWER);
+      put("cleaning", Category.CLEANING);
+      put("other", Category.OTHER);
+  }};
       
   private Category mapCategory(String raw) {
     if (raw == null)
