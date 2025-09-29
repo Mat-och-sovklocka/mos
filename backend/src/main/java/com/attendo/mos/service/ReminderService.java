@@ -26,11 +26,13 @@ public class ReminderService {
       "måltider", Category.MEAL,
       "maltdier", Category.MEAL, // fallback if accents drop
       "medicin", Category.MEDICATION,
+      "dusch", Category.SHOWER,
       // English
       "meal", Category.MEAL,
       "meals", Category.MEAL,
       "medication", Category.MEDICATION,
       "medicine", Category.MEDICATION,
+      "shower", Category.SHOWER,
       "other", Category.OTHER);
       
   private Category mapCategory(String raw) {
