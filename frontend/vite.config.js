@@ -7,10 +7,7 @@ export default defineConfig({
     host: '0.0.0.0',        // From main branch (mobile testing)
     port: 3000,             // From main branch (mobile testing)
     // Aggressively disable ALL WebSocket/HMR features
-    hmr: {
-      port: false,          // Disable HMR WebSocket completely
-      clientPort: false     // Disable client-side WebSocket
-    },
+    hmr: false,             // Completely disable HMR
     // Disable file watching to prevent any WebSocket triggers
     watch: {
       usePolling: false,
