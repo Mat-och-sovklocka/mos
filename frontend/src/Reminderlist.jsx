@@ -2,42 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 // import reminderData from "./reminder-data.json"; // Kommenterad mock-data
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { useAuth } from "./contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 
-// Alltid samma admin-login
-async function login() {
-  try {
-    const loginData = {
-      email: "resident1@mos.test",
-      password: "password123",
-    };
-
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Login failed: ${errorText}`);
-    }
-
-    const data = await response.json();
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.userId);
-    return data.token;
-  } catch (error) {
-    console.error("Login error:", error);
-    throw error;
-  }
-}
-
-// Byt till resident-userId
-const RESIDENT_USER_ID = "550e8400-e29b-41d4-a716-446655440004";
+// Removed old login function - now using AuthContext
 
 const ReminderList = () => {
+  const { user, getAuthHeaders } = useAuth();
+  const location = useLocation();
   // const [data, setData] = useState(reminderData); // Kommenterad mock-initiering
   const [data, setData] = useState([]); // Starta med tom array istället
   const [expandedNoteId, setExpandedNoteId] = useState(null);
@@ -119,44 +91,36 @@ const ReminderList = () => {
     });
   }, [data, window.innerWidth]);
 
-  // Hämtar påminnelser från backend
-  useEffect(() => {
-    const fetchReminders = async () => {
-      try {
-        let token = localStorage.getItem("token");
-        let userId = localStorage.getItem("userId");
+  // Hämtar påminnelser från backend - only when user changes (login/logout)
+  const fetchReminders = async () => {
+    if (!user) {
+      setData([]); // Clear data when user logs out
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api/users/${user.id}/reminders`, {
+        headers: getAuthHeaders(),
+      });
 
-        if (!token || !userId) {
-          token = await login();
-          userId = RESIDENT_USER_ID;
-          localStorage.setItem("userId", RESIDENT_USER_ID);
-        }
-
-        // Tvinga alltid resident-userId
-        userId = RESIDENT_USER_ID;
-        localStorage.setItem("userId", RESIDENT_USER_ID);
-
-        const response = await fetch(`/api/users/${userId}/reminders`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Server error: ${errorText}`);
-        }
-
-        const reminders = await response.json();
-        setData(reminders);
-      } catch (error) {
-        console.error("Error fetching reminders:", error);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
       }
-    };
 
-    fetchReminders();
-  }, []);
+      const reminders = await response.json();
+      setData(reminders);
+    } catch (error) {
+      console.error("Error fetching reminders:", error);
+    }
+  };
+
+  // Refresh when user changes OR when navigating to this page
+  useEffect(() => {
+    if (user) {
+      fetchReminders();
+    }
+  }, [user?.id, location.pathname]); // Run when user ID changes OR when pathname changes
 
   // Hjälpfunktioner
   const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
@@ -182,7 +146,7 @@ const ReminderList = () => {
   const addTime = () => setSelectedTimes((prev) => [...prev, ""]);
 
   // Handlers
-  const handleDeleteOnce = (id) => {
+  const handleDeleteOnce = async (id) => {
     const rem = data.find((r) => r.id === id);
     if (
       window.confirm(
@@ -193,11 +157,27 @@ const ReminderList = () => {
         )}\n${rem.note || ""}`
       )
     ) {
-      setData((prev) => prev.filter((r) => r.id !== id));
+      try {
+        const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+          // Only update frontend state after successful API call
+          setData((prev) => prev.filter((r) => r.id !== id));
+          alert('Påminnelse har tagits bort!');
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error deleting reminder:', error);
+        alert('Ett fel uppstod när påminnelsen skulle tas bort.');
+      }
     }
   };
 
-  const handleDeleteRecurring = (id) => {
+  const handleDeleteRecurring = async (id) => {
     const rem = data.find((r) => r.id === id);
     if (
       window.confirm(
@@ -208,7 +188,23 @@ const ReminderList = () => {
         }`
       )
     ) {
-      setData((prev) => prev.filter((r) => r.id !== id));
+      try {
+        const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+          // Only update frontend state after successful API call
+          setData((prev) => prev.filter((r) => r.id !== id));
+          alert('Påminnelse har tagits bort!');
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error deleting reminder:', error);
+        alert('Ett fel uppstod när påminnelsen skulle tas bort.');
+      }
     }
   };
 
