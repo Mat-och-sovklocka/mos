@@ -6,20 +6,23 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',        // From main branch (mobile testing)
     port: 3000,             // From main branch (mobile testing)
-    // Aggressively disable ALL WebSocket/HMR features
+    // NUCLEAR OPTION: Disable EVERYTHING that could trigger WebSocket
     hmr: false,             // Completely disable HMR
-    // Disable file watching to prevent any WebSocket triggers
-    watch: {
-      usePolling: false,
-      ignored: ['**/node_modules/**', '**/.git/**', '**/*']
-    },
-    // Force disable all dev server features that might cause WebSocket issues
+    ws: false,              // Explicitly disable WebSocket server
+    // Disable file watching completely
+    watch: null,            // Completely disable file watching
+    // Force disable all dev server features
     middlewareMode: false,
     fs: {
-      strict: false
+      strict: false,
+      allow: ['..']         // Restrict file system access
     },
-    // Force disable all WebSocket connections
+    // Disable all WebSocket-related features
     cors: true,
+    // Override any WebSocket attempts
+    configureServer(server) {
+      server.ws = null;     // Kill WebSocket server
+    },
     proxy: {                // From elizaisgettinungry branch
       '/api': {
         target: 'http://backend:8080',
