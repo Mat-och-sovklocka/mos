@@ -7,6 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies in container (not mounted)
+
 RUN npm install --force
 
 # Copy source code
