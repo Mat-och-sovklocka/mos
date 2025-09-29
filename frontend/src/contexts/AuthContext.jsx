@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing token on app start
   useEffect(() => {
-    const storedToken = localStorage.getItem('mos_token');
-    const storedUser = localStorage.getItem('mos_user');
+    const storedToken = sessionStorage.getItem('mos_token');
+    const storedUser = sessionStorage.getItem('mos_user');
     
     if (storedToken && storedUser) {
       setToken(storedToken);
@@ -44,8 +44,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       
       // Store token and user info
-      localStorage.setItem('mos_token', data.token);
-      localStorage.setItem('mos_user', JSON.stringify({
+      sessionStorage.setItem('mos_token', data.token);
+      sessionStorage.setItem('mos_user', JSON.stringify({
         id: data.userId,
         email: data.email,
         displayName: data.displayName,
@@ -68,8 +68,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('mos_token');
-    localStorage.removeItem('mos_user');
+    sessionStorage.removeItem('mos_token');
+    sessionStorage.removeItem('mos_user');
     setToken(null);
     setUser(null);
   };

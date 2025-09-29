@@ -6,13 +6,17 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',        // From main branch (mobile testing)
     port: 3000,             // From main branch (mobile testing)
-    hmr: false,             // Disable HMR to stop WebSocket errors
-    ws: false,              // Completely disable WebSocket
-    watch: {
-      usePolling: false,    // Disable file watching
-      ignored: ['**/node_modules/**', '**/.git/**']
+    // Aggressively disable ALL WebSocket/HMR features
+    hmr: {
+      port: false,          // Disable HMR WebSocket completely
+      clientPort: false     // Disable client-side WebSocket
     },
-    // Completely disable all dev server features that might cause WebSocket issues
+    // Disable file watching to prevent any WebSocket triggers
+    watch: {
+      usePolling: false,
+      ignored: ['**/node_modules/**', '**/.git/**', '**/*']
+    },
+    // Force disable all dev server features that might cause WebSocket issues
     middlewareMode: false,
     fs: {
       strict: false

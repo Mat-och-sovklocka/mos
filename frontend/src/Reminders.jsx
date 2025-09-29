@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
@@ -20,6 +21,7 @@ registerLocale("sv", sv);
 
 function Reminders() {
   const navigate = useNavigate();
+  const { user, getAuthHeaders } = useAuth();
   const images = [
     { src: img1, alt: "img1" },
     { src: img2, alt: "img2" },
@@ -109,10 +111,7 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
-    // Debug-logg
-    console.log("selectedIndex:", selectedIndex);
-    console.log("label:", labels[selectedIndex]);
-    console.log("category:", category);
+    // Debug logs removed for production
 
     const payload = {
       type: "once",
@@ -123,43 +122,25 @@ function Reminders() {
       note: reminderNote.trim() || null,
     };
 
-    // Add debug logs
-    console.log(
-      "Endpoint:",
-      "http://192.168.0.214:8080/api/users/550e8400-e29b-41d4-a716-446655440001/reminders"
-    );
-    console.log("Payload being sent:", payload);
+    // Debug logs removed for production
 
     try {
-      // Get token or login first
-      let token = localStorage.getItem("token");
-      if (!token) {
-        token = await login();
-      }
-
-      const userId = localStorage.getItem("userId");// Uppdaterat till korrekt användar-ID
-      const response = await fetch(`/api/users/${userId}/reminders`, {
+      const targetUserId = getTargetUserId();
+      const response = await fetch(`/api/users/${targetUserId}/reminders`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
         // Add this block to see the actual error message from the server
         const errorText = await response.text();
-        console.log("Server error details:", {
-          status: response.status,
-          statusText: response.statusText,
-          errorMessage: errorText,
-        });
+        // Server error details logged
         throw new Error(`Server error: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log("Success response:", data);
+      // Success response logged
       alert("Påminnelse har skapats!");
 
       // Reset form after successful creation
@@ -175,8 +156,16 @@ function Reminders() {
     }
   };
 
-  // För återkommande påminnelser
-  const RESIDENT_USER_ID = "550e8400-e29b-41d4-a716-446655440004"; // boendens userId
+  // Determine target user ID based on user role
+  const getTargetUserId = () => {
+    // If user is a caregiver, they should create reminders for their assigned residents
+    // For now, we'll use a default resident ID, but this should be configurable
+    if (user.userType === 'CAREGIVER') {
+      return "550e8400-e29b-41d4-a716-446655440004"; // Default resident for caregivers
+    }
+    // If user is a resident or admin, create reminders for themselves
+    return user.id;
+  };
 
   const handleRecurringReminderConfirm = async () => {
     if (selectedIndex === null || !labels[selectedIndex]) {
@@ -189,10 +178,7 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
-    // Debug-logg
-    console.log("selectedIndex:", selectedIndex);
-    console.log("label:", labels[selectedIndex]);
-    console.log("category:", category);
+    // Debug logs removed for production
 
     const payload = {
       type: "recurring",
@@ -204,18 +190,10 @@ function Reminders() {
     };
 
     try {
-      let token = localStorage.getItem("token");
-      if (!token) {
-        token = await login();
-      }
-
-      // Använd boendens userId i endpointen!
-      const response = await fetch(`/api/users/${RESIDENT_USER_ID}/reminders`, {
+      const targetUserId = getTargetUserId();
+      const response = await fetch(`/api/users/${targetUserId}/reminders`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -224,7 +202,7 @@ function Reminders() {
       }
 
       const data = await response.json();
-      console.log("Påminnelse skapad:", data);
+      // Reminder created successfully
       alert("Påminnelse har skapats!");
 
       // Återställ formuläret
@@ -342,35 +320,7 @@ function Reminders() {
     setErrorMessage("");
   }
 
-  async function login() {
-    try {
-      const loginData = {
-        email: "caregiver2@mos.test",
-        password: "password123"
-      };
-
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loginData)
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Login failed: ${errorText}`);
-      }
-
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId);
-      return data.token;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  }
+  // Removed old login function - now using AuthContext
 
   return (
     <div className="reminders-container">
