@@ -208,7 +208,7 @@ const ReminderList = () => {
     }
   };
 
-  const handleEditSubmit = (e, id) => {
+  const handleEditSubmit = async (e, id) => {
     e.preventDefault();
     const form = e.target;
     const updatedReminder = {
@@ -218,11 +218,32 @@ const ReminderList = () => {
       dateTime: `${form.date.value}T${form.time.value}`,
       note: form.note.value,
     };
-    setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
-    setEditingId(null);
+
+    try {
+      const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedReminder)
+      });
+
+      if (response.ok) {
+        // Only update frontend state after successful API call
+        setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
+        setEditingId(null);
+        alert('Påminnelse har uppdaterats!');
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error updating reminder:', error);
+      alert('Ett fel uppstod när påminnelsen skulle uppdateras.');
+    }
   };
 
-  const handleRecurringSubmit = (e, id) => {
+  const handleRecurringSubmit = async (e, id) => {
     e.preventDefault();
     const shortToFull = {
       Mån: "Måndag",
@@ -241,8 +262,29 @@ const ReminderList = () => {
       times: selectedTimes.filter((t) => t),
       note: e.target.note.value,
     };
-    setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
-    setEditingId(null);
+
+    try {
+      const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedReminder)
+      });
+
+      if (response.ok) {
+        // Only update frontend state after successful API call
+        setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
+        setEditingId(null);
+        alert('Påminnelse har uppdaterats!');
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error updating reminder:', error);
+      alert('Ett fel uppstod när påminnelsen skulle uppdateras.');
+    }
   };
 
   return (
