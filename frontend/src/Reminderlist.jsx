@@ -302,6 +302,8 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
+              {/* Debug: Show the actual category value */}
+              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -362,6 +364,8 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
+              {/* Debug: Show the actual category value */}
+              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
