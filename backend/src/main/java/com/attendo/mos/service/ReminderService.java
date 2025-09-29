@@ -25,14 +25,30 @@ public class ReminderService {
       // Swedish
       "måltider", Category.MEAL,
       "maltdier", Category.MEAL, // fallback if accents drop
+      "medicinintag", Category.MEDICATION,
       "medicin", Category.MEDICATION,
+      "rörelse/pauser", Category.EXERCISE,
+      "rorelse/pauser", Category.EXERCISE, // fallback if accents drop
+      "vila/sömn", Category.REST,
+      "vila/somn", Category.REST, // fallback if accents drop
+      "möte", Category.MEETING,
+      "mote", Category.MEETING, // fallback if accents drop
       "dusch", Category.SHOWER,
+      "städning", Category.CLEANING,
+      "stadning", Category.CLEANING, // fallback if accents drop
+      "övrigt", Category.OTHER,
+      "ovrigt", Category.OTHER, // fallback if accents drop
       // English
       "meal", Category.MEAL,
       "meals", Category.MEAL,
       "medication", Category.MEDICATION,
       "medicine", Category.MEDICATION,
+      "exercise", Category.EXERCISE,
+      "rest", Category.REST,
+      "sleep", Category.REST,
+      "meeting", Category.MEETING,
       "shower", Category.SHOWER,
+      "cleaning", Category.CLEANING,
       "other", Category.OTHER);
       
   private Category mapCategory(String raw) {
