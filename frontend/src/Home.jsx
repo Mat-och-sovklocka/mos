@@ -1,13 +1,14 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
 
 
 const Home = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   const items = [
 
@@ -33,7 +34,10 @@ const Home = () => {
           <span className="badge bg-primary ms-2">{user?.userType}</span>
         </div>
         <button 
-          onClick={logout}
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
           className="btn btn-outline-danger btn-sm"
         >
           Logout

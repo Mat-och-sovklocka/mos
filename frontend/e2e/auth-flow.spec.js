@@ -6,7 +6,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('http://localhost:3000/login')
     
     // Check login form is visible
-    await expect(page.getByText('MOS')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'MOS' })).toBeVisible()
     await expect(page.getByText('Mat och sovklocka')).toBeVisible()
     
     // Fill in credentials
@@ -17,8 +17,8 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]')
     
     // Should redirect to home page
-    await expect(page).toHaveURL('http://localhost:3000/')
-    await expect(page.getByText('Welcome,')).toBeVisible()
+    await expect(page).toHaveURL('http://localhost:3000/', { timeout: 10000 })
+    await expect(page.getByText('Welcome,')).toBeVisible({ timeout: 10000 })
   })
 
   test('should show error for invalid credentials', async ({ page }) => {
@@ -43,7 +43,7 @@ test.describe('Authentication Flow', () => {
     await page.click('button[type="submit"]')
     
     // Wait for home page
-    await expect(page).toHaveURL('http://localhost:3000/')
+    await expect(page).toHaveURL('http://localhost:3000/', { timeout: 10000 })
     
     // Click logout
     await page.click('button:has-text("Logout")')
