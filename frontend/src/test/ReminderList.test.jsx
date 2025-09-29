@@ -101,13 +101,32 @@ describe('ReminderList Component', () => {
 
   it('calls delete API when confirmation is accepted', async () => {
     global.confirm = vi.fn(() => true)
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve([])
-    }).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve([])
-    })
+    
+    // First call: fetch reminders (returns test data)
+    // Second call: delete reminder (returns success)
+    // Third call: refetch reminders (returns empty array)
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve([
+          {
+            id: '1',
+            type: 'once',
+            category: 'MEAL',
+            note: 'Test reminder',
+            dateTime: '2024-01-25T12:00:00Z',
+            createdAt: '2024-01-25T10:00:00Z'
+          }
+        ])
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ success: true })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve([])
+      })
     
     renderWithRouter(<ReminderList />)
     

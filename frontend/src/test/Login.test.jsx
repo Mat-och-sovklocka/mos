@@ -42,8 +42,10 @@ describe('Login Component', () => {
     renderWithRouter(<Login />)
     
     expect(screen.getByText('Demo-uppgifter:')).toBeInTheDocument()
-    expect(screen.getByText(/Admin:.*admin@mos\.test.*password123/)).toBeInTheDocument()
-    expect(screen.getByText(/Beware:.*resident1@mos\.test.*password123/)).toBeInTheDocument()
+    expect(screen.getByText('Admin:')).toBeInTheDocument()
+    expect(screen.getByText('admin@mos.test / password123')).toBeInTheDocument()
+    expect(screen.getByText('Beware:')).toBeInTheDocument()
+    expect(screen.getByText('resident1@mos.test / password123')).toBeInTheDocument()
   })
 
   it('calls login function when form is submitted', async () => {
@@ -86,16 +88,28 @@ describe('Login Component', () => {
   })
 
   it('shows loading state during login', async () => {
-    mockLogin.mockImplementation(() => new Promise(resolve => 
-      setTimeout(() => resolve({ success: true }), 100)
-    ))
+    let resolveLogin
+    const loginPromise = new Promise(resolve => {
+      resolveLogin = resolve
+    })
+    mockLogin.mockReturnValue(loginPromise)
     
     renderWithRouter(<Login />)
     
+    const emailInput = screen.getByLabelText('E-post')
+    const passwordInput = screen.getByLabelText('Lösenord')
     const submitButton = screen.getByRole('button', { name: 'Logga in' })
+    
+    fireEvent.change(emailInput, { target: { value: 'admin@mos.test' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
     fireEvent.click(submitButton)
     
-    expect(screen.getByText(/Loggar in/)).toBeInTheDocument()
+    // Check loading state immediately after click
+    expect(screen.getByText('Loggar in...')).toBeInTheDocument()
     expect(submitButton).toBeDisabled()
+    
+    // Resolve the promise to complete the test
+    resolveLogin({ success: true })
+    await loginPromise
   })
 })

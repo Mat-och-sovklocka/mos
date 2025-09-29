@@ -287,8 +287,22 @@ const ReminderList = () => {
                 )}
               </div>
               <div className="reminder-actions">
-                <FaEdit onClick={() => setEditingId(rem.id)} />
-                <FaTrash onClick={() => handleDeleteOnce(rem.id)} />
+                <FaEdit 
+                  onClick={() => setEditingId(rem.id)} 
+                  title="Redigera påminnelse"
+                  aria-label="Redigera påminnelse"
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                />
+                <FaTrash 
+                  onClick={() => handleDeleteOnce(rem.id)} 
+                  title="Ta bort påminnelse"
+                  aria-label="Ta bort påminnelse"
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                />
               </div>
             </div>
           </div>
@@ -322,8 +336,22 @@ const ReminderList = () => {
                 )}
               </div>
               <div className="reminder-actions">
-                <FaEdit onClick={() => setEditingId(rem.id)} />
-                <FaTrash onClick={() => handleDeleteRecurring(rem.id)} />
+                <FaEdit 
+                  onClick={() => setEditingId(rem.id)} 
+                  title="Redigera påminnelse"
+                  aria-label="Redigera påminnelse"
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                />
+                <FaTrash 
+                  onClick={() => handleDeleteRecurring(rem.id)} 
+                  title="Ta bort påminnelse"
+                  aria-label="Ta bort påminnelse"
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                />
               </div>
             </div>
           </div>
