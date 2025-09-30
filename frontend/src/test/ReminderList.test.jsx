@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import ReminderList from '../Reminderlist'
@@ -57,8 +57,10 @@ describe('ReminderList Component', () => {
     })
   })
 
-  it('renders reminder list with Swedish title', () => {
-    renderWithRouter(<ReminderList />)
+  it('renders reminder list with Swedish title', async () => {
+    await act(async () => {
+      renderWithRouter(<ReminderList />)
+    })
     
     expect(screen.getByText('Påminnelselista')).toBeInTheDocument()
   })
@@ -87,14 +89,18 @@ describe('ReminderList Component', () => {
   it('shows delete confirmation when delete button is clicked', async () => {
     global.confirm = vi.fn(() => true)
     
-    renderWithRouter(<ReminderList />)
+    await act(async () => {
+      renderWithRouter(<ReminderList />)
+    })
     
     await waitFor(() => {
       expect(screen.getByText('Test reminder')).toBeInTheDocument()
     })
     
     const deleteButton = screen.getByRole('button', { name: /ta bort/i })
-    fireEvent.click(deleteButton)
+    await act(async () => {
+      fireEvent.click(deleteButton)
+    })
     
     expect(global.confirm).toHaveBeenCalled()
   })

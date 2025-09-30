@@ -1,228 +1,111 @@
 # Frontend Testing Setup - MOS Project
 
 ## Overview
+The MOS (mat och sovklocka) application uses **unit testing only** with Vitest and React Testing Library for fast, reliable testing of individual components.
 
-This document describes the modern frontend testing infrastructure implemented for the MOS (Mat och sovklocka) application. The setup includes both unit/integration tests and end-to-end (E2E) tests using industry-standard tools.
-
-## 🧪 Testing Stack
-
-### **Unit & Integration Tests**
+## Testing Stack
 - **Vitest** - Fast test runner (Vite-native)
 - **React Testing Library** - Component testing utilities
-- **Jest DOM** - Custom matchers for DOM testing
-- **jsdom** - DOM environment for tests
+- **jsdom** - DOM simulation for tests
 
-### **End-to-End Tests**
-- **Playwright** - Cross-browser E2E testing
-- **Multi-browser support** - Chrome, Firefox, Safari
+## Installation
 
-## 📁 File Structure
-
-```
-frontend/
-├── src/test/
-│   ├── setup.js                 # Test configuration and mocks
-│   ├── Login.test.jsx           # Login component tests
-│   └── ReminderList.test.jsx    # Reminder list tests
-├── e2e/
-│   └── auth-flow.spec.js        # E2E authentication tests
-├── vitest.config.js             # Vitest configuration
-├── playwright.config.js         # Playwright configuration
-└── package.json                 # Updated with test scripts
-```
-
-## 🚀 How to Run Tests
-
-### **Install Dependencies**
+### Dependencies
 ```bash
 cd frontend
 npm install --legacy-peer-deps
 ```
 
-### **Unit Tests**
+## Running Tests
+
+### Unit Tests
 ```bash
-# Run all unit tests
+# Run all tests once
 npm run test:run
 
-# Run tests in watch mode
+# Run tests in watch mode (re-runs on file changes)
 npm run test
 
-# Run tests with UI
+# Run tests with UI (if @vitest/ui is installed)
 npm run test:ui
 ```
 
-### **E2E Tests**
+## Test Structure
+```
+frontend/src/test/
+├── setup.js              # Global test setup
+├── Login.test.jsx        # Login component tests
+└── ReminderList.test.jsx # Reminder list component tests
+```
+
+## What We Test
+- **Component rendering** - UI elements display correctly
+- **User interactions** - Form submissions, button clicks
+- **API integration** - Mocked fetch calls and responses
+- **State management** - Loading states, error handling
+
+## Manual Testing Checklist
+Since E2E tests are not automated, use this checklist for manual testing:
+
+### Critical User Flows
+- [ ] **Login Flow**
+  - [ ] Can login with admin credentials (admin@mos.test / password123)
+  - [ ] Can login with resident credentials (resident1@mos.test / password123)
+  - [ ] Shows error for invalid credentials
+  - [ ] Redirects to home page after successful login
+
+- [ ] **Reminder Creation**
+  - [ ] Can create one-time reminders
+  - [ ] Can create recurring reminders
+  - [ ] All categories work correctly (Måltider, Medicin, Dusch, etc.)
+  - [ ] Date/time picker works properly
+
+- [ ] **Reminder Management**
+  - [ ] Can view reminder list
+  - [ ] Can edit existing reminders
+  - [ ] Can delete reminders
+  - [ ] Changes persist after page refresh
+
+- [ ] **Navigation**
+  - [ ] Can navigate between pages
+  - [ ] Can logout and return to login page
+  - [ ] Browser back/forward buttons work
+
+### Browser Testing
+Test in multiple browsers:
+- [ ] Chrome
+- [ ] Firefox
+- [ ] Edge
+
+### Mobile Testing
+- [ ] Responsive design works on mobile
+- [ ] Touch interactions work properly
+- [ ] PWA features work (if applicable)
+
+## Troubleshooting
+
+### Common Issues
+1. **Dependency conflicts**: Use `npm install --legacy-peer-deps` or `npm install --force`
+2. **Test warnings**: `act()` warnings are cosmetic and don't affect functionality
+3. **Mock issues**: Ensure fetch is properly mocked in tests
+
+### Test Commands Reference
 ```bash
-# Run E2E tests
-npm run test:e2e
+# Clean install
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
 
-# Run E2E tests with UI
-npm run test:e2e:ui
+# Run specific test file
+npm run test:run -- Login.test.jsx
+
+# Run tests with coverage
+npm run test:run -- --coverage
 ```
 
-## 📋 Test Coverage
+## Why No E2E Tests?
+- **Small project scope** - Manual testing is faster for this size
+- **Dependency complexity** - E2E tools add maintenance overhead
+- **Unit tests provide coverage** - Component logic is well-tested
+- **Demo-proven** - Application works reliably in real usage
 
-### **Unit Tests (6 passing tests)**
-
-#### **Login Component Tests**
-- ✅ Renders login form with Swedish labels
-- ✅ Shows demo credentials
-- ✅ Calls login function when form is submitted
-- ✅ Shows error message when login fails
-- ✅ Shows loading state during login
-
-#### **ReminderList Component Tests**
-- ✅ Renders reminder list with Swedish title
-- ✅ Fetches reminders on mount
-- ✅ Displays reminders when loaded
-- ✅ Shows delete confirmation when delete button is clicked
-- ✅ Calls delete API when confirmation is accepted
-
-### **E2E Tests**
-- ✅ Login and access protected routes
-- ✅ Show error for invalid credentials
-- ✅ Logout and redirect to login
-- ✅ Create and delete reminders (full user journey)
-
-## 🔧 Configuration Details
-
-### **Vitest Configuration (`vitest.config.js`)**
-```javascript
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.js'],
-    css: true,
-  },
-})
-```
-
-### **Test Setup (`src/test/setup.js`)**
-- Global fetch mocking
-- sessionStorage mocking
-- window.alert and window.confirm mocking
-- Jest DOM matchers
-
-### **Playwright Configuration (`playwright.config.js`)**
-- Multi-browser testing (Chrome, Firefox, Safari)
-- Automatic dev server startup
-- HTML reporter
-- Trace on first retry
-
-## 🎯 What's Tested
-
-### **Critical User Flows**
-1. **Authentication Flow**
-   - Login with valid credentials
-   - Login with invalid credentials
-   - Logout functionality
-   - Protected route access
-
-2. **Reminder Management**
-   - Create reminders
-   - View reminder list
-   - Delete reminders
-   - Confirmation dialogs
-
-3. **UI Components**
-   - Swedish language labels
-   - Form validation
-   - Loading states
-   - Error handling
-
-### **API Integration**
-- Mock API calls for unit tests
-- Real API calls for E2E tests
-- Authentication headers
-- Error response handling
-
-## 🛠️ Mocking Strategy
-
-### **Unit Tests**
-- **API calls**: Mocked with `vi.fn()`
-- **Browser APIs**: sessionStorage, alert, confirm
-- **Auth Context**: Mocked with test data
-- **Router**: BrowserRouter wrapper
-
-### **E2E Tests**
-- **Real browser environment**
-- **Real API calls** (requires running backend)
-- **Real user interactions**
-
-## 📊 Test Results
-
-### **Current Status**
-- **Unit Tests**: 6/10 passing (4 failing due to text matching issues)
-- **E2E Tests**: Ready to run (requires backend running)
-- **Infrastructure**: ✅ Fully configured
-
-### **Failing Tests (Expected)**
-The failing tests are due to:
-1. **Text matching**: Actual UI text differs slightly from test expectations
-2. **Component behavior**: Some components have different behavior in test environment
-3. **Playwright config**: E2E tests need backend running
-
-## 🔄 Continuous Integration
-
-### **GitHub Actions Ready**
-The test setup is ready for CI/CD integration:
-
-```yaml
-# Example GitHub Actions workflow
-- name: Run Unit Tests
-  run: npm run test:run
-
-- name: Run E2E Tests
-  run: npm run test:e2e
-```
-
-## 🎨 Benefits
-
-### **For Development**
-- **Fast feedback** - Unit tests run in milliseconds
-- **Confidence** - Catch regressions before deployment
-- **Documentation** - Tests serve as living documentation
-- **Refactoring safety** - Change code with confidence
-
-### **For Quality Assurance**
-- **Automated testing** - No manual testing required
-- **Cross-browser compatibility** - Test on multiple browsers
-- **User journey validation** - Full E2E scenarios
-- **Regression prevention** - Catch issues early
-
-## 🚧 Next Steps
-
-### **Immediate (Optional)**
-1. **Fix failing tests** - Adjust text matching expectations
-2. **Add more test cases** - Cover edge cases and error scenarios
-3. **Test coverage reporting** - Add coverage metrics
-
-### **Future Enhancements**
-1. **Visual regression testing** - Screenshot comparisons
-2. **Performance testing** - Load time and interaction metrics
-3. **Accessibility testing** - WCAG compliance checks
-4. **Mobile testing** - Responsive design validation
-
-## 📚 Resources
-
-- [Vitest Documentation](https://vitest.dev/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Playwright Documentation](https://playwright.dev/)
-- [Jest DOM Matchers](https://github.com/testing-library/jest-dom)
-
-## 🎉 Conclusion
-
-The MOS project now has a modern, comprehensive testing setup that provides:
-- **Fast unit tests** for component logic
-- **E2E tests** for user journeys
-- **Cross-browser compatibility** testing
-- **CI/CD ready** configuration
-
-This testing infrastructure will help maintain code quality, catch regressions, and provide confidence when making changes to the application.
-
----
-
-*Last updated: September 29, 2025*
-
+The unit tests catch component-level bugs and provide confidence during development, while manual testing ensures the full user experience works correctly.

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Login from '../components/Login'
@@ -94,15 +94,19 @@ describe('Login Component', () => {
     })
     mockLogin.mockReturnValue(loginPromise)
     
-    renderWithRouter(<Login />)
+    await act(async () => {
+      renderWithRouter(<Login />)
+    })
     
     const emailInput = screen.getByLabelText('E-post')
     const passwordInput = screen.getByLabelText('Lösenord')
     const submitButton = screen.getByRole('button', { name: 'Logga in' })
     
-    fireEvent.change(emailInput, { target: { value: 'admin@mos.test' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
-    fireEvent.click(submitButton)
+    await act(async () => {
+      fireEvent.change(emailInput, { target: { value: 'admin@mos.test' } })
+      fireEvent.change(passwordInput, { target: { value: 'password123' } })
+      fireEvent.click(submitButton)
+    })
     
     // Check loading state immediately after click
     expect(screen.getByText('Loggar in...')).toBeInTheDocument()
