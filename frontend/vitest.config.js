@@ -10,9 +10,7 @@ export default defineConfig({
     css: true,
     exclude: [
       '**/node_modules/**',
-      '**/dist/**',
-      '**/e2e/**',
-      '**/*.e2e.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+      '**/dist/**'
     ],
   },
 })
