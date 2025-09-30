@@ -215,9 +215,10 @@ const ReminderList = () => {
       id,
       type: "once",
       category: currentReminder.category,
-      dateTime: `${form.date.value}T${form.time.value}`,
+      dateTime: `${form.date.value}T${form.time.value}:00+02:00`, // Add timezone info for OffsetDateTime
       note: form.note.value,
     };
+
 
     try {
       const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
@@ -229,12 +230,18 @@ const ReminderList = () => {
         body: JSON.stringify(updatedReminder)
       });
 
+      console.log('Edit response status:', response.status);
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('Edit response data:', responseData);
         // Only update frontend state after successful API call
         setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
         setEditingId(null);
         alert('Påminnelse har uppdaterats!');
       } else {
+        const errorText = await response.text();
+        console.error('Edit failed:', response.status, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
@@ -302,8 +309,6 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
-              {/* Debug: Show the actual category value */}
-              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -364,8 +369,6 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
-              {/* Debug: Show the actual category value */}
-              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
