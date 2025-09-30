@@ -215,9 +215,13 @@ const ReminderList = () => {
       id,
       type: "once",
       category: currentReminder.category,
-      dateTime: `${form.date.value}T${form.time.value}`,
+      dateTime: `${form.date.value}T${form.time.value}:00+02:00`, // Add timezone info for OffsetDateTime
       note: form.note.value,
     };
+
+    console.log('Submitting edit for reminder:', id, updatedReminder);
+    console.log('User:', user);
+    console.log('Auth headers:', getAuthHeaders());
 
     try {
       const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
@@ -229,12 +233,18 @@ const ReminderList = () => {
         body: JSON.stringify(updatedReminder)
       });
 
+      console.log('Edit response status:', response.status);
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log('Edit response data:', responseData);
         // Only update frontend state after successful API call
         setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
         setEditingId(null);
         alert('Påminnelse har uppdaterats!');
       } else {
+        const errorText = await response.text();
+        console.error('Edit failed:', response.status, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
@@ -332,7 +342,10 @@ const ReminderList = () => {
               </div>
               <div className="reminder-actions">
                 <FaEdit 
-                  onClick={() => setEditingId(rem.id)} 
+                  onClick={() => {
+                    console.log('Edit button clicked for once reminder:', rem.id, rem);
+                    setEditingId(rem.id);
+                  }} 
                   title="Redigera påminnelse"
                   aria-label="Redigera påminnelse"
                   role="button"
@@ -407,6 +420,7 @@ const ReminderList = () => {
       {/* Overlay + formulär för enstaka */}
       {currentReminder?.type === "once" && (
         <>
+          {console.log('Rendering edit form for once reminder:', currentReminder)}
           <div className="form-overlay" onClick={() => setEditingId(null)} />
           <div className="edit-form-container fixed-form">
             <form onSubmit={(e) => handleEditSubmit(e, currentReminder.id)}>
