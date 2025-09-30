@@ -219,9 +219,6 @@ const ReminderList = () => {
       note: form.note.value,
     };
 
-    console.log('Submitting edit for reminder:', id, updatedReminder);
-    console.log('User:', user);
-    console.log('Auth headers:', getAuthHeaders());
 
     try {
       const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
@@ -312,8 +309,6 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
-              {/* Debug: Show the actual category value */}
-              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -342,10 +337,7 @@ const ReminderList = () => {
               </div>
               <div className="reminder-actions">
                 <FaEdit 
-                  onClick={() => {
-                    console.log('Edit button clicked for once reminder:', rem.id, rem);
-                    setEditingId(rem.id);
-                  }} 
+                  onClick={() => setEditingId(rem.id)} 
                   title="Redigera påminnelse"
                   aria-label="Redigera påminnelse"
                   role="button"
@@ -377,8 +369,6 @@ const ReminderList = () => {
           >
             <div className="reminder-header">
               <h3>{categoryToLabel[rem.category] || rem.category}</h3>
-              {/* Debug: Show the actual category value */}
-              <small style={{color: 'red', fontSize: '10px'}}>Debug: {rem.category}</small>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -420,7 +410,6 @@ const ReminderList = () => {
       {/* Overlay + formulär för enstaka */}
       {currentReminder?.type === "once" && (
         <>
-          {console.log('Rendering edit form for once reminder:', currentReminder)}
           <div className="form-overlay" onClick={() => setEditingId(null)} />
           <div className="edit-form-container fixed-form">
             <form onSubmit={(e) => handleEditSubmit(e, currentReminder.id)}>
