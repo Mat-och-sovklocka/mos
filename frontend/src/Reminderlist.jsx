@@ -3,13 +3,15 @@ import React, { useState, useEffect, useRef } from "react";
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "./contexts/AuthContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import homeIcon from "./images/home.png";
 
 // Removed old login function - now using AuthContext
 
 const ReminderList = () => {
   const { user, getAuthHeaders } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   // const [data, setData] = useState(reminderData); // Kommenterad mock-initiering
   const [data, setData] = useState([]); // Starta med tom array istället
   const [expandedNoteId, setExpandedNoteId] = useState(null);
@@ -534,6 +536,12 @@ const ReminderList = () => {
           </div>
         </>
       )}
+      <img
+        src={homeIcon}
+        alt="Home"
+        className="home-icon"
+        onClick={() => navigate("/")}
+      />
     </div>
   );
 };

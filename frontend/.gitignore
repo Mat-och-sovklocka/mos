@@ -91,3 +91,6 @@ temp/
 # OS
 .DS_Store
 Thumbs.db
+
+# dotenv overrides
+.env.local
