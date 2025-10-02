@@ -156,7 +156,7 @@ const Form = () => {
                 <textarea
                   id="other"
                   className="kost-textarea"
-                  placeholder="Skriv här och tryck på enter mellan dina vali fall flera val anges"
+                  placeholder="Skriv här och tryck på enter mellan dina val i fall flera val anges"
                   value={annatText}
                   onChange={(e) => setAnnatText(e.target.value)}
                 />
