@@ -68,7 +68,7 @@ const Form = () => {
         }
       } catch (error) {
         console.error("Error fetching requirements:", error);
-        setError("Kunde inte hämta sparade kostpreferenser", response.status);
+        setError("Kunde inte hämta sparade kostpreferenser", error.status);
       } finally {
         setIsLoading(false);
       }
