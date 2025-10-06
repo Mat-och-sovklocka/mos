@@ -29,7 +29,7 @@ const Form = () => {
   // Hämta sparade preferenser när komponenten monteras
   useEffect(() => {
     const fetchRequirements = async () => {
-      if (!user) return; // Don't fetch if user is not logged in
+      if (!user?.id) return; // Don't fetch if user is not logged in
       
       try {
         const response = await fetch(
@@ -44,20 +44,26 @@ const Form = () => {
         }
 
         const data = await response.json();
-        // Extrahera bara requirement-värdena från response och uppdatera state
+        // Extrahera bara requirement-värdena från response
         const requirements = data.requirements.map((req) => req.requirement);
-        setValdaKost(requirements);
-
-        // Om någon requirement inte finns i kostAlternativ, lägg till i annatText
+        
+        // Separera standardkost från "annat"
         const standardKost = new Set(
           kostAlternativ.filter((k) => k !== "Annat")
+        );
+        const standardRequirements = requirements.filter(
+          (req) => standardKost.has(req)
         );
         const annatKost = requirements.filter(
           (req) => !standardKost.has(req)
         );
 
+        // Sätt standardkost som valda
+        setValdaKost(standardRequirements);
+
+        // Om det finns "annat" krav, lägg till "Annat" och sätt texten
         if (annatKost.length > 0) {
-          setValdaKost((prev) => [...prev.filter((k) => k !== "Annat"), "Annat"]);
+          setValdaKost(prev => [...prev, "Annat"]);
           setAnnatText(annatKost.join("\n"));
         }
       } catch (error) {
@@ -85,14 +91,9 @@ const Form = () => {
     // Ta bort "Annat" från listan
     const dataAttSkicka = [...valdaKost.filter((kost) => kost !== "Annat")];
 
-    // Lägg till varje rad från textarean som eget värde
+    // Lägg till textarean som ett värde
     if (valdaKost.includes("Annat") && annatText.trim()) {
-      const extraRader = annatText
-        .split("\n")
-        .map((rad) => rad.trim())
-        .filter((rad) => rad.length > 0);
-
-      dataAttSkicka.push(...extraRader);
+      dataAttSkicka.push(annatText.trim());
     }
 
     // Formattera data enligt API-specifikationen

@@ -49,13 +49,15 @@ public class MealRequirementController {
         // Delete existing meal requirements for this user
         mealRequirementRepository.deleteByUserId(userId);
         
-        // Create new meal requirements
+        // Create new meal requirements (remove duplicates)
         List<MealRequirement> newRequirements = request.requirements().stream()
+            .distinct() // Remove duplicates
+            .filter(requirement -> requirement != null && !requirement.trim().isEmpty()) // Remove null/empty
             .map(requirement -> {
                 MealRequirement mr = new MealRequirement();
                 mr.setUser(user);
                 mr.setType(com.attendo.mos.dto.MealRequirementType.OTHER);
-                mr.setNotes(requirement);
+                mr.setNotes(requirement.trim());
                 return mr;
             })
             .toList();
