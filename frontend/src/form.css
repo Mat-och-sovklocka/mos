@@ -21,6 +21,231 @@ body {
     padding-top: 20px;
 }
 
+.saved-requirements {
+  background-color: #f0f8f8;
+  border: 2px solid #316c6f;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem auto;
+  max-width: 900px;
+}
+
+.saved-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.saved-item {
+  background-color: #316c6f;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Two-box design styles */
+.preference-boxes {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.boxes-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.preference-box {
+  border: 2px solid #316c6f;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  min-height: 300px;
+}
+
+.saved-box {
+  background-color: #f0f8f8;
+}
+
+.available-box {
+  background-color: #f9f9f9;
+}
+
+.box-title {
+  color: #316c6f;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  border-bottom: 2px solid #316c6f;
+  padding-bottom: 0.5rem;
+}
+
+.preference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.preference-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.preference-item:hover {
+  border-color: #316c6f;
+  box-shadow: 0 2px 4px rgba(49, 108, 111, 0.1);
+}
+
+.preference-text {
+  font-weight: 500;
+  color: #333;
+}
+
+.add-btn, .remove-btn {
+  background-color: #316c6f;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover, .remove-btn:hover {
+  background-color: #2a5a5c;
+  transform: scale(1.1);
+}
+
+.remove-btn {
+  background-color: #dc3545;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}
+
+.empty-message {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin-top: 2rem;
+}
+
+.custom-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Tag-based input styles */
+.custom-tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: 2rem;
+}
+
+.custom-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #316c6f;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  gap: 0.5rem;
+}
+
+.tag-remove-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.tag-remove-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tag-input-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tag-input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.tag-input:focus {
+  outline: none;
+  border-color: #316c6f;
+}
+
+.add-tag-btn {
+  background-color: #316c6f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.add-tag-btn:hover:not(:disabled) {
+  background-color: #2a5a5c;
+  transform: scale(1.05);
+}
+
+.add-tag-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Ta bort alla andra selektorer som kan påverka .reminder-title */
 
 .kost-grid {
