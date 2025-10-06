@@ -92,5 +92,9 @@ temp/
 .DS_Store
 Thumbs.db
 
+*.code-workspace
+
+/frontend/vite.config.js
+
 # dotenv overrides
 .env.local
