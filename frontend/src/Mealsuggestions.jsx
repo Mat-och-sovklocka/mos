@@ -3,6 +3,8 @@ import './mealsuggestions.css'
 import { FaStar } from 'react-icons/fa'
 import { IoMdClose } from 'react-icons/io'
 import favoritesImage from './images/favorites.jpeg'
+import homeIcon from "./images/home.png";
+import { useNavigate } from "react-router-dom";
 
 // Bekräftelsemodal komponent
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title }) => {
@@ -164,8 +166,9 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
 }
 
 const Mealsuggestions = () => {
+  const navigate = useNavigate();
+
   // States
-  const [dietaryPreferences, setDietaryPreferences] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [recipes, setRecipes] = useState([])
   const [favorites, setFavorites] = useState([])
@@ -177,20 +180,6 @@ const Mealsuggestions = () => {
   const recipesPerPage = 5
   const totalPages = Math.ceil((showFavorites ? favorites : recipes).length / recipesPerPage)
   
-  // BACKEND_INTEGRATION: Hämta användarens kostpreferenser från backend
-  // GET /api/users/preferences
-  // Response: Array<string>
-  useEffect(() => {
-    // TODO: Ersätt denna mock med ett riktigt API-anrop
-    // fetch('/api/users/preferences')
-    //   .then(response => response.json())
-    //   .then(data => setDietaryPreferences(data))
-    //   .catch(error => console.error('Kunde inte hämta kostpreferenser:', error));
-
-    const mockDietaryPreferences = ['Vegetarisk', 'Glutenfri', 'Laktosfri']
-    setDietaryPreferences(mockDietaryPreferences)
-  }, [])
-
   // BACKEND_INTEGRATION: Hämta användarens sparade favoritrecept från backend
   // GET /api/favorites
   // Response: Array<Recipe>
@@ -828,108 +817,19 @@ const Mealsuggestions = () => {
   // - Error: { success: false, error: string }
   
   const handleToggleFavorite = (recipe) => {
-    const isFavorite = favorites.some(fav => fav.id === recipe.id)
-    
-    if (isFavorite) {
-      // BACKEND_INTEGRATION: Ta bort från favoriter
-      // SKICKAR: Endast recept-ID i URL:en
-      // API: DELETE /api/favorites/{recipeId}
-      // Exempel: DELETE /api/favorites/123
-      //
-      // TODO: Implementera API-anrop för att ta bort favorit
-      // fetch(`/api/favorites/${recipe.id}`, {
-      //   method: 'DELETE',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   }
-      // })
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     if (data.success) {
-      //       // Uppdatera frontend state först efter lyckat API-anrop
-      //       setFavorites(prev => prev.filter(fav => fav.id !== recipe.id));
-      //     } else {
-      //       console.error('Kunde inte ta bort favorit:', data.error);
-      //     }
-      //   })
-      //   .catch(error => console.error('Fel vid borttagning av favorit:', error));
-
-      // Temporär implementation tills backend är klar
-      setFavorites(prev => prev.filter(fav => fav.id !== recipe.id))
-    } else {
-      // Förbereder receptet för att läggas till i favoriter
-      const processedRecipe = {
-        ...recipe,
-        defaultServings: recipe.defaultServings || 2,
-        ingredients: recipe.ingredients.map(ingredient => 
-          typeof ingredient === 'string' ? parseIngredientString(ingredient) : ingredient
-        )
-      }
-
-      // BACKEND_INTEGRATION: Lägg till i favoriter
-      // SKICKAR: Helt receptobjekt med följande struktur:
-      // {
-      //   "recipeId": number,
-      //   "recipe": {
-      //     "title": string,
-      //     "defaultServings": number,
-      //     "cookingTime": string,
-      //     "ingredients": [
-      //       {
-      //         "item": string,
-      //         "amount": number,
-      //         "unit": string
-      //       }
-      //     ],
-      //     "instructions": string[],
-      //     "tips": string
-      //   }
-      // }
-      //
-      // API: POST /api/favorites/add
-      // TODO: Implementera API-anrop för att lägga till favorit
-      // fetch('/api/favorites/add', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     recipeId: recipe.id,
-      //     recipe: processedRecipe
-      //   })
-      // })
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     if (data.success) {
-      //       // Uppdatera frontend state först efter lyckat API-anrop
-      //       setFavorites(prev => [...prev, processedRecipe]);
-      //     } else {
-      //       console.error('Kunde inte lägga till favorit:', data.error);
-      //     }
-      //   })
-      //   .catch(error => console.error('Fel vid tillägg av favorit:', error));
-
-      // Temporär implementation tills backend är klar
-      setFavorites(prev => [...prev, processedRecipe])
-    }
+    const isFavorite = favorites.some(fav => fav.id === recipe.id);
 
     if (isFavorite) {
-      // STEG 1: Ta bort från favoriter i frontend
-      setFavorites(prev => prev.filter(fav => fav.id !== recipe.id))
+      // Ta bort receptet från favoriter
+      setFavorites(prev => prev.filter(fav => fav.id !== recipe.id));
     } else {
-      // STEG 1: Förbereder receptet för att läggas till i favoriter
-      // - Konvertera ingredienser från strängformat till objektformat om det behövs
-      // - Säkerställ att defaultServings finns
-      const processedRecipe = {
-        ...recipe,
-        defaultServings: recipe.defaultServings || 2,
-        ingredients: recipe.ingredients.map(ingredient => 
-          typeof ingredient === 'string' ? parseIngredientString(ingredient) : ingredient
-        )
-      }
-      
-      // STEG 2: Uppdatera frontend state med den nya favoriten
-      setFavorites(prev => [...prev, processedRecipe])
+      // Lägg till receptet i favoriter om det inte redan finns
+      setFavorites(prev => {
+        if (!prev.some(fav => fav.id === recipe.id)) {
+          return [...prev, recipe];
+        }
+        return prev; // Om receptet redan finns, gör inget
+      });
     }
   }
 
@@ -938,114 +838,111 @@ const Mealsuggestions = () => {
     .slice((currentPage - 1) * recipesPerPage, currentPage * recipesPerPage)
 
   return (
-    <div className="mealsuggestions-container">
-      <h2>Måltidsförslag</h2>
-      
-      {/* Kostpreferenser */}
-      <div className="dietary-preferences">
-        <h3>{dietaryPreferences.length === 0 ? 'Du har inte gjort några val' : 'Dina kostpreferenser:'}</h3>
-        {dietaryPreferences.length > 0 && (
-          <ul>
-            {dietaryPreferences.map((preference, index) => (
-              <li key={index}>{preference}</li>
-            ))}
-          </ul>
-        )}
-      </div>
+    <div className="mealsuggestions-page">
+      <div className="mealsuggestions-container">
+        <h2 className="mealsuggestions-title">Måltidsförslag</h2>
 
-      {/* Söksektion */}
-      <div className="search-section">
-        <label htmlFor="recipe-search">Vad vill du äta?</label>
-        <div className="search-input-container">
-          <input
-            id="recipe-search"
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Skriv t ex kyckling"
-          />
-          <button onClick={handleSearch}>Sök</button>
+        {/* Söksektion */}
+        <div className="search-section">
+          <label htmlFor="recipe-search">Vad vill du äta?</label>
+          <div className="search-input-container">
+            <input
+              id="recipe-search"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Skriv t ex kyckling"
+            />
+            <button onClick={handleSearch}>Sök</button>
+          </div>
         </div>
-      </div>
 
-      {/* Favoriter-sektion */}
-      <div className="favorites-section">
-        <label>Favoriter</label>
-        <div 
-          className={`favorites-button ${showFavorites ? 'active' : ''}`}
-          onClick={() => {
-            setShowFavorites(!showFavorites)
-            setCurrentPage(1)
-            setRecipes([]) // Rensa sökresultat när vi visar favoriter
-          }}
-        >
-          <img 
-            src={favoritesImage} 
-            alt="Favoriter" 
-            className="section-image"
-          />
-          <div className="favorites-info">
-            <div className="favorites-count">{favorites.length} sparade favoriter</div>
-            <div className="favorites-hint">
-              {showFavorites ? 'Klicka för att dölja favoriter' : 'Klicka för att visa favoriter'}
+        {/* Favoriter-sektion */}
+        <div className="favorites-section">
+          <label>Favoriter</label>
+          <div 
+            className={`favorites-button ${showFavorites ? 'active' : ''}`}
+            onClick={() => {
+              setShowFavorites(!showFavorites)
+              setCurrentPage(1)
+              setRecipes([]) // Rensa sökresultat när vi visar favoriter
+            }}
+          >
+            <img 
+              src={favoritesImage} 
+              alt="Favoriter" 
+              className="section-image"
+            />
+            <div className="favorites-info">
+              <div className="favorites-count">{favorites.length} sparade favoriter</div>
+              <div className="favorites-hint">
+                {showFavorites ? 'Klicka för att dölja favoriter' : 'Klicka för att visa favoriter'}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Resultatlista */}
-      <div className="results-section">
-        {(showFavorites || recipes.length > 0) && (
-          <>
-            <h3 className="section-title">
-              {showFavorites ? 'Dina favoritrecept' : 'Sökresultat'}
-            </h3>
-            {displayedRecipes.map(recipe => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                onToggleFavorite={handleToggleFavorite}
-                isFavorite={favorites.some(fav => fav.id === recipe.id)}
-              />
-            ))}
-          </>
-        )}
-        
-        {/* Knapp för att växla mellan första och andra uppsättningen recept */}
-        {!showFavorites && recipes.length > 0 && allSearchResults.length > 5 && (
-          <button 
-            className="toggle-results-button green-button"
-            onClick={() => {
-              const startIndex = showingFirstSet ? 5 : 0;
-              const endIndex = showingFirstSet ? 10 : 5;
-              setRecipes(allSearchResults.slice(startIndex, endIndex));
-              setShowingFirstSet(!showingFirstSet);
-              setCurrentPage(1); // Återställ paginering vid växling
-            }}
-          >
-            {showingFirstSet ? "Fler förslag" : "Fem första"}
-          </button>
-        )}
-      </div>
-
-      {/* Paginering */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-          >
-            Föregående
-          </button>
-          <span>{currentPage} av {totalPages}</span>
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Nästa
-          </button>
+        {/* Resultatlista */}
+        <div className="results-section">
+          {(showFavorites || recipes.length > 0) && (
+            <>
+              <h3 className="section-title">
+                {showFavorites ? 'Dina favoritrecept' : 'Sökresultat'}
+              </h3>
+              {displayedRecipes.map(recipe => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onToggleFavorite={handleToggleFavorite}
+                  isFavorite={favorites.some(fav => fav.id === recipe.id)}
+                />
+              ))}
+            </>
+          )}
+          
+          {/* Knapp för att växla mellan första och andra uppsättningen recept */}
+          {!showFavorites && recipes.length > 0 && allSearchResults.length > 5 && (
+            <button 
+              className="toggle-results-button green-button"
+              onClick={() => {
+                const startIndex = showingFirstSet ? 5 : 0;
+                const endIndex = showingFirstSet ? 10 : 5;
+                setRecipes(allSearchResults.slice(startIndex, endIndex));
+                setShowingFirstSet(!showingFirstSet);
+                setCurrentPage(1); // Återställ paginering vid växling
+              }}
+            >
+              {showingFirstSet ? "Fler förslag" : "Fem första"}
+            </button>
+          )}
         </div>
-      )}
+
+        {/* Paginering */}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              Föregående
+            </button>
+            <span>{currentPage} av {totalPages}</span>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Nästa
+            </button>
+          </div>
+        )}
+      </div>
+
+      <img
+        src={homeIcon}
+        alt="Home"
+        className="home-icon"
+        onClick={() => navigate("/")}
+      />
     </div>
   )
 }

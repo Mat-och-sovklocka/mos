@@ -96,3 +96,6 @@ SESSION_SUMMARY.md
 # Vite config
 /frontend/vite.config.js
 *.code-workspace
+*.code-workspace
+
+/frontend/vite.config.js
