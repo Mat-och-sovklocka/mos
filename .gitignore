@@ -90,6 +90,10 @@ build/
 SESSION_SUMMARY.md
 *_SUMMARY.md
 
+*.code-workspace
+
+/frontend/vite.config.js
+
 # Keep files
 .gitkeep
 
