@@ -1,3 +1,11 @@
+	// --- TEMP: Stubbar för AddUserForm ---
+	function handleSave() {
+		// TODO: Implementera spara användare
+		setEditUser(null);
+	}
+	function handleCancel() {
+		setEditUser(null);
+	}
 // Enkel modal-komponent
 function InfoModal({ show, name, message }) {
 	if (!show) return null;
@@ -185,6 +193,7 @@ function AddPatientBlock({ onAddPatient, patients, editPatient, onUpdatePatient,
 }
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./AdminUI.css";
@@ -195,11 +204,53 @@ function AddUserForm({ editUser, onSave, onCancel }) {
 	const [name, setName] = useState(editUser ? editUser.name : "");
 	const [email, setEmail] = useState(editUser ? editUser.email : "");
 	const [phone, setPhone] = useState(editUser ? editUser.phone : "");
-	// ...existing code for AddUserForm...
+
+	function handleSubmit(e) {
+		e.preventDefault();
+		// Enkel validering
+		if (name.trim().length < 2) {
+			alert("Namn måste anges");
+			return;
+		}
+		if (!email.includes('@')) {
+			alert("E-post måste anges");
+			return;
+		}
+		if (phone.trim().length < 6) {
+			alert("Telefon måste anges");
+			return;
+		}
+		onSave({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+		setName("");
+		setEmail("");
+		setPhone("");
+	}
+
+	return (
+		<form className="add-user-block" onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
+			<h2 className="admin-ui-block-title">Lägg till användare</h2>
+			<div className="mb-2">
+				<label htmlFor="user-name">Namn</label>
+				<input id="user-name" type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} />
+			</div>
+			<div className="mb-2">
+				<label htmlFor="user-email">Epost</label>
+				<input id="user-email" type="email" className="form-control" value={email} onChange={e => setEmail(e.target.value)} />
+			</div>
+			<div className="mb-3">
+				<label htmlFor="user-phone">Telefon</label>
+				<input id="user-phone" type="tel" className="form-control" value={phone} onChange={e => setPhone(e.target.value)} />
+			</div>
+			<div className="d-flex justify-content-center">
+				<button type="submit" className="btn btn-primary">Skicka inbjudan</button>
+			</div>
+		</form>
+	);
 }
 
 function AdminUI() {
-	const { user } = useAuth();
+const { user } = useAuth();
+console.log('DEBUG AdminUI user:', user);
 	// Mockade användare
 	const [users, setUsers] = useState([
 		{ id: 1, name: "Anna Andersson", email: "anna.andersson@example.com", phone: "070-1234567" },
@@ -256,7 +307,7 @@ function AdminUI() {
 
 	return (
 		<div className="admin-ui-container">
-				<InfoModal show={showModal} name={modalName} message={modalMessage} />
+			<InfoModal show={showModal} name={modalName} message={modalMessage} />
 			<h1 className="admin-ui-title">Admin UI</h1>
 			{user && (
 				<div className="admin-ui-badge">
@@ -268,28 +319,11 @@ function AdminUI() {
 			{/* Admin-meny: Lägg till användare */}
 			{user && user.userType === "ADMIN" && (
 				<div className="adminui-flex-container">
-					<div className="adminui-flex-item">
+					<div className="adminui-flex-item adminui-flex-wide" style={{ maxWidth: 500, minWidth: 320, width: '100%' }}>
 						<AddUserForm editUser={editUser} onSave={handleSave} onCancel={handleCancel} />
 						<div style={!!editUser ? { pointerEvents: "none", opacity: 0.5 } : {}}>
 							<UserListBlock users={users} selectedId={selectedId} setSelectedId={setSelectedId} onEdit={setEditUser} />
 						</div>
-					</div>
-					<div className="adminui-flex-item">
-						<AddPatientBlock
-							onAddPatient={handleAddPatient}
-							patients={patients}
-							editPatient={editPatient}
-							onUpdatePatient={handleUpdatePatient}
-							onCancelEdit={handleCancelEdit}
-						/>
-					</div>
-					<div className="adminui-flex-item">
-						<ResidentPatientListBlock
-							patients={patients}
-							setPatients={setPatients}
-							onEditPatient={handleEditPatient}
-							disabled={patientListDisabled}
-						/>
 					</div>
 				</div>
 			)}
@@ -314,17 +348,7 @@ function AdminUI() {
 					</div>
 				</div>
 			)}
-			<div className="adminui-home-row">
-				<div className="col-12 d-flex justify-content-center">
-					<a href="/">
-						<img
-							src={homeIcon}
-							alt="Tillbaka till startsidan"
-							style={{ width: "80px", cursor: "pointer" }}
-						/>
-					</a>
-				</div>
-			</div>
+			{/* Home-knappen borttagen */}
 		</div>
 	);
 }
