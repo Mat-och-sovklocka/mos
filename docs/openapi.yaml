@@ -137,22 +137,27 @@ paths:
           format: uuid
         description: User ID
       responses:
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties:
-                  type: object
         "200":
           description: OK
           content:
-            '*/*':
+            application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/ReminderDto"
+        "403":
+          description: Forbidden - User doesn't have permission to view reminders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to view reminders"
     post:
       tags:
       - reminders
@@ -176,23 +181,38 @@ paths:
               $ref: "#/components/schemas/CreateReminderRequest"
         required: true
       responses:
-        "400":
-          description: Invalid input
-          content:
-            '*/*':
-              schema:
-                type: string
-                example:
-                  status: 400
-                  error: Bad Request
-                  message: time must be now or future (±5m)
-                  path: /api/v1/reminders
         "201":
           description: Reminder created
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ReminderDto"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+                  message:
+                    type: string
+                    example: "time must be now or future (±5m)"
+        "403":
+          description: Forbidden - User doesn't have permission to create reminders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to create reminders"
   /api/users/{userId}/reminders/{reminderId}:
     put:
       tags:
@@ -271,6 +291,19 @@ paths:
                   message:
                     type: string
                     example: "Reminder not found for user"
+        "403":
+          description: Forbidden - User doesn't have permission to update reminders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to update reminders"
         "404":
           description: Reminder not found
           content:
@@ -308,16 +341,21 @@ paths:
           format: uuid
         description: Reminder ID
       responses:
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties:
-                  type: object
         "204":
           description: No Content
+        "403":
+          description: Forbidden - User doesn't have permission to delete reminders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to delete reminders"
 
   /api/users/{userId}/meal-requirements:
     get:
@@ -343,6 +381,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MealRequirementsResponse"
+        "403":
+          description: Forbidden - User doesn't have permission to view meal requirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to view meal requirements"
     post:
       tags:
       - meal-requirements
@@ -378,8 +429,294 @@ paths:
             application/json:
               schema:
                 type: object
-                additionalProperties:
-                  type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+                  message:
+                    type: string
+                    example: "Validation failed"
+        "403":
+          description: Forbidden - User doesn't have permission to manage meal requirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "You don't have permission to manage meal requirements"
+
+  # User Management endpoints
+  /api/user-management/caretakers:
+    post:
+      tags:
+      - user-management
+      summary: Create a caretaker
+      description: Create a new caretaker user and assign them to the current caregiver
+      operationId: createCaretaker
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCaretakerRequest"
+            example:
+              name: "John Doe"
+              email: "john.doe@example.com"
+      responses:
+        "200":
+          description: Caretaker created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440002"
+                email: "john.doe@example.com"
+                displayName: "John Doe"
+                userType: "RESIDENT"
+                isActive: true
+                createdAt: "2025-10-07T11:35:30.000Z"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+                  message:
+                    type: string
+                    example: "Email already exists"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+    get:
+      tags:
+      - user-management
+      summary: List caretakers
+      description: Get all caretakers assigned to the current caregiver
+      operationId: getCaretakers
+      security:
+      - bearerAuth: []
+      responses:
+        "200":
+          description: List of caretakers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+              example:
+                - id: "550e8400-e29b-41d4-a716-446655440002"
+                  email: "john.doe@example.com"
+                  displayName: "John Doe"
+                  userType: "RESIDENT"
+                  isActive: true
+                  createdAt: "2025-10-07T11:35:30.000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/user-management/caretakers/{caretakerId}/permissions:
+    get:
+      tags:
+      - user-management
+      summary: Get caretaker permissions
+      description: Get all permissions for a specific caretaker
+      operationId: getCaretakerPermissions
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: caretakerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Caretaker ID
+      responses:
+        "200":
+          description: List of permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
+        "403":
+          description: Forbidden - Caretaker not assigned to current caregiver
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "Access denied"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+    put:
+      tags:
+      - user-management
+      summary: Set caretaker permissions
+      description: Set permissions for a specific caretaker
+      operationId: setCaretakerPermissions
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: caretakerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Caretaker ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetPermissionsRequest"
+            example:
+              permissions: ["CREATE_REMINDERS", "VIEW_REMINDERS"]
+      responses:
+        "200":
+          description: Permissions updated successfully
+        "403":
+          description: Forbidden - Caretaker not assigned to current caregiver
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "Access denied"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/user-management/caretakers/{caretakerId}:
+    delete:
+      tags:
+      - user-management
+      summary: Delete caretaker
+      description: Delete a caretaker and remove all their assignments
+      operationId: deleteCaretaker
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: caretakerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Caretaker ID
+      responses:
+        "200":
+          description: Caretaker deleted successfully
+        "403":
+          description: Forbidden - Caretaker not assigned to current caregiver
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+                  message:
+                    type: string
+                    example: "Access denied"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/user-management/permissions:
+    get:
+      tags:
+      - user-management
+      summary: Get current user permissions
+      description: Get all permissions for the current authenticated user
+      operationId: getCurrentUserPermissions
+      security:
+      - bearerAuth: []
+      responses:
+        "200":
+          description: List of current user permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example: ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
 
 components:
   securitySchemes:
@@ -601,4 +938,66 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    # User Management schemas
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        email:
+          type: string
+          format: email
+          description: User email
+          example: "user@example.com"
+        displayName:
+          type: string
+          description: User display name
+          example: "John Doe"
+        userType:
+          type: string
+          enum: [ADMIN, CAREGIVER, RESIDENT]
+          description: User role
+          example: "RESIDENT"
+        isActive:
+          type: boolean
+          description: Whether user account is active
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2025-10-07T11:35:30.000Z"
+
+    CreateCaretakerRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          description: Caretaker's display name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: Caretaker's email address
+          example: "john.doe@example.com"
+
+    SetPermissionsRequest:
+      type: object
+      required:
+        - permissions
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [CREATE_REMINDERS, VIEW_REMINDERS, MEAL_REQUIREMENTS, MEAL_SUGGESTIONS, STATISTICS]
+          description: List of permissions to grant
+          example: ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
 

@@ -20,15 +20,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.attendo.mos.constants.PermissionConstants;
 import com.attendo.mos.dto.CreateReminderRequest;
 import com.attendo.mos.dto.ReminderDto;
 import com.attendo.mos.dto.ReminderResponse;
 import com.attendo.mos.dto.UpdateReminderRequest;
 import com.attendo.mos.service.ReminderService;
+import com.attendo.mos.service.UserPermissionService;
+import com.attendo.mos.config.JwtUtil;
 
 import jakarta.validation.Valid;
 
@@ -37,9 +41,13 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "http://localhost:3000")
 public class ReminderController {
     private final ReminderService service;
+    private final UserPermissionService userPermissionService;
+    private final JwtUtil jwtUtil;
     
-    public ReminderController(ReminderService service) {
+    public ReminderController(ReminderService service, UserPermissionService userPermissionService, JwtUtil jwtUtil) {
         this.service = service;
+        this.userPermissionService = userPermissionService;
+        this.jwtUtil = jwtUtil;
     }
     // Swagger annotations
     @Operation(summary = "Create a reminder", description = "Create a new reminder with time, category, and optional note.")
@@ -56,9 +64,18 @@ public class ReminderController {
     })
 
     @PostMapping
-    public ResponseEntity<?> create(@PathVariable UUID userId,
+    public ResponseEntity<?> create(@RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID userId,
             @RequestBody @Valid CreateReminderRequest req) {
         try {
+            UUID currentUserId = getCurrentUserId(authHeader);
+            if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "error", "Forbidden",
+                    "message", "You don't have permission to create reminders"
+                ));
+            }
+            
             var dto = service.addReminder(userId, req);
             return ResponseEntity.status(HttpStatus.CREATED).body(dto);
         } catch (IllegalArgumentException e) {
@@ -74,14 +91,33 @@ public class ReminderController {
         }
     }
     @GetMapping
-    public List<ReminderResponse> get(@PathVariable UUID userId) {
-        return service.getReminders(userId);
+    public ResponseEntity<?> get(@RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID userId) {
+        UUID currentUserId = getCurrentUserId(authHeader);
+        if (!hasPermission(currentUserId, PermissionConstants.VIEW_REMINDERS)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "error", "Forbidden",
+                "message", "You don't have permission to view reminders"
+            ));
+        }
+        
+        List<ReminderResponse> reminders = service.getReminders(userId);
+        return ResponseEntity.ok(reminders);
     }
 
     @DeleteMapping("/{reminderId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID userId, @PathVariable UUID reminderId) {
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID userId, @PathVariable UUID reminderId) {
+        UUID currentUserId = getCurrentUserId(authHeader);
+        if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "error", "Forbidden",
+                "message", "You don't have permission to delete reminders"
+            ));
+        }
+        
         service.deleteReminder(userId, reminderId);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Update a reminder", description = "Update an existing reminder with new time, category, or note.")
@@ -98,9 +134,18 @@ public class ReminderController {
             @ApiResponse(responseCode = "404", description = "Reminder not found")
     })
     @PutMapping("/{reminderId}")
-    public ResponseEntity<?> update(@PathVariable UUID userId, @PathVariable UUID reminderId,
+    public ResponseEntity<?> update(@RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID userId, @PathVariable UUID reminderId,
             @RequestBody @Valid UpdateReminderRequest req) {
         try {
+            UUID currentUserId = getCurrentUserId(authHeader);
+            if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "error", "Forbidden",
+                    "message", "You don't have permission to update reminders"
+                ));
+            }
+            
             var dto = service.updateReminder(userId, reminderId, req);
             return ResponseEntity.ok(dto);
         } catch (IllegalArgumentException e) {
@@ -114,6 +159,15 @@ public class ReminderController {
                 "message", "Failed to update reminder"
             ));
         }
+    }
+    
+    private UUID getCurrentUserId(String authHeader) {
+        String token = authHeader.substring(7); // Remove "Bearer "
+        return jwtUtil.getUserIdFromToken(token);
+    }
+    
+    private boolean hasPermission(UUID userId, String permission) {
+        return userPermissionService.hasPermission(userId, permission);
     }
 
 }

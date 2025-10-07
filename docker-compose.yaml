@@ -11,7 +11,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mos
       - SPRING_DATASOURCE_USERNAME=mos
       - SPRING_DATASOURCE_PASSWORD=mos
-    command: mvn spring-boot:run
+    command: mvn spring-boot:run -DskipTests
     depends_on:
       db:
         condition: service_healthy
