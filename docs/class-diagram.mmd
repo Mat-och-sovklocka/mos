@@ -1,0 +1,88 @@
+classDiagram
+  class User {
+    +UUID id
+    +String email
+    +String displayName
+    -String passwordHash
+    +OffsetDateTime createdAt
+    +UserType userType
+    +boolean isActive
+    +OffsetDateTime lastLoginAt
+  }
+
+  class Reminder {
+    +UUID id
+    +OffsetDateTime time
+    +Category category
+    +String note
+    +OffsetDateTime createdAt
+    +String type
+    +Map~String,Object~ recurrence
+  }
+
+  class MealRequirement {
+    +UUID id
+    +MealRequirementType type
+    +String notes
+    +OffsetDateTime createdAt
+  }
+
+  class UserAssignment {
+    +UUID id
+    +User caregiver
+    +User caretaker
+    +OffsetDateTime assignedAt
+  }
+
+  class UserPermission {
+    +UUID id
+    +User user
+    +String permissionName
+    +boolean isEnabled
+    +User grantedBy
+    +OffsetDateTime grantedAt
+  }
+
+  class Category {
+    <<enumeration>>
+    MEDICATION
+    MEAL
+    OTHER
+  }
+
+  class MealRequirementType {
+    <<enumeration>>
+    VEGETARIAN
+    VEGAN
+    GLUTEN_FREE
+    LACTOSE_FREE
+    NUT_ALLERGY
+    OTHER
+  }
+
+  class UserType {
+    <<enumeration>>
+    ADMIN
+    CAREGIVER
+    RESIDENT
+  }
+
+  class PermissionConstants {
+    <<enumeration>>
+    CREATE_REMINDERS
+    VIEW_REMINDERS
+    MEAL_REQUIREMENTS
+    MEAL_SUGGESTIONS
+    STATISTICS
+  }
+
+  User "1" --> "0..*" Reminder : owns
+  User "1" --> "0..*" MealRequirement : has
+  User "1" --> "0..*" UserAssignment : caregiver
+  User "1" --> "0..*" UserAssignment : caretaker
+  User "1" --> "0..*" UserPermission : has
+  User "1" --> "0..*" UserPermission : grantedBy
+  Reminder ..> Category : uses
+  MealRequirement ..> MealRequirementType : uses
+  User ..> UserType : uses
+  UserPermission ..> PermissionConstants : uses
