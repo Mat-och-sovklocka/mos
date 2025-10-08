@@ -99,6 +99,26 @@ public class UserManagementController {
         return ResponseEntity.ok(permissions);
     }
     
+    // Admin-only endpoints
+    @PostMapping("/admin/users")
+    public ResponseEntity<User> createUser(@RequestHeader("Authorization") String authHeader,
+                                         @RequestBody CreateUserRequest request) {
+        UUID adminId = getCurrentUserId(authHeader);
+        
+        // Verify admin has permission to create users (we'll add this permission later)
+        // For now, we'll check if user is admin type
+        // TODO: Add proper permission check for USER_MANAGEMENT permission
+        
+        User user = userManagementService.createUser(
+            request.getName(),
+            request.getEmail(),
+            request.getPassword(),
+            request.getUserType(),
+            adminId
+        );
+        return ResponseEntity.ok(user);
+    }
+    
     private UUID getCurrentUserId(String authHeader) {
         String token = authHeader.substring(7); // Remove "Bearer "
         return jwtUtil.getUserIdFromToken(token);
@@ -122,5 +142,22 @@ public class UserManagementController {
         // Getters and setters
         public List<String> getPermissions() { return permissions; }
         public void setPermissions(List<String> permissions) { this.permissions = permissions; }
+    }
+    
+    public static class CreateUserRequest {
+        private String name;
+        private String email;
+        private String password;
+        private String userType; // ADMIN, CAREGIVER, RESIDENT
+        
+        // Getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+        public String getUserType() { return userType; }
+        public void setUserType(String userType) { this.userType = userType; }
     }
 }
