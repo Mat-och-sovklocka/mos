@@ -1,6 +1,15 @@
-	// --- TEMP: Stubbar för AddUserForm ---
-	function handleSave() {
-		// TODO: Implementera spara användare
+// --- TEMP: Stubbar för AddUserForm ---
+	function handleSave(userData) {
+		// Lägg till användare i mockad lista
+		setUsers(prev => ([
+			...prev,
+			{
+				id: prev.length > 0 ? Math.max(...prev.map(u => u.id)) + 1 : 1,
+				name: userData.name,
+				email: userData.email,
+				phone: userData.phone
+			}
+		]));
 		setEditUser(null);
 	}
 	function handleCancel() {
@@ -248,6 +257,28 @@ function AddUserForm({ editUser, onSave, onCancel }) {
 	);
 }
 
+// Skapa resident/caretaker via backend
+async function createCaretaker({ name, email, phone }) {
+    try {
+        const response = await fetch('/api/user-management/caretakers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Lägg till eventuell auth-header här, t.ex. ...getAuthHeaders()
+            },
+            body: JSON.stringify({ name, email, phone })
+        });
+        if (!response.ok) {
+            throw new Error('Kunde inte skapa resident');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        alert('Fel vid skapande av resident: ' + error.message);
+        return null;
+    }
+}
+
 function AdminUI() {
 const { user } = useAuth();
 console.log('DEBUG AdminUI user:', user);
@@ -327,7 +358,7 @@ console.log('DEBUG AdminUI user:', user);
 					</div>
 				</div>
 			)}
-			{user && user.userType === "RESIDENT" && (
+			{user && user.userType === "CAREGIVER" && (
 				<div className="adminui-flex-container adminui-flex-column">
 					<div className="adminui-flex-item adminui-flex-wide">
 						<AddPatientBlock
