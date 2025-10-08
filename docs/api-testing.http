@@ -130,46 +130,9 @@ Authorization: Bearer {{caregiverToken}}
 Content-Type: application/json
 
 {
-  "name": "New Resident",
-  "email": "newresident@mos.test"
-}
-
-### 16b. Create New User (admin only) - NEW ENDPOINT
-# This endpoint allows admins to create any type of user (ADMIN, CAREGIVER, RESIDENT)
-# and automatically grants appropriate permissions based on user type
-POST {{baseUrl}}/user-management/admin/users
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
-
-{
-  "name": "New Caregiver",
-  "email": "newcaregiver@mos.test",
-  "password": "password123",
-  "userType": "CAREGIVER"
-}
-
-### 16c. Create New Admin User (admin only)
-POST {{baseUrl}}/user-management/admin/users
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
-
-{
-  "name": "New Admin",
-  "email": "newadmin@mos.test",
-  "password": "password123",
-  "userType": "ADMIN"
-}
-
-### 16d. Create New Resident User (admin only)
-POST {{baseUrl}}/user-management/admin/users
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
-
-{
-  "name": "New Resident",
   "email": "newresident@mos.test",
-  "password": "password123",
-  "userType": "RESIDENT"
+  "displayName": "New Resident",
+  "password": "password123"
 }
 
 ### 17. Set Permissions for Caretaker

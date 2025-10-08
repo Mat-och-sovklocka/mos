@@ -96,29 +96,4 @@ public class UserManagementService {
     public List<String> getCaretakerPermissions(UUID caretakerId) {
         return userPermissionService.getUserPermissions(caretakerId);
     }
-    
-    public User createUser(String name, String email, String password, String userType, UUID createdBy) {
-        User user = new User();
-        user.setDisplayName(name);
-        user.setEmail(email);
-        user.setPasswordHash(passwordEncoder.encode(password));
-        user.setUserType(UserType.valueOf(userType));
-        
-        User savedUser = userRepository.save(user);
-        
-        // If creating a caregiver or admin, grant them some default permissions
-        if (UserType.valueOf(userType) == UserType.CAREGIVER) {
-            // Grant basic permissions to caregivers
-            userPermissionService.grantPermission(savedUser.getId(), "VIEW_REMINDERS", createdBy);
-            userPermissionService.grantPermission(savedUser.getId(), "CREATE_REMINDERS", createdBy);
-            userPermissionService.grantPermission(savedUser.getId(), "MEAL_REQUIREMENTS", createdBy);
-        } else if (UserType.valueOf(userType) == UserType.ADMIN) {
-            // Grant all permissions to admins
-            userPermissionService.grantPermission(savedUser.getId(), "VIEW_REMINDERS", createdBy);
-            userPermissionService.grantPermission(savedUser.getId(), "CREATE_REMINDERS", createdBy);
-            userPermissionService.grantPermission(savedUser.getId(), "MEAL_REQUIREMENTS", createdBy);
-        }
-        
-        return savedUser;
-    }
 }

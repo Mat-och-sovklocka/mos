@@ -45,32 +45,6 @@ Content-Type: application/json
 }
 ```
 
-### User Management (Admin Operations)
-
-#### Create User (Admin Only)
-```http
-POST /api/user-management/admin/users
-Authorization: Bearer <admin_token>
-Content-Type: application/json
-
-{
-  "name": "New Caregiver",
-  "email": "newcaregiver@mos.test",
-  "password": "password123",
-  "userType": "CAREGIVER"
-}
-```
-
-**Available userTypes:**
-- `"ADMIN"` - Creates admin user with all permissions
-- `"CAREGIVER"` - Creates caregiver with basic permissions  
-- `"RESIDENT"` - Creates resident with no permissions (can be granted later)
-
-**Features:**
-- Automatically grants appropriate default permissions based on user type
-- Proper password hashing
-- Returns created user object
-
 #### List Caretakers
 ```http
 GET /api/user-management/caretakers
@@ -187,17 +161,11 @@ const hasPermission = (permission) => {
 
 ### API Testing with curl
 ```bash
-# Create caretaker (caregiver operation)
+# Create caretaker
 curl -X POST http://localhost:8080/api/user-management/caretakers \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"name": "Test User", "email": "test@example.com"}'
-
-# Create user (admin operation)
-curl -X POST http://localhost:8080/api/user-management/admin/users \
-  -H "Authorization: Bearer <admin_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "New Caregiver", "email": "newcaregiver@mos.test", "password": "password123", "userType": "CAREGIVER"}'
 
 # Set permissions
 curl -X PUT http://localhost:8080/api/user-management/caretakers/{id}/permissions \

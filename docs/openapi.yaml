@@ -718,78 +718,6 @@ paths:
                     type: string
                     example: "Unauthorized"
 
-  # Admin-only user management endpoints
-  /api/user-management/admin/users:
-    post:
-      tags:
-      - user-management
-      summary: Create user (Admin only)
-      description: Create a new user of any type (ADMIN, CAREGIVER, RESIDENT) with automatic permission assignment
-      operationId: createUser
-      security:
-      - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateUserRequest"
-            example:
-              name: "New Caregiver"
-              email: "newcaregiver@mos.test"
-              password: "password123"
-              userType: "CAREGIVER"
-      responses:
-        "200":
-          description: User created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-              example:
-                id: "550e8400-e29b-41d4-a716-446655440003"
-                email: "newcaregiver@mos.test"
-                displayName: "New Caregiver"
-                userType: "CAREGIVER"
-                isActive: true
-                createdAt: "2025-10-07T11:35:30.000Z"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Bad Request"
-                  message:
-                    type: string
-                    example: "Email already exists"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-        "403":
-          description: Forbidden - Admin access required
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Forbidden"
-                  message:
-                    type: string
-                    example: "Admin access required"
-
 components:
   securitySchemes:
     bearerAuth:
@@ -1072,32 +1000,4 @@ components:
             enum: [CREATE_REMINDERS, VIEW_REMINDERS, MEAL_REQUIREMENTS, MEAL_SUGGESTIONS, STATISTICS]
           description: List of permissions to grant
           example: ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
-
-    CreateUserRequest:
-      type: object
-      required:
-        - name
-        - email
-        - password
-        - userType
-      properties:
-        name:
-          type: string
-          description: User's display name
-          example: "New Caregiver"
-        email:
-          type: string
-          format: email
-          description: User's email address
-          example: "newcaregiver@mos.test"
-        password:
-          type: string
-          format: password
-          description: User's password
-          example: "password123"
-        userType:
-          type: string
-          enum: [ADMIN, CAREGIVER, RESIDENT]
-          description: Type of user to create
-          example: "CAREGIVER"
 
