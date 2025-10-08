@@ -13,7 +13,7 @@ const Home = () => {
   const items = [
 
     { className: "allergies", label: "Allergier och specialkost", link: "/form" },
-    { className: "home", label: "Home" },
+  { className: "settings", label: "Inställningar", link: "/adminui" },
     { className: "recepies", label: "Matförslag", link: "/mealsuggestions" },
     {
       className: "reminders_handle",
