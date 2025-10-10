@@ -63,6 +63,7 @@ public class AuthenticationService {
             user.getId(),
             user.getEmail(),
             user.getDisplayName(),
+            user.getPhone(),
             user.getUserType(),
             user.isActive(),
             user.getLastLoginAt(),
