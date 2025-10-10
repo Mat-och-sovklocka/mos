@@ -128,6 +128,7 @@ Content-Type: application/json
 {
   "name": "New Admin User",
   "email": "newadmin@mos.test",
+  "phone": "+46 70 123 4567",
   "userType": "ADMIN"
 }
 
@@ -139,6 +140,7 @@ Content-Type: application/json
 {
   "name": "New Caregiver",
   "email": "newcaregiver@mos.test",
+  "phone": "+46 70 234 5678",
   "userType": "CAREGIVER"
 }
 
@@ -150,6 +152,7 @@ Content-Type: application/json
 {
   "name": "New Resident",
   "email": "newresident@mos.test",
+  "phone": "+46 70 345 6789",
   "userType": "RESIDENT"
 }
 
@@ -164,7 +167,8 @@ Content-Type: application/json
 
 {
   "name": "New Resident",
-  "email": "newresident@mos.test"
+  "email": "newresident@mos.test",
+  "phone": "+46 70 123 4567"
 }
 
 ### 20. Set Permissions for Caretaker (use ID from step 19 response)

@@ -48,6 +48,7 @@ Retrieve details of the authenticated user.
   "id": "550e8400-e29b-41d4-a716-446655440001",
   "email": "admin@mos.test",
   "displayName": "System Administrator",
+  "phone": "+46 70 123 4567",
   "userType": "ADMIN",
   "isActive": true,
   "createdAt": "2025-09-22T09:13:56.743059+00"
@@ -168,7 +169,8 @@ Create a new caretaker user and assign them to the current caregiver.
 ```json
 {
   "name": "John Doe",
-  "email": "john.doe@example.com"
+  "email": "john.doe@example.com",
+  "phone": "+46 70 123 4567"
 }
 ```
 
@@ -178,6 +180,7 @@ Create a new caretaker user and assign them to the current caregiver.
   "id": "550e8400-e29b-41d4-a716-446655440002",
   "email": "john.doe@example.com",
   "displayName": "John Doe",
+  "phone": "+46 70 123 4567",
   "userType": "RESIDENT",
   "isActive": true,
   "createdAt": "2025-10-07T11:35:30.000Z"
@@ -258,6 +261,7 @@ Create a new user of any type (ADMIN, CAREGIVER, RESIDENT) with automatic permis
 {
   "name": "New Admin",
   "email": "newadmin@mos.test",
+  "phone": "+46 70 123 4567",
   "userType": "ADMIN"
 }
 ```
@@ -268,6 +272,7 @@ Create a new user of any type (ADMIN, CAREGIVER, RESIDENT) with automatic permis
   "id": "550e8400-e29b-41d4-a716-446655440005",
   "email": "newadmin@mos.test",
   "displayName": "New Admin",
+  "phone": "+46 70 123 4567",
   "userType": "ADMIN",
   "isActive": true,
   "createdAt": "2025-10-07T11:35:30.000Z"
@@ -325,6 +330,7 @@ All endpoints may return these error responses:
   "id": "uuid",
   "email": "string",
   "displayName": "string",
+  "phone": "string",
   "userType": "ADMIN|CAREGIVER|RESIDENT",
   "isActive": "boolean",
   "createdAt": "datetime"

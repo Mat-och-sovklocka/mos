@@ -35,6 +35,7 @@ public class UserManagementController {
         User caretaker = userManagementService.createCaretaker(
             request.getName(), 
             request.getEmail(), 
+            request.getPhone(),
             caregiverId
         );
         return ResponseEntity.ok(caretaker);
@@ -109,6 +110,7 @@ public class UserManagementController {
             User newUser = userManagementService.createUser(
                 request.getName(),
                 request.getEmail(),
+                request.getPhone(),
                 request.getUserType(),
                 adminId
             );
@@ -127,12 +129,15 @@ public class UserManagementController {
     public static class CreateCaretakerRequest {
         private String name;
         private String email;
+        private String phone;
         
         // Getters and setters
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
     }
     
     public static class SetPermissionsRequest {
@@ -146,6 +151,7 @@ public class UserManagementController {
     public static class CreateUserRequest {
         private String name;
         private String email;
+        private String phone;
         private UserType userType;
         
         // Getters and setters
@@ -153,6 +159,8 @@ public class UserManagementController {
         public void setName(String name) { this.name = name; }
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
         public UserType getUserType() { return userType; }
         public void setUserType(UserType userType) { this.userType = userType; }
     }

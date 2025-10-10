@@ -469,6 +469,7 @@ paths:
             example:
               name: "John Doe"
               email: "john.doe@example.com"
+              phone: "+46 70 123 4567"
       responses:
         "200":
           description: Caretaker created successfully
@@ -480,6 +481,7 @@ paths:
                 id: "550e8400-e29b-41d4-a716-446655440002"
                 email: "john.doe@example.com"
                 displayName: "John Doe"
+                phone: "+46 70 123 4567"
                 userType: "RESIDENT"
                 isActive: true
                 createdAt: "2025-10-07T11:35:30.000Z"
@@ -528,6 +530,7 @@ paths:
                 - id: "550e8400-e29b-41d4-a716-446655440002"
                   email: "john.doe@example.com"
                   displayName: "John Doe"
+                  phone: "+46 70 123 4567"
                   userType: "RESIDENT"
                   isActive: true
                   createdAt: "2025-10-07T11:35:30.000Z"
@@ -739,18 +742,21 @@ paths:
                 value:
                   name: "New Admin"
                   email: "newadmin@mos.test"
+                  phone: "+46 70 123 4567"
                   userType: "ADMIN"
               createCaregiver:
                 summary: Create a new caregiver user
                 value:
                   name: "New Caregiver"
                   email: "newcaregiver@mos.test"
+                  phone: "+46 70 234 5678"
                   userType: "CAREGIVER"
               createResident:
                 summary: Create a new resident user
                 value:
                   name: "New Resident"
                   email: "newresident@mos.test"
+                  phone: "+46 70 345 6789"
                   userType: "RESIDENT"
       responses:
         "200":
@@ -763,6 +769,7 @@ paths:
                 id: "550e8400-e29b-41d4-a716-446655440005"
                 email: "newadmin@mos.test"
                 displayName: "New Admin"
+                phone: "+46 70 123 4567"
                 userType: "ADMIN"
                 isActive: true
                 createdAt: "2025-10-07T11:35:30.000Z"
@@ -1042,6 +1049,10 @@ components:
           type: string
           description: User display name
           example: "John Doe"
+        phone:
+          type: string
+          description: User phone number
+          example: "+46 70 123 4567"
         userType:
           type: string
           enum: [ADMIN, CAREGIVER, RESIDENT]
@@ -1072,6 +1083,10 @@ components:
           format: email
           description: Caretaker's email address
           example: "john.doe@example.com"
+        phone:
+          type: string
+          description: Caretaker's phone number
+          example: "+46 70 123 4567"
 
     CreateUserRequest:
       type: object
@@ -1089,6 +1104,10 @@ components:
           format: email
           description: User's email address
           example: "newadmin@mos.test"
+        phone:
+          type: string
+          description: User's phone number
+          example: "+46 70 123 4567"
         userType:
           type: string
           enum: ["ADMIN", "CAREGIVER", "RESIDENT"]
