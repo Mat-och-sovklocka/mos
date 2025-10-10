@@ -1,6 +1,7 @@
 package com.attendo.mos.controller;
 
 import com.attendo.mos.entity.User;
+import com.attendo.mos.dto.UserType;
 import com.attendo.mos.service.UserManagementService;
 import com.attendo.mos.service.UserPermissionService;
 import com.attendo.mos.config.JwtUtil;
@@ -99,6 +100,24 @@ public class UserManagementController {
         return ResponseEntity.ok(permissions);
     }
     
+    @PostMapping("/admin/users")
+    public ResponseEntity<User> createUser(@RequestHeader("Authorization") String authHeader,
+                                         @RequestBody CreateUserRequest request) {
+        UUID adminId = getCurrentUserId(authHeader);
+        
+        try {
+            User newUser = userManagementService.createUser(
+                request.getName(),
+                request.getEmail(),
+                request.getUserType(),
+                adminId
+            );
+            return ResponseEntity.ok(newUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).build(); // Forbidden - not admin or other error
+        }
+    }
+    
     private UUID getCurrentUserId(String authHeader) {
         String token = authHeader.substring(7); // Remove "Bearer "
         return jwtUtil.getUserIdFromToken(token);
@@ -122,5 +141,19 @@ public class UserManagementController {
         // Getters and setters
         public List<String> getPermissions() { return permissions; }
         public void setPermissions(List<String> permissions) { this.permissions = permissions; }
+    }
+    
+    public static class CreateUserRequest {
+        private String name;
+        private String email;
+        private UserType userType;
+        
+        // Getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public UserType getUserType() { return userType; }
+        public void setUserType(UserType userType) { this.userType = userType; }
     }
 }
