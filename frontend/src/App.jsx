@@ -7,6 +7,7 @@ import Home from './Home.jsx';
 import Form from './Form.jsx';
 import Reminderlist from './Reminderlist.jsx';
 import Mealsuggestions from './Mealsuggestions.jsx';
+import AdminUI from './AdminUI.jsx';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
@@ -55,6 +56,11 @@ function App() {
           <Route path="/mealsuggestions" element={
             <ProtectedRoute>
               <Mealsuggestions />
+            </ProtectedRoute>
+          } />
+          <Route path="/adminui" element={
+            <ProtectedRoute>
+              <AdminUI />
             </ProtectedRoute>
           } />
         </Routes>
