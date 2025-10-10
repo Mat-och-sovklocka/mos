@@ -1,7 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:8080/api
 # Note: Tokens expire after 24 hours. Get fresh tokens by running the login requests below.
-@adminToken = YOUR_ADMIN_TOKEN_HERE
+@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc2MDExMjU1NywiZXhwIjoxNzYwMTk4OTU3fQ.yzU4Oa_8LtpZ2W6Xs4XBsgnOBcJLJ3CTLwGno3maqd15DcwhUei5BTXy9AqCXKLy41C5dFgMiAYyS17Ius5MTw
 @caregiverToken = YOUR_CAREGIVER_TOKEN_HERE
 @residentToken = YOUR_RESIDENT_TOKEN_HERE
 
@@ -120,50 +120,76 @@ Authorization: Bearer {{adminToken}}
 GET {{baseUrl}}/user-management/permissions
 Authorization: Bearer {{adminToken}}
 
-### 15. Get All Caretakers (for caregiver)
+### 15. Create New User (Admin only)
+POST {{baseUrl}}/user-management/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "New Admin User",
+  "email": "newadmin@mos.test",
+  "userType": "ADMIN"
+}
+
+### 16. Create New Caregiver (Admin only)
+POST {{baseUrl}}/user-management/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "New Caregiver",
+  "email": "newcaregiver@mos.test",
+  "userType": "CAREGIVER"
+}
+
+### 17. Create New Resident (Admin only)
+POST {{baseUrl}}/user-management/admin/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "New Resident",
+  "email": "newresident@mos.test",
+  "userType": "RESIDENT"
+}
+
+### 18. Get All Caretakers (for caregiver)
 GET {{baseUrl}}/user-management/caretakers
 Authorization: Bearer {{caregiverToken}}
 
-### 16. Create New Caretaker (caregiver only)
+### 19. Create New Caretaker (caregiver only)
 POST {{baseUrl}}/user-management/caretakers
 Authorization: Bearer {{caregiverToken}}
 Content-Type: application/json
 
 {
-  "email": "newresident@mos.test",
-  "displayName": "New Resident",
-  "password": "password123"
+  "name": "New Resident",
+  "email": "newresident@mos.test"
 }
 
-### 17. Set Permissions for Caretaker
-PUT {{baseUrl}}/user-management/caretakers/{{newCaretakerId}}/permissions
+### 20. Set Permissions for Caretaker (use ID from step 19 response)
+PUT {{baseUrl}}/user-management/caretakers/550e8400-e29b-41d4-a716-446655440004/permissions
 Authorization: Bearer {{caregiverToken}}
 Content-Type: application/json
 
 {
   "permissions": [
-    {
-      "permissionName": "VIEW_REMINDERS",
-      "isEnabled": true
-    },
-    {
-      "permissionName": "CREATE_REMINDERS",
-      "isEnabled": false
-    }
+    "VIEW_REMINDERS",
+    "CREATE_REMINDERS"
   ]
 }
 
-### 18. Delete Caretaker
-DELETE {{baseUrl}}/user-management/caretakers/{{newCaretakerId}}
+### 21. Delete Caretaker (use ID from step 19 response)
+DELETE {{baseUrl}}/user-management/caretakers/550e8400-e29b-41d4-a716-446655440004
 Authorization: Bearer {{caregiverToken}}
 
 ### ===== PERMISSION TESTING =====
 
-### 19. Test Permission Denied (resident trying to access admin endpoint)
+### 22. Test Permission Denied (resident trying to access admin endpoint)
 GET {{baseUrl}}/user-management/caretakers
 Authorization: Bearer {{residentToken}}
 
-### 20. Test Permission Denied (caregiver without MEAL_REQUIREMENTS permission)
+### 23. Test Permission Denied (caregiver without MEAL_REQUIREMENTS permission)
 POST {{baseUrl}}/users/{{residentId}}/meal-requirements
 Authorization: Bearer {{caregiverToken}}
 Content-Type: application/json
@@ -174,9 +200,9 @@ Content-Type: application/json
 
 ### ===== UTILITY ENDPOINTS =====
 
-### 21. Get All Users (admin only)
+### 24. Get All Users (admin only)
 GET {{baseUrl}}/users
 Authorization: Bearer {{adminToken}}
 
-### 22. Health Check
+### 25. Health Check
 GET {{baseUrl}}/health

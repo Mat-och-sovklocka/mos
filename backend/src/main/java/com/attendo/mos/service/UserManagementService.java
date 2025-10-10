@@ -96,4 +96,51 @@ public class UserManagementService {
     public List<String> getCaretakerPermissions(UUID caretakerId) {
         return userPermissionService.getUserPermissions(caretakerId);
     }
+    
+    /**
+     * Admin-only method to create any type of user with automatic permission assignment
+     */
+    public User createUser(String name, String email, UserType userType, UUID createdBy) {
+        // Verify the creator is an admin
+        User creator = userRepository.findById(createdBy)
+            .orElseThrow(() -> new RuntimeException("Creator not found"));
+        
+        if (creator.getUserType() != UserType.ADMIN) {
+            throw new RuntimeException("Only admins can create users");
+        }
+        
+        User newUser = new User();
+        newUser.setDisplayName(name);
+        newUser.setEmail(email);
+        newUser.setUserType(userType);
+        newUser.setPasswordHash(passwordEncoder.encode("defaultPassword123")); // TODO: Generate secure password
+        
+        User savedUser = userRepository.save(newUser);
+        
+        // Assign default permissions based on user type
+        assignDefaultPermissions(savedUser, createdBy);
+        
+        return savedUser;
+    }
+    
+    private void assignDefaultPermissions(User user, UUID grantedBy) {
+        switch (user.getUserType()) {
+            case ADMIN:
+                // Admins get all permissions
+                userPermissionService.grantPermission(user.getId(), "VIEW_REMINDERS", grantedBy);
+                userPermissionService.grantPermission(user.getId(), "CREATE_REMINDERS", grantedBy);
+                userPermissionService.grantPermission(user.getId(), "MEAL_REQUIREMENTS", grantedBy);
+                break;
+            case CAREGIVER:
+                // Caregivers get permissions to manage reminders and meal requirements
+                userPermissionService.grantPermission(user.getId(), "VIEW_REMINDERS", grantedBy);
+                userPermissionService.grantPermission(user.getId(), "CREATE_REMINDERS", grantedBy);
+                userPermissionService.grantPermission(user.getId(), "MEAL_REQUIREMENTS", grantedBy);
+                break;
+            case RESIDENT:
+                // Residents get basic view permissions
+                userPermissionService.grantPermission(user.getId(), "VIEW_REMINDERS", grantedBy);
+                break;
+        }
+    }
 }

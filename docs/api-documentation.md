@@ -246,6 +246,45 @@ Get all permissions for the current authenticated user.
 ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
 ```
 
+### Create User (Admin Only)
+**POST** `/api/user-management/admin/users`
+
+Create a new user of any type (ADMIN, CAREGIVER, RESIDENT) with automatic permission assignment.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "name": "New Admin",
+  "email": "newadmin@mos.test",
+  "userType": "ADMIN"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440005",
+  "email": "newadmin@mos.test",
+  "displayName": "New Admin",
+  "userType": "ADMIN",
+  "isActive": true,
+  "createdAt": "2025-10-07T11:35:30.000Z"
+}
+```
+
+**Responses:**
+- **200:** User created successfully
+- **400:** Bad request (e.g., email already exists)
+- **401:** Unauthorized
+- **403:** Forbidden - Only admins can create users
+
+**User Type Examples:**
+- **ADMIN:** Gets all permissions (VIEW_REMINDERS, CREATE_REMINDERS, MEAL_REQUIREMENTS)
+- **CAREGIVER:** Gets management permissions (VIEW_REMINDERS, CREATE_REMINDERS, MEAL_REQUIREMENTS)
+- **RESIDENT:** Gets basic permissions (VIEW_REMINDERS)
+
 ## Permission Types
 
 - **`CREATE_REMINDERS`** - Create, edit, and delete reminders

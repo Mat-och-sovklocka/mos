@@ -4,6 +4,8 @@ import com.attendo.mos.dto.LoginRequest;
 import com.attendo.mos.dto.LoginResponse;
 import com.attendo.mos.dto.UserInfoResponse;
 import com.attendo.mos.service.AuthenticationService;
+import com.attendo.mos.service.UserService;
+import com.attendo.mos.config.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,9 +24,15 @@ import java.util.UUID;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public AuthenticationController(AuthenticationService authenticationService) {
+    public AuthenticationController(AuthenticationService authenticationService, 
+                                  UserService userService, 
+                                  JwtUtil jwtUtil) {
         this.authenticationService = authenticationService;
+        this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
@@ -60,10 +68,22 @@ public class AuthenticationController {
                     .body("Missing or invalid authorization header");
             }
 
-            // For now, return a simple response - this would need JWT validation
-            // In a real implementation, you'd extract the user ID from the JWT token
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
-                .body("JWT token validation not implemented in service layer yet");
+            // Extract token from Authorization header
+            String token = authHeader.substring(7); // Remove "Bearer " prefix
+            
+            // Validate token
+            if (!jwtUtil.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid or expired token");
+            }
+
+            // Extract user ID from token
+            UUID userId = jwtUtil.getUserIdFromToken(token);
+            
+            // Get user info from service
+            UserInfoResponse userInfo = userService.getUserById(userId);
+            
+            return ResponseEntity.ok(userInfo);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
