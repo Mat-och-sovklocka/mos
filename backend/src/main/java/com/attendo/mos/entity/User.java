@@ -24,6 +24,8 @@ public class User {
     private String displayName;
     @Column(nullable = false)
     private String passwordHash;
+    @Column
+    private String phone;
     @Column(nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC);
     

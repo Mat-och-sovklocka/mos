@@ -7,6 +7,7 @@ public record UserInfoResponse(
     UUID id,
     String email,
     String displayName,
+    String phone,
     UserType userType,
     boolean isActive,
     OffsetDateTime lastLoginAt,

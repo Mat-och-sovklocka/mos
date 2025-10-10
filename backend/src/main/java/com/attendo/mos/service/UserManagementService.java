@@ -32,10 +32,11 @@ public class UserManagementService {
         this.passwordEncoder = passwordEncoder;
     }
     
-    public User createCaretaker(String name, String email, UUID caregiverId) {
+    public User createCaretaker(String name, String email, String phone, UUID caregiverId) {
         User caretaker = new User();
         caretaker.setDisplayName(name);
         caretaker.setEmail(email);
+        caretaker.setPhone(phone);
         caretaker.setUserType(UserType.RESIDENT); // Caretakers are residents
         caretaker.setPasswordHash(passwordEncoder.encode("defaultPassword123")); // TODO: Generate secure password
         
@@ -100,7 +101,7 @@ public class UserManagementService {
     /**
      * Admin-only method to create any type of user with automatic permission assignment
      */
-    public User createUser(String name, String email, UserType userType, UUID createdBy) {
+    public User createUser(String name, String email, String phone, UserType userType, UUID createdBy) {
         // Verify the creator is an admin
         User creator = userRepository.findById(createdBy)
             .orElseThrow(() -> new RuntimeException("Creator not found"));
@@ -112,6 +113,7 @@ public class UserManagementService {
         User newUser = new User();
         newUser.setDisplayName(name);
         newUser.setEmail(email);
+        newUser.setPhone(phone);
         newUser.setUserType(userType);
         newUser.setPasswordHash(passwordEncoder.encode("defaultPassword123")); // TODO: Generate secure password
         
