@@ -10,6 +10,8 @@
 @caregiverId = 550e8400-e29b-41d4-a716-446655440002
 @residentId = 550e8400-e29b-41d4-a716-446655440004
 
+@reminderId = 550e8400-e29b-41d4-a716-446655440001
+
 ### 1. Login as Admin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
