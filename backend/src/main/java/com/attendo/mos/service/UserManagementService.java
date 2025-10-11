@@ -106,8 +106,12 @@ public class UserManagementService {
         User creator = userRepository.findById(createdBy)
             .orElseThrow(() -> new RuntimeException("Creator not found"));
         
+        System.out.println("DEBUG: Creator user type: " + creator.getUserType());
+        System.out.println("DEBUG: Expected ADMIN type: " + UserType.ADMIN);
+        System.out.println("DEBUG: Are they equal? " + (creator.getUserType() == UserType.ADMIN));
+        
         if (creator.getUserType() != UserType.ADMIN) {
-            throw new RuntimeException("Only admins can create users");
+            throw new RuntimeException("Only admins can create users. Creator type: " + creator.getUserType());
         }
         
         User newUser = new User();

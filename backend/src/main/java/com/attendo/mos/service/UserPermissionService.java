@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,22 +33,25 @@ public class UserPermissionService {
     }
     
     public void grantPermission(UUID userId, String permissionName, UUID grantedBy) {
-        userPermissionRepository.findByUserIdAndPermissionName(userId, permissionName)
-            .ifPresentOrElse(
-                existingPermission -> {
-                    existingPermission.setIsEnabled(true);
-                    existingPermission.setGrantedBy(new User());
-                    userPermissionRepository.save(existingPermission);
-                },
-                () -> {
-                    UserPermission newPermission = new UserPermission();
-                    newPermission.setUser(new User());
-                    newPermission.setPermissionName(permissionName);
-                    newPermission.setIsEnabled(true);
-                    newPermission.setGrantedBy(new User());
-                    userPermissionRepository.save(newPermission);
-                }
-            );
+        // Check if permission already exists
+        Optional<UserPermission> existingPermission = userPermissionRepository.findByUserIdAndPermissionName(userId, permissionName);
+        
+        if (existingPermission.isPresent()) {
+            // Update existing permission
+            UserPermission permission = existingPermission.get();
+            permission.setIsEnabled(true);
+            userPermissionRepository.save(permission);
+        } else {
+            // Create new permission using the constructor that sets all fields
+            User user = new User();
+            user.setId(userId);
+            
+            User grantedByUser = new User();
+            grantedByUser.setId(grantedBy);
+            
+            UserPermission newPermission = new UserPermission(user, permissionName, true, grantedByUser);
+            userPermissionRepository.save(newPermission);
+        }
     }
     
     public void revokePermission(UUID userId, String permissionName) {
