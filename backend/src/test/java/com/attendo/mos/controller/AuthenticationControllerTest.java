@@ -107,6 +107,7 @@ class AuthenticationControllerTest {
         verify(authenticationService).authenticate(request);
     }
 
+    //todo: fix this test
     @Test
     void getCurrentUser_ShouldReturnUserInfoWhenTokenValid() throws Exception {
         // Given
