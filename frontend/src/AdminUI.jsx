@@ -282,23 +282,16 @@ async function createCaretaker({ name, email, phone }) {
 function AdminUI() {
 const { user } = useAuth();
 console.log('DEBUG AdminUI user:', user);
-	// Mockade användare
-	const [users, setUsers] = useState([
-		{ id: 1, name: "Anna Andersson", email: "anna.andersson@example.com", phone: "070-1234567" },
-		{ id: 2, name: "Bertil Berg", email: "bertil.berg@example.com", phone: "073-9876543" },
-		{ id: 3, name: "Cecilia Carlsson", email: "cecilia.carlsson@example.com", phone: "076-5554321" }
-	]);
-	const [selectedId, setSelectedId] = useState(1);
+	// Users will be fetched from API
+	const [users, setUsers] = useState([]);
+	const [selectedId, setSelectedId] = useState(null);
 	const [editUser, setEditUser] = useState(null);
 	// Patientlistan för resident
 	const modules = ["Lägg påminnelser", "Matförslag", "Statistik", "Specialkost"];
 	const extraModules = ["Se påminnelser"];
 	const defaultHelperModules = [...modules, ...extraModules];
-	const [patients, setPatients] = useState([
-		{ id: 1, name: "Elsa Eriksson", helperModules: [...defaultHelperModules] },
-		{ id: 2, name: "Gustav Gran", helperModules: [...defaultHelperModules] },
-		{ id: 3, name: "Mona Månsson", helperModules: [...defaultHelperModules] }
-	]);
+	// Patients will be fetched from API
+	const [patients, setPatients] = useState([]);
 	// Modal state
 	const [showModal, setShowModal] = useState(false);
 	const [modalName, setModalName] = useState("");

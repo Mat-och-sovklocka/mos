@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-// import reminderData from "./reminder-data.json"; // Kommenterad mock-data
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "./contexts/AuthContext";
@@ -12,8 +11,7 @@ const ReminderList = () => {
   const { user, getAuthHeaders } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  // const [data, setData] = useState(reminderData); // Kommenterad mock-initiering
-  const [data, setData] = useState([]); // Starta med tom array istället
+  const [data, setData] = useState([]);
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);

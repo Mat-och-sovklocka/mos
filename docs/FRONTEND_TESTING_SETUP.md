@@ -53,6 +53,7 @@ Since E2E tests are not automated, use this checklist for manual testing:
   - [ ] Can login with resident credentials (resident1@mos.test / password123)
   - [ ] Shows error for invalid credentials
   - [ ] Redirects to home page after successful login
+  - [ ] Demo credentials display correctly (including the "Beware:" label)
 
 - [ ] **Reminder Creation**
   - [ ] Can create one-time reminders
@@ -98,7 +99,7 @@ npm install --legacy-peer-deps
 # Run specific test file
 npm run test:run -- Login.test.jsx
 
-# Run tests with coverage
+# Run tests with coverage (requires @vitest/coverage-v8)
 npm run test:run -- --coverage
 ```
 
