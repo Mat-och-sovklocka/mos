@@ -108,7 +108,7 @@ class AuthenticationControllerTest {
     }
 
     //todo: fix this test
-/*     @Test
+    @Test
     void getCurrentUser_ShouldReturnUserInfoWhenTokenValid() throws Exception {
         // Given
         String authHeader = "Bearer " + testToken;
