@@ -648,6 +648,90 @@ paths:
                     example: "Unauthorized"
 
   /api/user-management/caretakers/{caretakerId}:
+    put:
+      tags:
+      - user-management
+      summary: Update caretaker
+      description: Update a caretaker's information (name, email, phone). Only the assigned caregiver can update their caretakers.
+      operationId: updateCaretaker
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: caretakerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: Caretaker ID to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCaretakerRequest"
+            example:
+              name: "Updated Caretaker Name"
+              email: "updatedcaretaker@mos.test"
+              phone: "+46 70 777 6666"
+      responses:
+        "200":
+          description: Caretaker updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+        "403":
+          description: Forbidden - Caretaker not assigned to current caregiver
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        "404":
+          description: Caretaker not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not Found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
     delete:
       tags:
       - user-management
@@ -720,6 +804,73 @@ paths:
                   error:
                     type: string
                     example: "Unauthorized"
+
+  /api/user-management/profile:
+    put:
+      tags:
+      - user-management
+      summary: Update own profile
+      description: Update the current user's own profile information (name, email, phone). Any authenticated user can update their own profile.
+      operationId: updateProfile
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+            example:
+              name: "Updated My Name"
+              email: "updatedme@mos.test"
+              phone: "+46 70 555 4444"
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not Found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
 
   /api/user-management/admin/users:
     post:
@@ -811,6 +962,90 @@ paths:
                     example: "Only admins can create users"
 
   /api/user-management/admin/users/{userId}:
+    put:
+      tags:
+      - user-management
+      summary: Update a user (Admin only)
+      description: Update any user's information (name, email, phone). Only admins can update users.
+      operationId: updateUser
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: User ID to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+            example:
+              name: "Updated User Name"
+              email: "updated@mos.test"
+              phone: "+46 70 999 8888"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Bad Request"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+        "403":
+          description: Forbidden - Only admins can update users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not Found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
     delete:
       tags:
       - user-management
@@ -1205,4 +1440,58 @@ components:
             enum: [CREATE_REMINDERS, VIEW_REMINDERS, MEAL_REQUIREMENTS, MEAL_SUGGESTIONS, STATISTICS]
           description: List of permissions to grant
           example: ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
+
+    UpdateUserRequest:
+      type: object
+      description: Request body for updating a user (all fields optional for partial updates)
+      properties:
+        name:
+          type: string
+          description: User's display name
+          example: "Updated User Name"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "updated@mos.test"
+        phone:
+          type: string
+          description: User's phone number
+          example: "+46 70 999 8888"
+
+    UpdateCaretakerRequest:
+      type: object
+      description: Request body for updating a caretaker (all fields optional for partial updates)
+      properties:
+        name:
+          type: string
+          description: Caretaker's display name
+          example: "Updated Caretaker Name"
+        email:
+          type: string
+          format: email
+          description: Caretaker's email address
+          example: "updatedcaretaker@mos.test"
+        phone:
+          type: string
+          description: Caretaker's phone number
+          example: "+46 70 777 6666"
+
+    UpdateProfileRequest:
+      type: object
+      description: Request body for updating own profile (all fields optional for partial updates)
+      properties:
+        name:
+          type: string
+          description: User's display name
+          example: "Updated My Name"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "updatedme@mos.test"
+        phone:
+          type: string
+          description: User's phone number
+          example: "+46 70 555 4444"
 

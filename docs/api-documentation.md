@@ -290,6 +290,116 @@ Create a new user of any type (ADMIN, CAREGIVER, RESIDENT) with automatic permis
 - **CAREGIVER:** Gets management permissions (VIEW_REMINDERS, CREATE_REMINDERS, MEAL_REQUIREMENTS)
 - **RESIDENT:** Gets basic permissions (VIEW_REMINDERS)
 
+### Update User (Admin Only)
+**PUT** `/api/user-management/admin/users/{userId}`
+
+Update any user's information (name, email, phone). Only admins can update users.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "name": "Updated User Name",
+  "email": "updated@mos.test",
+  "phone": "+46 70 999 8888"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440001",
+  "email": "updated@mos.test",
+  "displayName": "Updated User Name",
+  "phone": "+46 70 999 8888",
+  "userType": "RESIDENT",
+  "isActive": true,
+  "createdAt": "2025-10-07T11:35:30.000Z"
+}
+```
+
+**Responses:**
+- **200:** User updated successfully
+- **400:** Bad request
+- **401:** Unauthorized
+- **403:** Forbidden - Only admins can update users
+- **404:** User not found
+- **500:** Internal server error
+
+### Update Caretaker (Caregiver Only)
+**PUT** `/api/user-management/caretakers/{caretakerId}`
+
+Update a caretaker's information (name, email, phone). Only the assigned caregiver can update their caretakers.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "name": "Updated Caretaker Name",
+  "email": "updatedcaretaker@mos.test",
+  "phone": "+46 70 777 6666"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440002",
+  "email": "updatedcaretaker@mos.test",
+  "displayName": "Updated Caretaker Name",
+  "phone": "+46 70 777 6666",
+  "userType": "RESIDENT",
+  "isActive": true,
+  "createdAt": "2025-10-07T11:35:30.000Z"
+}
+```
+
+**Responses:**
+- **200:** Caretaker updated successfully
+- **400:** Bad request
+- **401:** Unauthorized
+- **403:** Forbidden - Caretaker not assigned to current caregiver
+- **404:** Caretaker not found
+- **500:** Internal server error
+
+### Update Own Profile
+**PUT** `/api/user-management/profile`
+
+Update the current user's own profile information (name, email, phone). Any authenticated user can update their own profile.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "name": "Updated My Name",
+  "email": "updatedme@mos.test",
+  "phone": "+46 70 555 4444"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440001",
+  "email": "updatedme@mos.test",
+  "displayName": "Updated My Name",
+  "phone": "+46 70 555 4444",
+  "userType": "ADMIN",
+  "isActive": true,
+  "createdAt": "2025-10-07T11:35:30.000Z"
+}
+```
+
+**Responses:**
+- **200:** Profile updated successfully
+- **400:** Bad request
+- **401:** Unauthorized
+- **404:** User not found
+- **500:** Internal server error
+
 ## Permission Types
 
 - **`CREATE_REMINDERS`** - Create, edit, and delete reminders

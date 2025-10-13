@@ -202,6 +202,112 @@ public class UserManagementService {
     }
     
     /**
+     * Admin-only method to update any user
+     */
+    public User updateUser(UUID userId, String name, String email, String phone, UUID updatedBy) {
+        // Verify the updater is an admin
+        User updater = userRepository.findById(updatedBy)
+            .orElseThrow(() -> new RuntimeException("Updater not found"));
+        
+        if (updater.getUserType() != UserType.ADMIN) {
+            throw new RuntimeException("Only admins can update users. Updater type: " + updater.getUserType());
+        }
+        
+        // Get the user to be updated
+        User userToUpdate = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Update the user fields
+        if (name != null && !name.trim().isEmpty()) {
+            userToUpdate.setDisplayName(name);
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            userToUpdate.setEmail(email);
+        }
+        if (phone != null) {
+            userToUpdate.setPhone(phone);
+        }
+        
+        return userRepository.save(userToUpdate);
+    }
+    
+    /**
+     * Caregiver can update their assigned caretakers
+     */
+    public User updateCaretaker(UUID caretakerId, String name, String email, String phone, UUID caregiverId) {
+        // Verify the caregiver manages this caretaker
+        List<User> assignedCaretakers = userAssignmentRepository.findCaretakersByCaregiverId(caregiverId);
+        if (assignedCaretakers.stream().noneMatch(caretaker -> caretaker.getId().equals(caretakerId))) {
+            throw new RuntimeException("Caregiver is not assigned to this caretaker");
+        }
+        
+        // Get the caretaker to be updated
+        User caretakerToUpdate = userRepository.findById(caretakerId)
+            .orElseThrow(() -> new RuntimeException("Caretaker not found"));
+        
+        // Update the caretaker fields
+        if (name != null && !name.trim().isEmpty()) {
+            caretakerToUpdate.setDisplayName(name);
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            caretakerToUpdate.setEmail(email);
+        }
+        if (phone != null) {
+            caretakerToUpdate.setPhone(phone);
+        }
+        
+        return userRepository.save(caretakerToUpdate);
+    }
+    
+    /**
+     * User can update their own profile
+     */
+    public User updateProfile(UUID userId, String name, String email, String phone) {
+        // Get the user to be updated
+        User userToUpdate = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Update the user fields
+        if (name != null && !name.trim().isEmpty()) {
+            userToUpdate.setDisplayName(name);
+        }
+        if (email != null && !email.trim().isEmpty()) {
+            userToUpdate.setEmail(email);
+        }
+        if (phone != null) {
+            userToUpdate.setPhone(phone);
+        }
+        
+        return userRepository.save(userToUpdate);
+    }
+    
+    /**
+     * Get all users (admin only)
+     */
+    public List<com.attendo.mos.dto.UserInfoResponse> getAllUsers() {
+        return userRepository.findAll().stream()
+            .map(user -> new com.attendo.mos.dto.UserInfoResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.getPhone(),
+                user.getUserType(),
+                user.isActive(),
+                user.getLastLoginAt(),
+                user.getCreatedAt()
+            ))
+            .toList();
+    }
+    
+    /**
+     * Find user by ID
+     */
+    public User findUserById(UUID userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    
+    /**
      * Perform the actual user deletion with cleanup
      */
     private void performUserDeletion(UUID userId) {

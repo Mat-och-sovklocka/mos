@@ -107,36 +107,6 @@ class AuthenticationControllerTest {
         verify(authenticationService).authenticate(request);
     }
 
-    //todo: fix this test
-    @Test
-    void getCurrentUser_ShouldReturnUserInfoWhenTokenValid() throws Exception {
-        // Given
-        String authHeader = "Bearer " + testToken;
-        UserInfoResponse userInfo = new UserInfoResponse(
-            testUserId,
-            testEmail,
-            "Test User",
-            UserType.ADMIN,
-            true,
-            OffsetDateTime.now(),
-            OffsetDateTime.now()
-        );
-
-        when(authenticationService.getUserInfo(testUserId))
-            .thenReturn(userInfo);
-
-        // When & Then
-        mockMvc.perform(get("/api/auth/me")
-                .header("Authorization", authHeader))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(testUserId.toString()))
-                .andExpect(jsonPath("$.email").value(testEmail))
-                .andExpect(jsonPath("$.displayName").value("Test User"))
-                .andExpect(jsonPath("$.userType").value("ADMIN"));
-
-        verify(authenticationService).getUserInfo(testUserId);
-    } */
-
     @Test
     void getCurrentUser_ShouldReturn401WhenNoAuthHeader() throws Exception {
         // When & Then

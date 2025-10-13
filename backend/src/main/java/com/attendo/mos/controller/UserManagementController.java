@@ -102,6 +102,20 @@ public class UserManagementController {
         return ResponseEntity.ok(permissions);
     }
     
+    @GetMapping("/admin/users")
+    public ResponseEntity<List<com.attendo.mos.dto.UserInfoResponse>> getAllUsers(@RequestHeader("Authorization") String authHeader) {
+        UUID adminId = getCurrentUserId(authHeader);
+        
+        // Verify the user is an admin
+        com.attendo.mos.entity.User admin = userManagementService.findUserById(adminId);
+        if (admin.getUserType() != com.attendo.mos.dto.UserType.ADMIN) {
+            return ResponseEntity.status(403).build();
+        }
+        
+        List<com.attendo.mos.dto.UserInfoResponse> users = userManagementService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+    
     @PostMapping("/admin/users")
     public ResponseEntity<User> createUser(@RequestHeader("Authorization") String authHeader,
                                          @RequestBody CreateUserRequest request) {
@@ -138,6 +152,80 @@ public class UserManagementController {
                 return ResponseEntity.status(404).body(Map.of("error", "User not found"));
             } else {
                 return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+            }
+        }
+    }
+    
+    @PutMapping("/admin/users/{userId}")
+    public ResponseEntity<User> updateUser(@RequestHeader("Authorization") String authHeader,
+                                         @PathVariable UUID userId,
+                                         @RequestBody UpdateUserRequest request) {
+        UUID adminId = getCurrentUserId(authHeader);
+        
+        try {
+            User updatedUser = userManagementService.updateUser(
+                userId,
+                request.getName(),
+                request.getEmail(),
+                request.getPhone(),
+                adminId
+            );
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Only admins can update users")) {
+                return ResponseEntity.status(403).build();
+            } else if (e.getMessage().contains("User not found")) {
+                return ResponseEntity.status(404).build();
+            } else {
+                return ResponseEntity.status(500).build();
+            }
+        }
+    }
+    
+    @PutMapping("/caretakers/{caretakerId}")
+    public ResponseEntity<User> updateCaretaker(@RequestHeader("Authorization") String authHeader,
+                                              @PathVariable UUID caretakerId,
+                                              @RequestBody UpdateCaretakerRequest request) {
+        UUID caregiverId = getCurrentUserId(authHeader);
+        
+        try {
+            User updatedCaretaker = userManagementService.updateCaretaker(
+                caretakerId,
+                request.getName(),
+                request.getEmail(),
+                request.getPhone(),
+                caregiverId
+            );
+            return ResponseEntity.ok(updatedCaretaker);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Caregiver is not assigned to this caretaker")) {
+                return ResponseEntity.status(403).build();
+            } else if (e.getMessage().contains("Caretaker not found")) {
+                return ResponseEntity.status(404).build();
+            } else {
+                return ResponseEntity.status(500).build();
+            }
+        }
+    }
+    
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateProfile(@RequestHeader("Authorization") String authHeader,
+                                            @RequestBody UpdateProfileRequest request) {
+        UUID userId = getCurrentUserId(authHeader);
+        
+        try {
+            User updatedUser = userManagementService.updateProfile(
+                userId,
+                request.getName(),
+                request.getEmail(),
+                request.getPhone()
+            );
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("User not found")) {
+                return ResponseEntity.status(404).build();
+            } else {
+                return ResponseEntity.status(500).build();
             }
         }
     }
@@ -185,5 +273,47 @@ public class UserManagementController {
         public void setPhone(String phone) { this.phone = phone; }
         public UserType getUserType() { return userType; }
         public void setUserType(UserType userType) { this.userType = userType; }
+    }
+    
+    public static class UpdateUserRequest {
+        private String name;
+        private String email;
+        private String phone;
+        
+        // Getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
+    }
+    
+    public static class UpdateCaretakerRequest {
+        private String name;
+        private String email;
+        private String phone;
+        
+        // Getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
+    }
+    
+    public static class UpdateProfileRequest {
+        private String name;
+        private String email;
+        private String phone;
+        
+        // Getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPhone() { return phone; }
+        public void setPhone(String phone) { this.phone = phone; }
     }
 }

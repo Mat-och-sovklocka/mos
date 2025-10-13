@@ -1,8 +1,8 @@
 ### Variables
 @baseUrl = http://localhost:8080/api
 # Note: Tokens expire after 24 hours. Get fresh tokens by running the login requests below.
-@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc2MDM0NjY0MiwiZXhwIjoxNzYwNDMzMDQyfQ.3HPssykT2vM1y60Hc5HdhLmMUEEtRR7GOej_WacbAQo1Hlk0DWvYnIcL88KEI4yrb28DLOfjC8PZJdonndPCzQ
-@caregiverToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDIiLCJlbWFpbCI6ImNhcmVnaXZlcjFAbW9zLnRlc3QiLCJ1c2VyVHlwZSI6IkNBUkVHSVZFUiIsImlhdCI6MTc2MDM0ODc2NiwiZXhwIjoxNzYwNDM1MTY2fQ.CdFdkuWD_1mwO5WogfCOHyHtMX6v8huti5padM7waQ8vDg62ZGDKvgCgB4TQG9xsNGkA7sCiJRKDkNrXeYjVVA
+@adminToken = YOUR_ADMIN_TOKEN_HERE
+@caregiverToken = YOUR_CAREGIVER_TOKEN_HERE
 @residentToken = YOUR_RESIDENT_TOKEN_HERE
 
 ### Test Users
@@ -149,7 +149,7 @@ Content-Type: application/json
 
 {
   "name": "New Caregiver",
-  "email": "newcaregiver3@mos.test",
+  "email": "newcaregiver4@mos.test",
   "phone": "+46 70 234 5678",
   "userType": "CAREGIVER"
 }
@@ -215,7 +215,7 @@ Content-Type: application/json
 ### ===== UTILITY ENDPOINTS =====
 
 ### 24. Get All Users (admin only)
-GET {{baseUrl}}/users
+GET {{baseUrl}}/user-management/admin/users
 Authorization: Bearer {{adminToken}}
 
 ### 25. Health Check
@@ -238,3 +238,67 @@ Authorization: Bearer {{caregiverToken}}
 ### 29. Delete User (Admin only) - Non-existent user (should fail)
 DELETE {{baseUrl}}/user-management/admin/users/00000000-0000-0000-0000-000000000000
 Authorization: Bearer {{adminToken}}
+
+### ===== USER EDITING ENDPOINTS =====
+
+### 30. Update User (Admin only) - Success
+PUT {{baseUrl}}/user-management/admin/users/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Resident Name",
+  "email": "updatedresident@mos.test",
+  "phone": "+46 70 999 8888"
+}
+
+### 31. Update User (Non-admin) - Should fail
+PUT {{baseUrl}}/user-management/admin/users/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "name": "Should Not Work",
+  "email": "shouldnotwork@mos.test"
+}
+
+### 32. Update Caretaker (Caregiver only) - Success
+PUT {{baseUrl}}/user-management/caretakers/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Caretaker Name",
+  "email": "updatedcaretaker@mos.test",
+  "phone": "+46 70 777 6666"
+}
+
+### 33. Update Caretaker (Wrong caregiver) - Should fail
+PUT {{baseUrl}}/user-management/caretakers/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Should Not Work"
+}
+
+### 34. Update Profile (Self) - Success
+PUT {{baseUrl}}/user-management/profile
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Admin Name",
+  "email": "updatedadmin@mos.test",
+  "phone": "+46 70 555 4444"
+}
+
+### 35. Update Profile (Caregiver) - Success
+PUT {{baseUrl}}/user-management/profile
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Caregiver Name",
+  "phone": "+46 70 333 2222"
+}
