@@ -149,4 +149,74 @@ public class UserManagementService {
                 break;
         }
     }
+    
+    /**
+     * Admin-only method to delete any user with proper protection checks
+     */
+    public void deleteUser(UUID userId, UUID deletedBy) {
+        // Verify the deleter is an admin
+        User deleter = userRepository.findById(deletedBy)
+            .orElseThrow(() -> new RuntimeException("Deleter not found"));
+        
+        if (deleter.getUserType() != UserType.ADMIN) {
+            throw new RuntimeException("Only admins can delete users. Deleter type: " + deleter.getUserType());
+        }
+        
+        // Get the user to be deleted
+        User userToDelete = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Check if user can be deleted
+        if (!canDeleteUser(userId)) {
+            throw new RuntimeException("Cannot delete user: " + userToDelete.getDisplayName() + 
+                " (ID: " + userId + ") - user has active assignments or dependencies");
+        }
+        
+        // Delete the user and clean up all related data
+        performUserDeletion(userId);
+    }
+    
+    /**
+     * Check if a user can be safely deleted
+     */
+    public boolean canDeleteUser(UUID userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Check if caregiver has assigned caretakers
+        if (user.getUserType() == UserType.CAREGIVER) {
+            List<User> assignedCaretakers = userAssignmentRepository.findCaretakersByCaregiverId(userId);
+            if (!assignedCaretakers.isEmpty()) {
+                return false; // Cannot delete caregiver with assigned caretakers
+            }
+        }
+        
+        // Check if user has any reminders (optional - you might want to allow deletion with reminders)
+        // This is commented out for now, but you can uncomment if needed
+        // long reminderCount = reminderRepository.countByUserId(userId);
+        // if (reminderCount > 0) {
+        //     return false;
+        // }
+        
+        return true;
+    }
+    
+    /**
+     * Perform the actual user deletion with cleanup
+     */
+    private void performUserDeletion(UUID userId) {
+        // Remove all assignments where this user is a caregiver
+        userAssignmentRepository.findByCaregiverId(userId)
+            .forEach(assignment -> userAssignmentRepository.delete(assignment));
+        
+        // Remove all assignments where this user is a caretaker
+        userAssignmentRepository.findByCaretakerId(userId)
+            .forEach(assignment -> userAssignmentRepository.delete(assignment));
+        
+        // Remove all permissions
+        userPermissionService.deleteAllUserPermissions(userId);
+        
+        // Delete the user
+        userRepository.deleteById(userId);
+    }
 }

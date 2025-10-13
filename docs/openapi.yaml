@@ -810,6 +810,85 @@ paths:
                     type: string
                     example: "Only admins can create users"
 
+  /api/user-management/admin/users/{userId}:
+    delete:
+      tags:
+      - user-management
+      summary: Delete a user (Admin only)
+      description: Delete any user with proper protection checks. Cannot delete caregivers with assigned caretakers.
+      operationId: deleteUser
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: User ID to delete
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User deleted successfully"
+        "400":
+          description: Bad Request - Cannot delete user with active assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Cannot delete user: John Doe (ID: 550e8400-e29b-41d4-a716-446655440002) - user has active assignments or dependencies"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+        "403":
+          description: Forbidden - Only admins can delete users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Only admins can delete users"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+
 components:
   securitySchemes:
     bearerAuth:

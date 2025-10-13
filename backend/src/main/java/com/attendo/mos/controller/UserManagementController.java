@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -117,6 +118,27 @@ public class UserManagementController {
             return ResponseEntity.ok(newUser);
         } catch (RuntimeException e) {
             return ResponseEntity.status(403).build(); // Forbidden - not admin or other error
+        }
+    }
+    
+    @DeleteMapping("/admin/users/{userId}")
+    public ResponseEntity<Map<String, String>> deleteUser(@RequestHeader("Authorization") String authHeader,
+                                                         @PathVariable UUID userId) {
+        UUID adminId = getCurrentUserId(authHeader);
+        
+        try {
+            userManagementService.deleteUser(userId, adminId);
+            return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Only admins can delete users")) {
+                return ResponseEntity.status(403).body(Map.of("error", "Only admins can delete users"));
+            } else if (e.getMessage().contains("Cannot delete user")) {
+                return ResponseEntity.status(400).body(Map.of("error", e.getMessage()));
+            } else if (e.getMessage().contains("User not found")) {
+                return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+            } else {
+                return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+            }
         }
     }
     

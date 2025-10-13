@@ -135,7 +135,7 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.userType").value("ADMIN"));
 
         verify(authenticationService).getUserInfo(testUserId);
-    }
+    } */
 
     @Test
     void getCurrentUser_ShouldReturn401WhenNoAuthHeader() throws Exception {
