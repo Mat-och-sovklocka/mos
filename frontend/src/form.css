@@ -13,12 +13,17 @@ body {
 }
 
 .reminder-title {
-    color: #316c6f !important;
-    font-weight: bold;
-    font-size: 2.5rem;
-    text-align: center;
-    margin: 40px 0 80px 0;  /* top right bottom left */
-    padding-top: 20px;
+  color: #316c6f !important;
+  font-weight: bold;
+  /* Use a fluid font size: allow smaller min to avoid forced mid-word breaks on very small screens */
+  font-size: clamp(0.95rem, 3vw + 0.5rem, 3.2rem);
+  line-height: 1.2;
+  text-align: center;
+  margin: 40px 0 80px 0;  /* top right bottom left */
+  padding-top: 20px;
+  /* Prefer hyphenation and avoid breaking words in the middle */
+  hyphens: auto;
+  overflow-wrap: anywhere;
 }
 
 .saved-requirements {
@@ -353,5 +358,110 @@ body {
 @media (max-width: 600px) {
   .custom-checkbox {
     flex: 1 1 100%;
+  }
+}
+
+/* Responsiveness: convert two-column grid to single column on smaller screens */
+@media (max-width: 900px) {
+  .boxes-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .kost-form {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .preference-box {
+    min-height: auto;
+  }
+
+  .reminder-title {
+    font-size: 2rem;
+    margin: 24px 0 48px 0;
+  }
+
+  .box-title {
+    font-size: 1.1rem;
+  }
+
+  .custom-section {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reminder-title {
+    font-size: 1.6rem;
+    margin: 16px 0 32px 0;
+  }
+
+  .form-title {
+    font-size: 1.15rem;
+  }
+
+  .tag-input, .tag-input-container input, .tag-input-container .tag-input {
+    font-size: 0.95rem;
+  }
+
+  .submit-button {
+    padding: 0.75rem 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .kost-form {
+    padding: 0.75rem;
+  }
+}
+
+/* User settings specific layout: main form + admin user list */
+.user-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px; /* main + sidebar */
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.main-panel {
+  min-width: 0;
+}
+
+.admin-user-list {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #ffffff;
+  max-height: 70vh;
+  overflow: auto;
+}
+
+/* Form card: wrap form in a card-like surface to match the user list */
+.form-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.kost-form {
+  background: transparent; /* keep inputs background white via .form-card */
+  padding: 0; /* padding handled by .form-card */
+}
+
+.admin-user-list .user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-user-list .user-item:last-child { border-bottom: none; }
+
+@media (max-width: 900px) {
+  .user-settings-grid {
+    grid-template-columns: 1fr; /* stack vertically on smaller screens */
   }
 }
