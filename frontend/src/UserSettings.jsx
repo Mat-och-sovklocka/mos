@@ -21,6 +21,9 @@ export default function UserSettings() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState(null);
+  const [assignedPatients, setAssignedPatients] = useState([]);
+  const [loadingAssigned, setLoadingAssigned] = useState(false);
+  const [assignedError, setAssignedError] = useState(null);
   // delete state handled per-action
 
   const mockUsers = [
@@ -52,8 +55,36 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (user?.userType === 'ADMIN') fetchUsers();
+    if (user?.userType === 'CAREGIVER') fetchAssignedPatients();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  async function fetchAssignedPatients() {
+    setLoadingAssigned(true);
+    setAssignedError(null);
+    try {
+  // Use documented caretakers endpoint which lists caretakers assigned to the current caregiver
+  const res = await fetch('/api/user-management/caretakers', { headers: getAuthHeaders() });
+      if (res.ok) {
+        const data = await res.json();
+        setAssignedPatients(Array.isArray(data) ? data.map(normalizeUser) : []);
+        return;
+      }
+      // Fallback: use allUsers if available and filter by RESIDENT
+      if (allUsers && allUsers.length > 0) {
+        setAssignedPatients(allUsers.filter((u) => (u.userType || '').toUpperCase() === 'RESIDENT'));
+        return;
+      }
+      // final fallback: empty list
+      setAssignedPatients([]);
+    } catch (err) {
+      console.warn('Could not fetch assigned patients', err);
+      setAssignedError(err.message || String(err));
+      setAssignedPatients([]);
+    } finally {
+      setLoadingAssigned(false);
+    }
+  }
 
   // change-detection removed: Save is available whenever not saving
 
@@ -149,19 +180,81 @@ export default function UserSettings() {
         setSelectedUser(normalized);
         setAllUsers((prev) => prev.map((u) => (u.id === normalized.id ? normalized : u)));
         setSaveMessage({ type: 'success', text: 'Sparat.' });
-        setOriginalSelectedUser({ displayName: normalized.displayName || '', email: normalized.email || '', phone: normalized.phone || '', userType: normalized.userType || '' });
+  // originalSelectedUser state removed; nothing to update here
       } else {
         // no body returned — refresh list from server
         setSaveMessage({ type: 'success', text: 'Sparat.' });
         await fetchUsers();
-        // reset original snapshot from current UI values
-        setOriginalSelectedUser({ displayName: selectedUser.displayName || '', email: selectedUser.email || '', phone: selectedUser.phone || '', userType: selectedUser.userType || '' });
+  // originalSelectedUser state removed; nothing to update here
       }
     } catch (err) {
       setSaveMessage({ type: 'error', text: 'Kunde inte spara: ' + (err.message || err) });
   // debug logging removed
     } finally {
       setSaving(false);
+    }
+  }
+
+  // Save handler for caregiver editing an assigned patient/caretaker
+  async function handleSaveCaretaker(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!selectedUser?.id) { setSaveMessage({ type: 'error', text: 'Ingen användare vald.' }); return; }
+    setSaving(true);
+    setSaveMessage(null);
+    try {
+      const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
+      const body = { name: selectedUser.displayName, email: selectedUser.email, phone: selectedUser.phone };
+      const res = await fetch(`/api/user-management/caretakers/${selectedUser.id}`, { method: 'PUT', headers, body: JSON.stringify(body) });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`${res.status} ${res.statusText} - ${text}`);
+      }
+      let updated = null;
+      try { updated = await res.json(); } catch (err) { /* ignore parse errors */ }
+      if (updated && (updated.id || updated._id)) {
+        // refresh list from server to restore canonical state
+        await fetchAssignedPatients();
+      } else {
+        // refresh list from server
+        await fetchAssignedPatients();
+      }
+      // restore UI to initial loaded state
+      setSelectedUser(null);
+      setSaveMessage(null);
+      setCreateMessage(null);
+    } catch (err) {
+      setSaveMessage({ type: 'error', text: 'Kunde inte spara: ' + (err.message || err) });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  // Create handler for caregiver to add a new patient/caretaker
+  async function handleCreateCaretaker(e) {
+    e.preventDefault();
+    setCreating(true);
+    setCreateMessage(null);
+    try {
+      const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
+      const body = { name: newName, email: newEmail, phone: newPhone };
+      const res = await fetch('/api/user-management/caretakers', { method: 'POST', headers, body: JSON.stringify(body) });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`${res.status} ${res.statusText} - ${text}`);
+      }
+      const created = await res.json();
+      const normalized = normalizeUser(created || {});
+      setAssignedPatients((prev) => [{ ...normalized, _temp: !normalized?.id }, ...prev]);
+      setCreateMessage({ type: 'success', text: 'Användare skapad.' });
+      setNewName(''); setNewEmail(''); setNewPhone(''); setNewType('RESIDENT');
+      setShowCreateModal(false);
+      return true;
+    } catch (err) {
+      console.error(err);
+      setCreateMessage({ type: 'error', text: 'Kunde inte skapa användare: ' + (err.message || err) });
+      return false;
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -175,11 +268,10 @@ export default function UserSettings() {
         <section className="preference-boxes user-settings-grid">
           {/* personal settings card removed */}
 
-          {user.userType === 'ADMIN' && (
+          {user.userType === 'ADMIN' ? (
             <>
-            {/* Create user is now in a modal. Open modal using button next to 'Alla användare' */}
-            <div className="left-column">
-              <div className="form-card">
+              <div className="left-column">
+                <div className="form-card">
                 <h2 className="form-title">Användardetaljer</h2>
                 {(!selectedUser || showCreateModal) && <div className="text-muted">Klicka på en användare i listan för att visa och redigera uppgifter.</div>}
                 {!showCreateModal && selectedUser && (
@@ -294,6 +386,117 @@ export default function UserSettings() {
               </div>
               </div>
             </div>
+            </>
+          ) : null}
+
+          {/* Caregiver view: show assigned patients list */}
+          {user.userType === 'CAREGIVER' && (
+            <>
+            <div className="left-column">
+              <div className="form-card">
+                <h2 className="form-title">Användardetaljer</h2>
+                {selectedUser ? (
+                  <form className="kost-form" onSubmit={handleSaveCaretaker}>
+                    <div className="column">
+                      <label className="form-title">Namn</label>
+                      <input className="tag-input" value={selectedUser.displayName || ''} onChange={(e) => setSelectedUser({ ...selectedUser, displayName: e.target.value })} />
+                    </div>
+                    <div className="column">
+                      <label className="form-title">E-post</label>
+                      <input className="tag-input" type="email" value={selectedUser.email || ''} onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })} />
+                    </div>
+                    <div className="column">
+                      <label className="form-title">Telefon</label>
+                      <input className="tag-input" type="tel" value={selectedUser.phone || ''} onChange={(e) => setSelectedUser({ ...selectedUser, phone: e.target.value })} />
+                    </div>
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <button type="submit" className="submit-button" disabled={saving}>{saving ? 'Sparar...' : 'Spara'}</button>
+                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => {
+                        // delete caretaker immediately
+                        if (!selectedUser?.id) { setSaveMessage({ type: 'error', text: 'Ingen användare vald.' }); return; }
+                        setSaving(true);
+                        try {
+                          const res = await fetch(`/api/user-management/caretakers/${selectedUser.id}`, { method: 'DELETE', headers: getAuthHeaders() });
+                          if (!res.ok) {
+                            const text = await res.text();
+                            throw new Error(`${res.status} ${res.statusText} - ${text}`);
+                          }
+                          // refresh list and restore initial UI
+                          await fetchAssignedPatients();
+                          setSelectedUser(null);
+                          setSaveMessage(null);
+                          setCreateMessage(null);
+                        } catch (err) {
+                          setSaveMessage({ type: 'error', text: 'Kunde inte ta bort användare: ' + (err.message || err) });
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}>Ta bort</button>
+                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => {
+                        // cancel edit and restore initial state
+                        setSelectedUser(null);
+                        setSaveMessage(null);
+                        await fetchAssignedPatients();
+                      }}>Avbryt</button>
+                    </div>
+                    {saveMessage && <div className={`message ${saveMessage.type}`} style={{ marginTop: '0.5rem' }}>{saveMessage.text}</div>}
+                  </form>
+                ) : (
+                  <div className="text-muted">Klicka på en patient i listan för att visa och redigera uppgifter.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="right-column">
+              <div className="form-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h2 className="form-title">Mina patienter</h2>
+                  <div>
+                    <button className="submit-button" onClick={() => { setSelectedUser(null); setShowCreateModal(true); }}>Ny användare</button>
+                  </div>
+                </div>
+                {loadingAssigned && <div className="text-muted">Laddar patienter...</div>}
+                {!loadingAssigned && assignedError && <div className="text-muted">Kunde inte hämta patienter.</div>}
+                <div style={{ marginTop: '0.5rem' }}>
+                  {assignedPatients && assignedPatients.length > 0 ? (
+                    assignedPatients.map((p) => (
+                      <div key={p.id || p.email} className="user-item" style={{ cursor: 'pointer' }} onClick={() => setSelectedUser(p)}>
+                        <span style={{ textDecoration: 'underline' }}>{p.displayName || p.email}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-muted">Inga patienter tilldelade.</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {showCreateModal && (
+              <div className="left-column">
+                <div className="form-card" style={{ marginTop: '1rem' }}>
+                  <h3 className="form-title">Skapa användare</h3>
+                  <form onSubmit={async (e) => { e.preventDefault(); const ok = await handleCreateCaretaker(e); if (ok) setShowCreateModal(false); }} className="kost-form">
+                    <div className="column">
+                      <label className="form-title">Namn</label>
+                      <input className="tag-input" value={newName} onChange={(e) => setNewName(e.target.value)} />
+                    </div>
+                    <div className="column">
+                      <label className="form-title">E-post</label>
+                      <input className="tag-input" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+                    </div>
+                    <div className="column">
+                      <label className="form-title">Telefon</label>
+                      <input className="tag-input" type="tel" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
+                    </div>
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <button type="submit" className="submit-button" disabled={creating || !newName || !newEmail}>{creating ? 'Skapar...' : 'Skapa användare'}</button>
+                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={() => { setShowCreateModal(false); setNewName(''); setNewEmail(''); setNewPhone(''); setCreateMessage(null); }}>Avbryt</button>
+                    </div>
+                    {createMessage && <div className={`message ${createMessage.type}`} style={{ marginTop: '0.5rem' }}>{createMessage.text}</div>}
+                  </form>
+                </div>
+              </div>
+            )}
             </>
           )}
         </section>
