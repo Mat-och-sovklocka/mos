@@ -1,8 +1,8 @@
 ### Variables
 @baseUrl = http://localhost:8080/api
 # Note: Tokens expire after 24 hours. Get fresh tokens by running the login requests below.
-@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc2MDExMjU1NywiZXhwIjoxNzYwMTk4OTU3fQ.yzU4Oa_8LtpZ2W6Xs4XBsgnOBcJLJ3CTLwGno3maqd15DcwhUei5BTXy9AqCXKLy41C5dFgMiAYyS17Ius5MTw
-@caregiverToken = YOUR_CAREGIVER_TOKEN_HERE
+@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc2MDM0NjY0MiwiZXhwIjoxNzYwNDMzMDQyfQ.3HPssykT2vM1y60Hc5HdhLmMUEEtRR7GOej_WacbAQo1Hlk0DWvYnIcL88KEI4yrb28DLOfjC8PZJdonndPCzQ
+@caregiverToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDIiLCJlbWFpbCI6ImNhcmVnaXZlcjFAbW9zLnRlc3QiLCJ1c2VyVHlwZSI6IkNBUkVHSVZFUiIsImlhdCI6MTc2MDM0ODc2NiwiZXhwIjoxNzYwNDM1MTY2fQ.CdFdkuWD_1mwO5WogfCOHyHtMX6v8huti5padM7waQ8vDg62ZGDKvgCgB4TQG9xsNGkA7sCiJRKDkNrXeYjVVA
 @residentToken = YOUR_RESIDENT_TOKEN_HERE
 
 ### Test Users
@@ -21,12 +21,20 @@ Content-Type: application/json
   "password": "password123"
 }
 
+### 1.5. Logout
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+}
+
 ### 2. Login as Caregiver
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "caregiver@mos.test",
+  "email": "caregiver1@mos.test",
   "password": "password123"
 }
 
@@ -129,7 +137,7 @@ Content-Type: application/json
 
 {
   "name": "New Admin User",
-  "email": "newadmin@mos.test",
+  "email": "newadmin3@mos.test",
   "phone": "+46 70 123 4567",
   "userType": "ADMIN"
 }
@@ -141,7 +149,7 @@ Content-Type: application/json
 
 {
   "name": "New Caregiver",
-  "email": "newcaregiver@mos.test",
+  "email": "newcaregiver3@mos.test",
   "phone": "+46 70 234 5678",
   "userType": "CAREGIVER"
 }
@@ -153,7 +161,7 @@ Content-Type: application/json
 
 {
   "name": "New Resident",
-  "email": "newresident@mos.test",
+  "email": "newresident3@mos.test",
   "phone": "+46 70 345 6789",
   "userType": "RESIDENT"
 }
@@ -212,3 +220,21 @@ Authorization: Bearer {{adminToken}}
 
 ### 25. Health Check
 GET {{baseUrl}}/health
+
+### ===== USER DELETION ENDPOINTS =====
+
+### 26. Delete User (Admin only) - Success
+DELETE {{baseUrl}}/user-management/admin/users/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{adminToken}}
+
+### 27. Delete User (Admin only) - Try to delete caregiver with assigned caretakers (should fail)
+DELETE {{baseUrl}}/user-management/admin/users/550e8400-e29b-41d4-a716-446655440002
+Authorization: Bearer {{adminToken}}
+
+### 28. Delete User (Non-admin) - Should fail
+DELETE {{baseUrl}}/user-management/admin/users/550e8400-e29b-41d4-a716-446655440004
+Authorization: Bearer {{caregiverToken}}
+
+### 29. Delete User (Admin only) - Non-existent user (should fail)
+DELETE {{baseUrl}}/user-management/admin/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{adminToken}}
