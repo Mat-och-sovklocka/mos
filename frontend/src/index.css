@@ -25,8 +25,19 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  min-width: 320px;
+  flex-direction: column;
   min-height: 100vh;
+  /* allow content to shrink on very small devices */
+  min-width: 0;
+}
+
+/* A global responsive wrapper used by top-level pages */
+.app-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem; /* small horizontal padding on mobile */
+  box-sizing: border-box;
 }
 
 h1 {
