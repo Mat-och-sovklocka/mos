@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import homeIcon from './images/home.png';
 
 export default function UserSettings() {
   const { user, getAuthHeaders } = useAuth();
@@ -24,6 +26,9 @@ export default function UserSettings() {
   const [assignedPatients, setAssignedPatients] = useState([]);
   const [loadingAssigned, setLoadingAssigned] = useState(false);
   const [assignedError, setAssignedError] = useState(null);
+  const [patientPermissions, setPatientPermissions] = useState([]);
+  const [loadingPermissions, setLoadingPermissions] = useState(false);
+  const [permissionsError, setPermissionsError] = useState(null);
   // delete state handled per-action
 
   const mockUsers = [
@@ -55,9 +60,21 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (user?.userType === 'ADMIN') fetchUsers();
-    if (user?.userType === 'CAREGIVER') fetchAssignedPatients();
+    if (user?.userType === 'CAREGIVER') {
+      fetchAssignedPatients();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // When selected user (patient) changes, fetch that patient's permissions
+  useEffect(() => {
+    if (user?.userType === 'CAREGIVER' && selectedUser?.id) {
+      fetchPatientPermissions(selectedUser.id);
+    } else {
+      setPatientPermissions([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUser]);
 
   async function fetchAssignedPatients() {
     setLoadingAssigned(true);
@@ -83,6 +100,29 @@ export default function UserSettings() {
       setAssignedPatients([]);
     } finally {
       setLoadingAssigned(false);
+    }
+  }
+
+  // Note: caregiver's own permissions are not editable here; only patient permissions are shown
+
+  // Fetch permissions for a specific patient/caretaker (for caregiver to edit)
+  async function fetchPatientPermissions(caretakerId) {
+    if (!caretakerId) { setPatientPermissions([]); return; }
+    setLoadingPermissions(true);
+    setPermissionsError(null);
+    try {
+      const res = await fetch(`/api/user-management/caretakers/${caretakerId}/permissions`, { headers: getAuthHeaders() });
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      const data = await res.json();
+      setPatientPermissions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.warn('Could not fetch patient permissions', err);
+      setPermissionsError(err.message || String(err));
+      setPatientPermissions([]);
+    } finally {
+      setLoadingPermissions(false);
     }
   }
 
@@ -265,7 +305,7 @@ export default function UserSettings() {
       {!user && <p className="empty-message">Inloggning krävs för att visa och ändra inställningar.</p>}
 
       {user && (
-        <section className="preference-boxes user-settings-grid">
+        <section className="preference-boxes user-settings-grid" style={{ position: 'relative', paddingBottom: '6rem' }}>
           {/* personal settings card removed */}
 
           {user.userType === 'ADMIN' ? (
@@ -444,6 +484,61 @@ export default function UserSettings() {
                 ) : (
                   <div className="text-muted">Klicka på en patient i listan för att visa och redigera uppgifter.</div>
                 )}
+                {/* Permissions card for caregiver -> patient: only show when a patient is selected */}
+                {selectedUser && (
+                  <div style={{ marginTop: '1rem' }} className="permissions-section">
+                    <h3 className="form-title">Behörigheter</h3>
+                    <div style={{ marginTop: '0.5rem', textAlign: 'left' }}>
+                      {/* Only the patient's permissions are shown and editable */}
+                    </div>
+                    <div style={{ marginTop: '0.75rem', textAlign: 'left' }}>
+                      <div style={{ fontWeight: 600 }}>Patientens behörigheter</div>
+                      {loadingPermissions && <div className="text-muted">Laddar behörigheter...</div>}
+                      {!loadingPermissions && permissionsError && <div className="text-muted">Kunde inte hämta behörigheter.</div>}
+                      <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!selectedUser?.id) return;
+                        try {
+                          const headers = { ...getAuthHeaders(), 'Content-Type': 'application/json' };
+                          const body = { permissions: patientPermissions };
+                          const res = await fetch(`/api/user-management/caretakers/${selectedUser.id}/permissions`, { method: 'PUT', headers, body: JSON.stringify(body) });
+                          if (!res.ok) {
+                            const text = await res.text();
+                            throw new Error(`${res.status} ${res.statusText} - ${text}`);
+                          }
+                          // refresh list and show saved
+                          setSaveMessage({ type: 'success', text: 'Behörigheter uppdaterade.' });
+                          await fetchAssignedPatients();
+                          await fetchPatientPermissions(selectedUser.id);
+                        } catch (err) {
+                          setSaveMessage({ type: 'error', text: 'Kunde inte uppdatera behörigheter: ' + (err.message || err) });
+                        }
+                      }}>
+                        <div style={{ marginTop: '0.5rem' }}>
+                          {[
+                            { key: 'CREATE_REMINDERS', label: 'Skapa påminnelser' },
+                            { key: 'VIEW_REMINDERS', label: 'Visa påminnelser' },
+                            { key: 'MEAL_REQUIREMENTS', label: 'Måltidskrav' },
+                            { key: 'MEAL_SUGGESTIONS', label: 'Måltidsförslag' },
+                            { key: 'STATISTICS', label: 'Statistik' },
+                          ].map((perm) => (
+                            <label key={perm.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', justifyContent: 'flex-start' }}>
+                              <input type="checkbox" checked={patientPermissions.includes(perm.key)} onChange={(e) => {
+                                if (e.target.checked) setPatientPermissions((prev) => Array.from(new Set([...prev, perm.key])));
+                                else setPatientPermissions((prev) => prev.filter((x) => x !== perm.key));
+                              }} />
+                              <span>{perm.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <button type="submit" className="submit-button">Spara behörigheter</button>
+                          <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => { setPatientPermissions([]); if (selectedUser?.id) await fetchPatientPermissions(selectedUser.id); setSaveMessage(null); }}>Återställ</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -499,6 +594,12 @@ export default function UserSettings() {
             )}
             </>
           )}
+          {/* Home icon anchored relative to the last visible card */}
+          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: '12px' }}>
+            <Link to="/">
+              <img src={homeIcon} alt="Tillbaka till startsidan" style={{ width: '64px', cursor: 'pointer' }} />
+            </Link>
+          </div>
         </section>
       )}
       {/* Immediate delete - confirmation modal removed per request */}
