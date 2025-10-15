@@ -16,6 +16,15 @@ docker compose down
 
 # Stop + clear DB volume (fresh start)
 docker compose down -v
+
+# Clear just buildx cache (what we used before)
+docker buildx prune --all --force
+
+# Clear all Docker cache (more aggressive)
+docker system prune --all --force
+
+# Clear Docker Compose cache specifically
+docker-compose down --volumes --remove-orphans
 ```
 
 ## Postgres inside Docker

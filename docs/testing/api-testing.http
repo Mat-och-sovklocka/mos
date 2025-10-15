@@ -1,7 +1,7 @@
 ### Variables
 @baseUrl = http://localhost:8080/api
 # Note: Tokens expire after 24 hours. Get fresh tokens by running the login requests below.
-@adminToken = YOUR_ADMIN_TOKEN_HERE
+@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDEiLCJlbWFpbCI6ImFkbWluQG1vcy50ZXN0IiwidXNlclR5cGUiOiJBRE1JTiIsImlhdCI6MTc2MDM3OTU2NiwiZXhwIjoxNzYwNDY1OTY2fQ.lWBsD9q3CGR1U6S-FTRIh6EvvbdRGK8VrTOlX2pbmSlxHWBKqIa9QlZAtw7kouuz5ZumgoPZ63eLgWcY5yahZg
 @caregiverToken = YOUR_CAREGIVER_TOKEN_HERE
 @residentToken = YOUR_RESIDENT_TOKEN_HERE
 
