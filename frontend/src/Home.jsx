@@ -1,9 +1,14 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
+import imgAllergies from './images/allergies.png';
+import imgSettings from './images/settings.png';
+import imgRecepies from './images/recepies.png';
+import imgRemindersHandle from './images/reminders_handle.png';
+import imgRemindersList from './images/reminders_list.png';
+import imgStatistics from './images/statistics.png';
 
 
 const Home = () => {
@@ -11,17 +16,12 @@ const Home = () => {
   const navigate = useNavigate();
   
   const items = [
-
-    { className: "allergies", label: "Allergier och specialkost", link: "/form" },
-  { className: "settings", label: "Inställningar", link: "/usersettings" },
-    { className: "recepies", label: "Matförslag", link: "/mealsuggestions" },
-    {
-      className: "reminders_handle",
-      label: "Lägg påminnelser",
-      link: "/reminders",
-    },
-    { className: "reminders_list", label: "Påminnelselista", link: "/reminderlist" },
-    { className: "statistics", label: "Statistik" },
+    { className: "allergies", label: "Allergier och specialkost", link: "/form", src: imgAllergies },
+    { className: "settings", label: "Inställningar", link: "/usersettings", src: imgSettings },
+    { className: "recepies", label: "Matförslag", link: "/mealsuggestions", src: imgRecepies },
+    { className: "reminders_handle", label: "Lägg påminnelser", link: "/reminders", src: imgRemindersHandle },
+    { className: "reminders_list", label: "Påminnelselista", link: "/reminderlist", src: imgRemindersList },
+    { className: "statistics", label: "Statistik", src: imgStatistics },
   ];
 
   return (
@@ -56,10 +56,14 @@ const Home = () => {
           >
             {link ? (
               <Link to={link}>
-                <div className={`image ${className}`}></div>
+                <div className={`image ${className}`}>
+                  <img src={src} alt={label} loading="lazy" decoding="async" />
+                </div>
               </Link>
             ) : (
-              <div className={`image ${className}`}></div>
+              <div className={`image ${className}`}>
+                <img src={src} alt={label} loading="lazy" decoding="async" />
+              </div>
             )}
             <span className="mt-2 text-center label-text">{label}</span>
           </div>

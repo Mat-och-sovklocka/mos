@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import "./reminder.css";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
@@ -17,7 +15,8 @@ import img7 from "./images/img7.png";
 import img8 from "./images/img8.png";
 import homeIcon from "./images/home.png";
 
-registerLocale("sv", sv);
+// Lazy-load DatePicker to avoid pulling it into initial route chunk
+const DatePicker = lazy(() => import("react-datepicker"));
 
 function Reminders() {
   const navigate = useNavigate();
@@ -338,7 +337,7 @@ function Reminders() {
                   className={`image-wrapper ${isDisabled ? "disabled" : ""}`}
                   onClick={() => handleClick(index)}
                 >
-                  <img src={image.src} alt={labels[index]} className="image" />
+                  <img src={image.src} alt={labels[index]} className="image" loading="lazy" decoding="async" />
                   <label
                     className={`image-label ${isSelected ? "visible" : ""}`}
                   >
@@ -385,18 +384,20 @@ function Reminders() {
           <div className="picker-inputs">
             <div className="form-group">
               <label>Välj dag och tid för påminnelsen:</label>
-              <DatePicker
-                selected={selectedDateTime}
-                onChange={(date) => setSelectedDateTime(date)}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="yyyy-MM-dd HH:mm"
-                placeholderText="Klicka för att välja"
-                locale="sv"
-                minDate={new Date()}
-                withPortal
-              />
+              <Suspense fallback={<div>Loading date picker…</div>}>
+                <DatePicker
+                  selected={selectedDateTime}
+                  onChange={(date) => setSelectedDateTime(date)}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  dateFormat="yyyy-MM-dd HH:mm"
+                  placeholderText="Klicka för att välja"
+                  locale={sv}
+                  minDate={new Date()}
+                  withPortal
+                />
+              </Suspense>
             </div>
 
             <div className="form-group">
@@ -571,6 +572,8 @@ function Reminders() {
               src={homeIcon}
               alt="Tillbaka till startsidan"
               style={{ width: "80px", cursor: "pointer" }}
+              loading="lazy"
+              decoding="async"
             />
           </Link>
         </div>
