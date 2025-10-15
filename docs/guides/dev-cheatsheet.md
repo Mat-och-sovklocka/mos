@@ -38,6 +38,7 @@ docker exec -it db psql -U mos -d mos -c "select current_database(), current_sch
 docker exec -it db psql -U mos -d mos -c "\dt"
 docker exec -it db psql -U mos -d mos -c "select * from flyway_schema_history;"
 docker exec -it db psql -U mos -d mos -c "select * from app_user;"
+docker exec -it db psql -U mos -d mos -c "select * from user_assignments;"
 docker exec -it db psql -U mos -d mos -c "select count(*) from reminder;"
 docker exec -it db psql -U mos -d mos -c "select r.*, u.email from reminder r join app_user u on r.user_id = u.id;"
 # Count all users
