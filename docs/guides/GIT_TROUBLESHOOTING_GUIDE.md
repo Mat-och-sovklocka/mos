@@ -126,6 +126,24 @@ git diff HEAD origin/main --name-only
 
 # See recent commits
 git log --oneline -5
+
+# See recent commits including merges
+git log --oneline --graph -10
+
+# See what you merged recently
+git log --merges --oneline -5
+
+# See the actual diff of your recent merge
+git show HEAD --name-only
+
+# See what's different on remote main (what you're missing)
+git diff origin/main HEAD --name-only
+
+# See the actual diff of what's on main that you don't have
+git diff HEAD origin/main
+
+# See just the file names
+git diff HEAD origin/main --name-only
 ```
 
 ### 🚨 **Emergency: Get Out of Messy State**
