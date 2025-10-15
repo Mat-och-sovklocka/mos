@@ -16,16 +16,69 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(email, password);
-    
-    if (result.success) {
-      // Navigate to home page after successful login
-      navigate('/');
-    } else {
-      setError(result.error || 'Login failed. Please check your credentials.');
+    try {
+      const result = await login(email, password);
+
+      if (!result.success) {
+        setError(result.error || 'Login failed. Please check your credentials.');
+        setLoading(false);
+        return;
+      }
+
+      const user = result.user;
+
+      // If admin or caregiver, always navigate to UserSettings
+      if (user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER') {
+        navigate('/UserSettings');
+        setLoading(false);
+        return;
+      }
+
+      // If resident, check if they have access to any modules
+      if (user?.userType === 'RESIDENT') {
+        // Use token stored in sessionStorage (AuthContext saves it) to fetch permissions
+        const token = result.token || sessionStorage.getItem('mos_token');
+        try {
+          const res = await fetch('/api/user-management/permissions', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (!res.ok) {
+            // If we can't fetch permissions, treat as no access
+            setError('Inloggning lyckades, men kunde inte verifiera behörigheter. Kontakta administratör.');
+            setLoading(false);
+            return;
+          }
+
+          const perms = await res.json();
+
+          // Expecting an array of permission strings
+          const enabled = Array.isArray(perms) && perms.length > 0;
+
+          if (enabled) {
+            navigate('/');
+          } else {
+            setError('Du har tyvärr ingen åtkomst till några moduler. Kontakta administratör.');
+          }
+        } catch (err) {
+          console.error('Could not fetch permissions', err);
+          setError('Inloggning lyckades, men kunde inte verifiera behörigheter.');
+        }
+      } else {
+        // Default fallback: navigate to home
+        navigate('/');
+      }
+
+    } catch (err) {
+      console.error('Login flow error', err);
+      setError('Något gick fel vid inloggning. Försök igen.');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (

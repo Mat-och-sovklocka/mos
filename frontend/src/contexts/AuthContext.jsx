@@ -60,7 +60,17 @@ export const AuthProvider = ({ children }) => {
         userType: data.userType
       });
       
-      return { success: true };
+      // Return user and token so callers can act immediately without waiting for context state updates
+      return {
+        success: true,
+        user: {
+          id: data.userId,
+          email: data.email,
+          displayName: data.displayName,
+          userType: data.userType,
+        },
+        token: data.token,
+      };
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: error.message };
