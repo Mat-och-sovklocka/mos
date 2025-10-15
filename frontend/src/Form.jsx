@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"; // Lägg till useEffect här
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./form.css";
@@ -20,7 +20,9 @@ const kostAlternativ = [
 ];
 
 const Form = () => {
-  const { user, getAuthHeaders } = useAuth();
+  const { user, getAuthHeaders, logout } = useAuth();
+  const navigate = useNavigate();
+  const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
   const [savedPreferences, setSavedPreferences] = useState([]);
   const [availablePreferences, setAvailablePreferences] = useState([]);
   const [customText, setCustomText] = useState("");
@@ -280,13 +282,34 @@ const Form = () => {
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">
-          <Link to="/">
+          {isAdminOrCaregiver && (
+            <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
+              <button
+                onClick={() => { logout(); navigate('/login'); }}
+                className="btn btn-outline-danger btn-sm"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+          {isAdminOrCaregiver ? (
             <img
               src={homeIcon}
-              alt="Tillbaka till startsidan"
-              style={{ width: "80px", cursor: "pointer" }}
+              alt="Hem (otillgänglig)"
+              className="disabled-home"
+              title="Inte tillgänglig för administratörer eller vårdgivare"
+              aria-label="Hem (otillgänglig för administratörer eller vårdgivare)"
+              style={{ width: "80px" }}
             />
-          </Link>
+          ) : (
+            <Link to="/">
+              <img
+                src={homeIcon}
+                alt="Tillbaka till startsidan"
+                style={{ width: "80px", cursor: "pointer" }}
+              />
+            </Link>
+          )}
         </div>
       </div>
     </div>

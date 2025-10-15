@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./home.css";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
 
@@ -9,6 +9,8 @@ import NotificationTest from './components/NotificationTest';
 const Home = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const viewedPatientName = location?.state?.viewedPatientName || null;
   
   const items = [
 
@@ -32,6 +34,11 @@ const Home = () => {
           <span className="text-muted">Welcome, </span>
           <strong>{user?.displayName || user?.email}</strong>
           <span className="badge bg-primary ms-2">{user?.userType}</span>
+          {viewedPatientName && (
+            <div style={{ marginTop: '6px', fontSize: '0.95rem' }}>
+              Du tittar på {viewedPatientName} sida
+            </div>
+          )}
         </div>
         <button 
           onClick={() => {

@@ -5,6 +5,7 @@ import { IoMdClose } from 'react-icons/io'
 import favoritesImage from './images/favorites.jpeg'
 import homeIcon from "./images/home.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from './contexts/AuthContext';
 
 // Bekräftelsemodal komponent
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title }) => {
@@ -167,6 +168,8 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
 
 const Mealsuggestions = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
 
   // States
   const [searchQuery, setSearchQuery] = useState('')
@@ -937,11 +940,27 @@ const Mealsuggestions = () => {
         )}
       </div>
 
+  {isAdminOrCaregiver && (
+        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="btn btn-outline-danger btn-sm"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
       <img
         src={homeIcon}
-        alt="Home"
-        className="home-icon"
-        onClick={() => navigate("/")}
+  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
+  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
+  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+        onClick={() => {
+          if (isAdminOrCaregiver) return;
+          navigate('/');
+        }}
       />
     </div>
   )

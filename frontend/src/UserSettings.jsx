@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import homeIcon from './images/home.png';
+import './UserSettings.css';
 
 export default function UserSettings() {
-  const { user, getAuthHeaders } = useAuth();
+  const { user, getAuthHeaders, logout } = useAuth();
+  const navigate = useNavigate();
+  const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
 
   // (Personal settings UI removed) -- admin user management remains below
 
@@ -26,6 +29,9 @@ export default function UserSettings() {
   const [assignedPatients, setAssignedPatients] = useState([]);
   const [loadingAssigned, setLoadingAssigned] = useState(false);
   const [assignedError, setAssignedError] = useState(null);
+  const [patientNavigationEnabled, setPatientNavigationEnabled] = useState(false);
+  const [patientNavigationName, setPatientNavigationName] = useState(null);
+  const [showPatientModal, setShowPatientModal] = useState(false);
   const [patientPermissions, setPatientPermissions] = useState([]);
   const [loadingPermissions, setLoadingPermissions] = useState(false);
   const [permissionsError, setPermissionsError] = useState(null);
@@ -70,8 +76,13 @@ export default function UserSettings() {
   useEffect(() => {
     if (user?.userType === 'CAREGIVER' && selectedUser?.id) {
       fetchPatientPermissions(selectedUser.id);
+      // enable quick navigation affordance for caregiver when a patient is selected
+      setPatientNavigationEnabled(true);
+      setPatientNavigationName(selectedUser.displayName || selectedUser.email || null);
     } else {
       setPatientPermissions([]);
+      setPatientNavigationEnabled(false);
+      setPatientNavigationName(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser]);
@@ -300,12 +311,39 @@ export default function UserSettings() {
 
   return (
     <div>
+      {/* Show top-right logout for ADMIN similar to Home.jsx */}
+      {isAdminOrCaregiver && !showPatientModal && (
+        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
+          <button
+            onClick={() => {
+              logout();
+              navigate('/login');
+            }}
+            className="btn btn-outline-danger btn-sm"
+          >
+            Logout
+          </button>
+        </div>
+      )}
       <h1 className="reminder-title">Användarinställningar</h1>
 
       {!user && <p className="empty-message">Inloggning krävs för att visa och ändra inställningar.</p>}
 
       {user && (
         <section className="preference-boxes user-settings-grid" style={{ position: 'relative', paddingBottom: '6rem' }}>
+          {/* Patient navigation modal for caregivers */}
+          {showPatientModal && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000 }}>
+              <div style={{ background: '#fff', padding: '1.25rem', borderRadius: '8px', maxWidth: '520px', width: '90%', boxShadow: '0 6px 24px rgba(0,0,0,0.2)' }}>
+                <h3 style={{ marginTop: 0 }}>Navigera till patient</h3>
+                <p style={{ marginTop: '0.5rem' }}>{patientNavigationName ? `Nu kan du navigera i ${patientNavigationName} gränssnitt.` : 'Nu kan du navigera i patientens gränssnitt.'}</p>
+                <p className="text-muted">Klicka på knappen nedan för att gå till startsidan där du sedan kan använda Hem-ikonen för att gå vidare.</p>
+                <div className="patient-modal-actions">
+                  <button className="submit-button patient-modal-ok" onClick={() => { setShowPatientModal(false); /* keep patientNavigationEnabled true so home icon becomes available */ }}>OK</button>
+                </div>
+              </div>
+            </div>
+          )}
           {/* personal settings card removed */}
 
           {user.userType === 'ADMIN' ? (
@@ -555,7 +593,20 @@ export default function UserSettings() {
                 <div style={{ marginTop: '0.5rem' }}>
                   {assignedPatients && assignedPatients.length > 0 ? (
                     assignedPatients.map((p) => (
-                      <div key={p.id || p.email} className="user-item" style={{ cursor: 'pointer' }} onClick={() => setSelectedUser(p)}>
+                      <div
+                        key={p.id || p.email}
+                        className="user-item"
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          setSelectedUser(p);
+                          if (user?.userType === 'CAREGIVER') {
+                            setPatientNavigationEnabled(true);
+                            setPatientNavigationName(p.displayName || p.email || null);
+                            // show modal guidance to caregiver
+                            setShowPatientModal(true);
+                          }
+                        }}
+                      >
                         <span style={{ textDecoration: 'underline' }}>{p.displayName || p.email}</span>
                       </div>
                     ))
@@ -596,9 +647,18 @@ export default function UserSettings() {
           )}
           {/* Home icon anchored relative to the last visible card */}
           <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', bottom: '12px' }}>
-            <Link to="/">
-              <img src={homeIcon} alt="Tillbaka till startsidan" style={{ width: '64px', cursor: 'pointer' }} />
-            </Link>
+            {/* Caregiver quick-navigation: when enabled show message and clickable home icon. Admins remain disabled. */}
+            {user?.userType === 'CAREGIVER' && patientNavigationEnabled ? (
+              <Link to="/" state={{ viewedPatientName: patientNavigationName, viewedPatientId: selectedUser?.id }}>
+                <img src={homeIcon} alt={`Gå till ${patientNavigationName || 'patientens'} gränssnitt`} title={`Gå till ${patientNavigationName || 'patientens'} gränssnitt`} style={{ width: '64px', cursor: 'pointer' }} />
+              </Link>
+            ) : isAdminOrCaregiver ? (
+              <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: '64px' }} />
+            ) : (
+              <Link to="/">
+                <img src={homeIcon} alt="Tillbaka till startsidan" style={{ width: '64px', cursor: 'pointer' }} />
+              </Link>
+            )}
           </div>
         </section>
       )}
