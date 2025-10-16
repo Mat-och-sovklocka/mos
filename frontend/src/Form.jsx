@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"; // Lägg till useEffect här
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./form.css";
@@ -22,7 +22,10 @@ const kostAlternativ = [
 const Form = () => {
   const { user, getAuthHeaders, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
+  const viewedPatientId = location?.state?.viewedPatientId || null;
   const [savedPreferences, setSavedPreferences] = useState([]);
   const [availablePreferences, setAvailablePreferences] = useState([]);
   const [customText, setCustomText] = useState("");
@@ -30,15 +33,26 @@ const Form = () => {
   const [newTagInput, setNewTagInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Helper function to get the correct user ID for API calls
+  const getTargetUserId = () => {
+    if (user.userType === 'CAREGIVER' && viewedPatientId) {
+      return viewedPatientId;
+    }
+    return user.id;
+  };
 
   // Hämta sparade preferenser när komponenten monteras
   useEffect(() => {
     const fetchRequirements = async () => {
       if (!user?.id) return; // Don't fetch if user is not logged in
       
+      const targetUserId = getTargetUserId();
+      
       try {
         const response = await fetch(
-          `/api/users/${user.id}/meal-requirements`,
+          `/api/users/${targetUserId}/meal-requirements`,
           {
             headers: getAuthHeaders()
           }
@@ -81,7 +95,7 @@ const Form = () => {
     };
 
     fetchRequirements();
-  }, [user, getAuthHeaders]); // Re-fetch when user changes
+  }, [user, getAuthHeaders, viewedPatientId]); // Re-fetch when user or viewed patient changes
 
   // Flytta från tillgängliga till sparade
   const moveToSaved = (preference) => {
@@ -132,9 +146,11 @@ const Form = () => {
       requirements: dataAttSkicka,
     };
 
+    const targetUserId = getTargetUserId();
+
     try {
       const response = await fetch(
-        `/api/users/${user.id}/meal-requirements`,
+        `/api/users/${targetUserId}/meal-requirements`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -160,7 +176,8 @@ const Form = () => {
       setCustomTags(newSavedCustom);
       setCustomText(newSavedCustom.length > 0 ? newSavedCustom.join("\n") : "");
       
-      // TODO: Lägg till användarvänlig feedback här
+      // Visa framgångsmeddelande
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error:", error);
       // TODO: Lägg till felmeddelande till användaren här
@@ -274,14 +291,28 @@ const Form = () => {
             </div>
           </div>
 
-          <button type="submit" className="submit-button">
+          <button type="submit" className="submit-button" style={{ marginTop: '2rem' }}>
             Spara preferenser
           </button>
         </form>
       </section>
 
-      <div className="row mt-5">
+      <div className="row mt-2">
         <div className="col-12 d-flex justify-content-center">
+          {/* User info and patient name */}
+          <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
+            <div>
+              <span className="text-muted">Welcome, </span>
+              <strong>{user?.displayName || user?.email}</strong>
+              <span className="badge bg-primary ms-2">{user?.userType}</span>
+            </div>
+            {viewedPatientName && (
+              <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
+                Du tittar på {viewedPatientName} sida
+              </div>
+            )}
+          </div>
+
           {isAdminOrCaregiver && (
             <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
               <button
@@ -292,7 +323,7 @@ const Form = () => {
               </button>
             </div>
           )}
-          {isAdminOrCaregiver ? (
+          {isAdminOrCaregiver && !viewedPatientName ? (
             <img
               src={homeIcon}
               alt="Hem (otillgänglig)"
@@ -302,7 +333,7 @@ const Form = () => {
               style={{ width: "80px" }}
             />
           ) : (
-            <Link to="/">
+            <Link to="/" state={location.state}>
               <img
                 src={homeIcon}
                 alt="Tillbaka till startsidan"
@@ -312,6 +343,34 @@ const Form = () => {
           )}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Framgång!</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Dina kostpreferenser har sparats framgångsrikt!</p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="modal-ok-btn"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

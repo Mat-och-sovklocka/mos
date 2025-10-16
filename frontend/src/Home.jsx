@@ -98,7 +98,7 @@ const Home = () => {
               // Residents: show active icon only if they have the permission; otherwise show disabled icon
               perm ? (
                 hasPerm(perm) ? (
-                  <Link to={link}>
+                  <Link to={link} state={location.state}>
                     <div className={`image ${className}`}></div>
                   </Link>
                 ) : (
@@ -107,7 +107,7 @@ const Home = () => {
               ) : (
                 // Items without a permission requirement are visible
                 link ? (
-                  <Link to={link}>
+                  <Link to={link} state={location.state}>
                     <div className={`image ${className}`}></div>
                   </Link>
                 ) : (
@@ -117,7 +117,7 @@ const Home = () => {
             ) : (
               // Non-residents: unchanged behavior
               link ? (
-                <Link to={link}>
+                <Link to={link} state={location.state}>
                   <div className={`image ${className}`}></div>
                 </Link>
               ) : (

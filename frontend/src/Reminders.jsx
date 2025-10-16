@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
 import img1 from "./images/img1.png";
@@ -21,8 +21,11 @@ registerLocale("sv", sv);
 
 function Reminders() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, getAuthHeaders, logout } = useAuth();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
+  const viewedPatientId = location?.state?.viewedPatientId || null;
   const images = [
     { src: img1, alt: "img1" },
     { src: img2, alt: "img2" },
@@ -159,12 +162,11 @@ function Reminders() {
 
   // Determine target user ID based on user role
   const getTargetUserId = () => {
-    // If user is a caregiver, they should create reminders for their assigned residents
-    // For now, we'll use a default resident ID, but this should be configurable
-    if (user.userType === 'CAREGIVER') {
-      return "550e8400-e29b-41d4-a716-446655440004"; // Default resident for caregivers
+    // If caregiver is viewing a specific patient, create reminders for that patient
+    if (user.userType === 'CAREGIVER' && viewedPatientId) {
+      return viewedPatientId;
     }
-    // If user is a resident or admin, create reminders for themselves
+    // If user is a caregiver without a viewed patient, or resident/admin, create reminders for themselves
     return user.id;
   };
 
@@ -242,7 +244,14 @@ function Reminders() {
   };
 
   const handleClick = (index) => {
-    setSelectedIndex(index); // Alltid välj det du klickar på
+    // Toggle functionality: if clicking the same figure, go back to initial state
+    if (selectedIndex === index) {
+      setSelectedIndex(null); // Reset to initial state - all figures visible, no reminder buttons
+    } else {
+      setSelectedIndex(index); // Select the clicked figure
+    }
+    
+    // Always reset these when clicking any figure
     setReminderType(null);
     setSelectedDateTime(null);
     setCustomReminderText("");
@@ -365,14 +374,14 @@ function Reminders() {
 
           <div className="reminder-buttons-row">
             <button
-              className="reminder-button"
+              className="reminder-button reminder-button-once"
               onClick={() => handleReminderType("once")}
             >
               Enstaka påminnelser
             </button>
 
             <button
-              className="reminder-button"
+              className="reminder-button reminder-button-recurring"
               onClick={() => handleReminderType("recurring")}
             >
               Återkommande påminnelser
@@ -567,16 +576,30 @@ function Reminders() {
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">
+          {/* User info and patient name */}
+          <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
+            <div>
+              <span className="text-muted">Welcome, </span>
+              <strong>{user?.displayName || user?.email}</strong>
+              <span className="badge bg-primary ms-2">{user?.userType}</span>
+            </div>
+            {viewedPatientName && (
+              <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
+                Du tittar på {viewedPatientName} sida
+              </div>
+            )}
+          </div>
+
           {isAdminOrCaregiver && (
             <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
               <button className="btn btn-outline-danger btn-sm" onClick={() => { logout(); navigate('/login'); }}>Logout</button>
             </div>
           )}
 
-          {isAdminOrCaregiver ? (
+          {isAdminOrCaregiver && !viewedPatientName ? (
             <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
           ) : (
-            <Link to="/">
+            <Link to="/" state={location.state}>
               <img
                 src={homeIcon}
                 alt="Tillbaka till startsidan"
