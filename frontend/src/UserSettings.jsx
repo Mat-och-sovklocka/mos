@@ -42,6 +42,8 @@ export default function UserSettings() {
   const [patientPermissions, setPatientPermissions] = useState([]);
   const [loadingPermissions, setLoadingPermissions] = useState(false);
   const [permissionsError, setPermissionsError] = useState(null);
+  const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
+  const [showPermissionsSuccessModal, setShowPermissionsSuccessModal] = useState(false);
   // delete state handled per-action
 
   const mockUsers = [
@@ -280,6 +282,8 @@ export default function UserSettings() {
       setSelectedUser(null);
       setSaveMessage(null);
       setCreateMessage(null);
+      // Show success modal
+      setShowSaveSuccessModal(true);
     } catch (err) {
       setSaveMessage({ type: 'error', text: 'Kunde inte spara: ' + (err.message || err) });
     } finally {
@@ -555,6 +559,12 @@ export default function UserSettings() {
                           setSaveMessage({ type: 'success', text: 'Behörigheter uppdaterade.' });
                           await fetchAssignedPatients();
                           await fetchPatientPermissions(selectedUser.id);
+                          // restore UI to initial loaded state (same as handleSaveCaretaker)
+                          setSelectedUser(null);
+                          setSaveMessage(null);
+                          setCreateMessage(null);
+                          // Show permissions success modal
+                          setShowPermissionsSuccessModal(true);
                         } catch (err) {
                           setSaveMessage({ type: 'error', text: 'Kunde inte uppdatera behörigheter: ' + (err.message || err) });
                         }
@@ -669,6 +679,61 @@ export default function UserSettings() {
           </div>
         </section>
       )}
+      {/* Success Modals */}
+      {showSaveSuccessModal && (
+        <div className="modal-overlay" onClick={() => setShowSaveSuccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Framgång!</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowSaveSuccessModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Användaruppgifterna har sparats framgångsrikt!</p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="modal-ok-btn"
+                onClick={() => setShowSaveSuccessModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPermissionsSuccessModal && (
+        <div className="modal-overlay" onClick={() => setShowPermissionsSuccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Framgång!</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowPermissionsSuccessModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Behörigheterna har uppdaterats framgångsrikt!</p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="modal-ok-btn"
+                onClick={() => setShowPermissionsSuccessModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Immediate delete - confirmation modal removed per request */}
       {/* debug UI removed */}
     </div>
