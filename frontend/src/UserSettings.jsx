@@ -9,6 +9,13 @@ export default function UserSettings() {
   const navigate = useNavigate();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
 
+  // Prevent residents from accessing this page directly
+  if (user?.userType === 'RESIDENT') {
+    // redirect back to home (they should only use modules they have permissions for)
+    navigate('/');
+    return null;
+  }
+
   // (Personal settings UI removed) -- admin user management remains below
 
   // Admin: users list + create

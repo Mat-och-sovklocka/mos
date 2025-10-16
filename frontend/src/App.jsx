@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import './App.css'
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
@@ -25,6 +25,23 @@ const ProtectedRoute = ({ children }) => {
   }
   
   return isAuthenticated() ? children : <Login />;
+};
+
+// Role-based protected route: only allows users with one of the allowedRoles
+const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+  if (loading) return (
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+      <p>Loading...</p>
+    </div>
+  );
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
+  if (!user || !allowedRoles.includes(user.userType)) {
+    // Not allowed: redirect to home
+    return <Navigate to="/" replace />;
+  }
+  return children;
 };
 
 function App() {
@@ -59,9 +76,9 @@ function App() {
             </ProtectedRoute>
           } />
           <Route path="/UserSettings" element={
-            <ProtectedRoute>
+            <RoleProtectedRoute allowedRoles={["ADMIN","CAREGIVER"]}>
               <UserSettings />
-            </ProtectedRoute>
+            </RoleProtectedRoute>
           } />
         </Routes>
       </Router>
