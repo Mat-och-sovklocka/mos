@@ -8,7 +8,8 @@ import homeIcon from "./images/home.png";
 // Removed old login function - now using AuthContext
 
 const ReminderList = () => {
-  const { user, getAuthHeaders } = useAuth();
+  const { user, getAuthHeaders, logout } = useAuth();
+  const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
   const location = useLocation();
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -534,11 +535,28 @@ const ReminderList = () => {
           </div>
         </>
       )}
+      {/* Admin top-right logout */}
+  {isAdminOrCaregiver && (
+        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="btn btn-outline-danger btn-sm"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+
       <img
         src={homeIcon}
-        alt="Home"
-        className="home-icon"
-        onClick={() => navigate("/")}
+  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
+  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
+  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+        onClick={() => {
+          if (isAdminOrCaregiver) return; // do nothing for admins or caregivers
+          navigate('/');
+        }}
       />
     </div>
   );

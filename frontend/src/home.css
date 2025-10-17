@@ -46,6 +46,31 @@
   opacity: 1;
 }
 
+/* Home icon used across pages */
+.home-icon {
+  width: 64px;
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.home-icon.disabled-home {
+  opacity: 0.35;
+  filter: grayscale(60%);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Disabled home img used inline in some components */
+.disabled-home {
+  opacity: 0.35;
+  filter: grayscale(60%);
+  cursor: not-allowed;
+}
+
 .app-title {
   color: #316e70; /* din gröna färg */
   font-weight: 800; /* ännu fetare än standard */

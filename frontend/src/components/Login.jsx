@@ -16,16 +16,39 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const result = await login(email, password);
-    
-    if (result.success) {
-      // Navigate to home page after successful login
+    try {
+      const result = await login(email, password);
+
+      if (!result.success) {
+        setError(result.error || 'Login failed. Please check your credentials.');
+        setLoading(false);
+        return;
+      }
+
+      const user = result.user;
+
+      // If admin or caregiver, always navigate to UserSettings
+      if (user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER') {
+        navigate('/UserSettings');
+        setLoading(false);
+        return;
+      }
+
+      // If resident, always navigate to Home — Home will render active/inactive icons based on permissions
+      if (user?.userType === 'RESIDENT') {
+        navigate('/');
+        setLoading(false);
+        return;
+      }
+      // Default fallback: navigate to home
       navigate('/');
-    } else {
-      setError(result.error || 'Login failed. Please check your credentials.');
+
+    } catch (err) {
+      console.error('Login flow error', err);
+      setError('Något gick fel vid inloggning. Försök igen.');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (

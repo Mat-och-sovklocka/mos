@@ -53,3 +53,15 @@
 }
 .user-settings .message.success { background: #e6ffed; color: #05632d }
 .user-settings .message.error { background: #ffecec; color: #8a1f1f }
+
+.patient-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.patient-modal-ok {
+  min-width: 160px;
+  padding: 0.6rem 1rem;
+}
