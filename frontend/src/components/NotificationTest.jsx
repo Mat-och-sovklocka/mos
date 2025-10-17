@@ -51,6 +51,14 @@ const NotificationTest = () => {
     }
   };
 
+  const handleShowDiagnostics = () => {
+    // Access the notification service directly to get diagnostic info
+    const { notificationService } = require('../notifications/NotificationService');
+    const adapter = notificationService.getAdapter();
+    const diagnostics = adapter?.getDiagnosticInfo?.() || 'Diagnostics not available';
+    setTestResult(`🔍 Diagnostics: ${JSON.stringify(diagnostics, null, 2)}`);
+  };
+
   return (
     <div className="card mt-4">
       <div className="card-header">
@@ -68,6 +76,13 @@ const NotificationTest = () => {
         </div>
         
         <div className="d-flex flex-column gap-2">
+          <button 
+            className="btn btn-secondary"
+            onClick={handleShowDiagnostics}
+          >
+            🔍 Show Diagnostics
+          </button>
+          
           {!hasPermission && (
             <button 
               className="btn btn-primary"
