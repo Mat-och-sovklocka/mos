@@ -144,8 +144,9 @@ public class UserManagementService {
                 userPermissionService.grantPermission(user.getId(), "MEAL_REQUIREMENTS", grantedBy);
                 break;
             case RESIDENT:
-                // Residents get basic view permissions
+                // Residents get permissions to view and manage their own reminders
                 userPermissionService.grantPermission(user.getId(), "VIEW_REMINDERS", grantedBy);
+                userPermissionService.grantPermission(user.getId(), "CREATE_REMINDERS", grantedBy);
                 break;
         }
     }

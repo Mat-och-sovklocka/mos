@@ -57,6 +57,13 @@ Retrieve details of the authenticated user.
 
 ## Reminders
 
+### Authorization Model
+The reminder system uses assignment-based authorization:
+
+- **Admins**: Can manage reminders for any user
+- **Caregivers**: Can manage reminders for their assigned caretakers (override capability)
+- **Residents/Caretakers**: Can manage their own reminders (if they have CREATE_REMINDERS permission)
+
 ### Get User Reminders
 **GET** `/api/users/{userId}/reminders`
 
@@ -64,9 +71,14 @@ Retrieve all reminders for a specific user.
 
 **Headers:** `Authorization: Bearer <token>`
 
+**Authorization Rules:**
+- Admins can view any user's reminders
+- Caregivers can view their assigned caretakers' reminders
+- Users can view their own reminders
+
 **Responses:**
 - **200:** List of reminders
-- **403:** Forbidden - No permission to view reminders
+- **403:** Forbidden - No permission to view reminders for this user
 
 ### Create Reminder
 **POST** `/api/users/{userId}/reminders`
@@ -85,10 +97,15 @@ Create a new reminder.
 }
 ```
 
+**Authorization Rules:**
+- Admins can create reminders for any user
+- Caregivers can create reminders for their assigned caretakers
+- Users can create reminders for themselves (if they have CREATE_REMINDERS permission)
+
 **Responses:**
 - **201:** Reminder created
 - **400:** Invalid input
-- **403:** Forbidden - No permission to create reminders
+- **403:** Forbidden - No permission to create reminders for this user
 
 ### Update Reminder
 **PUT** `/api/users/{userId}/reminders/{reminderId}`
@@ -107,10 +124,15 @@ Update an existing reminder.
 }
 ```
 
+**Authorization Rules:**
+- Admins can update reminders for any user
+- Caregivers can update reminders for their assigned caretakers
+- Users can update their own reminders (if they have CREATE_REMINDERS permission)
+
 **Responses:**
 - **200:** Reminder updated
 - **400:** Invalid input
-- **403:** Forbidden - No permission to update reminders
+- **403:** Forbidden - No permission to update reminders for this user
 - **404:** Reminder not found
 
 ### Delete Reminder
@@ -120,9 +142,14 @@ Delete a specific reminder.
 
 **Headers:** `Authorization: Bearer <token>`
 
+**Authorization Rules:**
+- Admins can delete reminders for any user
+- Caregivers can delete reminders for their assigned caretakers
+- Users can delete their own reminders (if they have CREATE_REMINDERS permission)
+
 **Responses:**
 - **204:** No Content
-- **403:** Forbidden - No permission to delete reminders
+- **403:** Forbidden - No permission to delete reminders for this user
 
 ## Meal Requirements
 

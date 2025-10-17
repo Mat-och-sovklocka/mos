@@ -51,7 +51,72 @@ Content-Type: application/json
 GET {{baseUrl}}/auth/me
 Authorization: Bearer {{adminToken}}
 
-### 5. Create Reminder (Admin)
+### 5. Test Reminder Authorization - Admin can manage any user's reminders
+# Admin creating reminder for resident
+POST {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "category": "medicinintag",
+  "note": "Test reminder created by admin",
+  "type": "once",
+  "dateTime": "2025-01-20T10:00:00"
+}
+
+### 6. Test Reminder Authorization - Resident can manage their own reminders
+# Resident creating reminder for themselves
+POST {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{residentToken}}
+Content-Type: application/json
+
+{
+  "category": "måltider",
+  "note": "Test reminder created by resident",
+  "type": "once",
+  "dateTime": "2025-01-20T12:00:00"
+}
+
+### 7. Test Reminder Authorization - Caregiver can manage assigned caretaker's reminders
+# Caregiver creating reminder for their assigned resident
+POST {{baseUrl}}/users/{{residentId}}/reminders
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "category": "rörelse/pauser",
+  "note": "Test reminder created by caregiver",
+  "type": "once",
+  "dateTime": "2025-01-20T14:00:00"
+}
+
+### 8. Test Reminder Authorization - Resident cannot manage other user's reminders (should fail)
+# Resident trying to create reminder for admin (should return 403)
+POST {{baseUrl}}/users/{{adminId}}/reminders
+Authorization: Bearer {{residentToken}}
+Content-Type: application/json
+
+{
+  "category": "måltider",
+  "note": "This should fail - resident managing admin's reminders",
+  "type": "once",
+  "dateTime": "2025-01-20T16:00:00"
+}
+
+### 9. Test Reminder Authorization - Caregiver cannot manage non-assigned user's reminders (should fail)
+# Caregiver trying to create reminder for admin (should return 403)
+POST {{baseUrl}}/users/{{adminId}}/reminders
+Authorization: Bearer {{caregiverToken}}
+Content-Type: application/json
+
+{
+  "category": "måltider",
+  "note": "This should fail - caregiver managing non-assigned user's reminders",
+  "type": "once",
+  "dateTime": "2025-01-20T18:00:00"
+}
+
+### 10. Create Reminder (Admin)
 POST {{baseUrl}}/users/{{adminId}}/reminders
 Authorization: Bearer {{adminToken}}
 Content-Type: application/json

@@ -1,7 +1,27 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: MOS (Meal and Reminder System) API
-  description: API for managing meal requirements, reminders, and user authentication
+  description: |
+    API for managing meal requirements, reminders, and user authentication.
+    
+    ## Authorization Model
+    
+    The system uses role-based access control with assignment-based authorization:
+    
+    ### User Types
+    - **ADMIN**: System administrators with full access
+    - **CAREGIVER**: Care providers who manage assigned residents
+    - **RESIDENT**: Care recipients who can manage their own data
+    
+    ### Reminder Authorization Rules
+    - **Admins**: Can manage reminders for any user
+    - **Caregivers**: Can manage reminders for their assigned caretakers (override capability)
+    - **Residents**: Can manage their own reminders (if they have CREATE_REMINDERS permission)
+    
+    ### Assignment Model
+    - Caregivers are assigned to specific residents through the user assignment system
+    - Caregivers can set permissions for their assigned residents
+    - Residents can only access modules they have been granted permissions for
   version: 1.0.0
   contact:
     name: MOS Development Team
@@ -124,7 +144,13 @@ paths:
       tags:
       - reminders
       summary: Get user reminders
-      description: Retrieve all reminders for a specific user
+      description: |
+        Retrieve all reminders for a specific user.
+        
+        **Authorization Rules:**
+        - Admins can view any user's reminders
+        - Caregivers can view their assigned caretakers' reminders
+        - Users can view their own reminders
       operationId: getReminders
       security:
       - bearerAuth: []
@@ -146,7 +172,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/ReminderDto"
         "403":
-          description: Forbidden - User doesn't have permission to view reminders
+          description: Forbidden - No permission to view reminders for this user
           content:
             application/json:
               schema:
@@ -157,12 +183,18 @@ paths:
                     example: "Forbidden"
                   message:
                     type: string
-                    example: "You don't have permission to view reminders"
+                    example: "You don't have permission to view reminders for this user"
     post:
       tags:
       - reminders
       summary: Create a reminder
-      description: "Create a new reminder with time, category, and optional note."
+      description: |
+        Create a new reminder with time, category, and optional note.
+        
+        **Authorization Rules:**
+        - Admins can create reminders for any user
+        - Caregivers can create reminders for their assigned caretakers
+        - Users can create reminders for themselves (if they have CREATE_REMINDERS permission)
       operationId: createReminder
       security:
       - bearerAuth: []
@@ -201,7 +233,7 @@ paths:
                     type: string
                     example: "time must be now or future (±5m)"
         "403":
-          description: Forbidden - User doesn't have permission to create reminders
+          description: Forbidden - No permission to create reminders for this user
           content:
             application/json:
               schema:
@@ -212,13 +244,19 @@ paths:
                     example: "Forbidden"
                   message:
                     type: string
-                    example: "You don't have permission to create reminders"
+                    example: "You don't have permission to create reminders for this user"
   /api/users/{userId}/reminders/{reminderId}:
     put:
       tags:
       - reminders
       summary: Update a reminder
-      description: Update an existing reminder with new time, category, or note
+      description: |
+        Update an existing reminder with new time, category, or note.
+        
+        **Authorization Rules:**
+        - Admins can update reminders for any user
+        - Caregivers can update reminders for their assigned caretakers
+        - Users can update their own reminders (if they have CREATE_REMINDERS permission)
       operationId: updateReminder
       security:
       - bearerAuth: []
@@ -292,7 +330,7 @@ paths:
                     type: string
                     example: "Reminder not found for user"
         "403":
-          description: Forbidden - User doesn't have permission to update reminders
+          description: Forbidden - No permission to update reminders for this user
           content:
             application/json:
               schema:
@@ -303,7 +341,7 @@ paths:
                     example: "Forbidden"
                   message:
                     type: string
-                    example: "You don't have permission to update reminders"
+                    example: "You don't have permission to update reminders for this user"
         "404":
           description: Reminder not found
           content:
@@ -321,7 +359,13 @@ paths:
       tags:
       - reminders
       summary: Delete a reminder
-      description: Delete a specific reminder by ID
+      description: |
+        Delete a specific reminder by ID.
+        
+        **Authorization Rules:**
+        - Admins can delete reminders for any user
+        - Caregivers can delete reminders for their assigned caretakers
+        - Users can delete their own reminders (if they have CREATE_REMINDERS permission)
       operationId: deleteReminder
       security:
       - bearerAuth: []
@@ -344,7 +388,7 @@ paths:
         "204":
           description: No Content
         "403":
-          description: Forbidden - User doesn't have permission to delete reminders
+          description: Forbidden - No permission to delete reminders for this user
           content:
             application/json:
               schema:
@@ -355,7 +399,7 @@ paths:
                     example: "Forbidden"
                   message:
                     type: string
-                    example: "You don't have permission to delete reminders"
+                    example: "You don't have permission to delete reminders for this user"
 
   /api/users/{userId}/meal-requirements:
     get:
