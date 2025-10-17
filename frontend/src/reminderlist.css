@@ -8,12 +8,12 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
-  width: 100%;
-  min-width: 320px;  /* Increased from 280px */
-  max-width: 100%;
+  width: 50%;           /* Set to 50% of screen width */
+  min-width: 320px;     /* Keep minimum width for smaller screens */
+  max-width: 600px;     /* Add reasonable maximum width */
   box-sizing: border-box;
-  height: auto;      /* Allow height to grow */
-  min-height: 120px; /* Minimum height for content */
+  height: auto;         /* Allow height to grow */
+  min-height: 120px;    /* Minimum height for content */
   display: flex;
   flex-direction: column;
 }

@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from "react-datepicker";
 import sv from "date-fns/locale/sv";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
 import img1 from "./images/img1.png";
@@ -159,12 +159,11 @@ function Reminders() {
 
   // Determine target user ID based on user role
   const getTargetUserId = () => {
-    // If user is a caregiver, they should create reminders for their assigned residents
-    // For now, we'll use a default resident ID, but this should be configurable
-    if (user.userType === 'CAREGIVER') {
-      return "550e8400-e29b-41d4-a716-446655440004"; // Default resident for caregivers
+    // If caregiver is viewing a specific patient, create reminders for that patient
+    if (user.userType === 'CAREGIVER' && viewedPatientId) {
+      return viewedPatientId;
     }
-    // If user is a resident or admin, create reminders for themselves
+    // If user is a caregiver without a viewed patient, or resident/admin, create reminders for themselves
     return user.id;
   };
 
@@ -242,7 +241,14 @@ function Reminders() {
   };
 
   const handleClick = (index) => {
-    setSelectedIndex(index); // Alltid välj det du klickar på
+    // Toggle functionality: if clicking the same figure, go back to initial state
+    if (selectedIndex === index) {
+      setSelectedIndex(null); // Reset to initial state - all figures visible, no reminder buttons
+    } else {
+      setSelectedIndex(index); // Select the clicked figure
+    }
+    
+    // Always reset these when clicking any figure
     setReminderType(null);
     setSelectedDateTime(null);
     setCustomReminderText("");
@@ -365,14 +371,14 @@ function Reminders() {
 
           <div className="reminder-buttons-row">
             <button
-              className="reminder-button"
+              className="reminder-button reminder-button-once"
               onClick={() => handleReminderType("once")}
             >
               Enstaka påminnelser
             </button>
 
             <button
-              className="reminder-button"
+              className="reminder-button reminder-button-recurring"
               onClick={() => handleReminderType("recurring")}
             >
               Återkommande påminnelser

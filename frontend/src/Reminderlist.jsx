@@ -12,6 +12,8 @@ const ReminderList = () => {
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
   const location = useLocation();
   const navigate = useNavigate();
+  const viewedPatientName = location?.state?.viewedPatientName || null;
+  const viewedPatientId = location?.state?.viewedPatientId || null;
   const [data, setData] = useState([]);
   const [expandedNoteId, setExpandedNoteId] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -100,7 +102,9 @@ const ReminderList = () => {
     }
     
     try {
-      const response = await fetch(`/api/users/${user.id}/reminders`, {
+      // Use viewedPatientId when caregiver is viewing patient, otherwise use current user's ID
+      const targetUserId = viewedPatientId || user.id;
+      const response = await fetch(`/api/users/${targetUserId}/reminders`, {
         headers: getAuthHeaders(),
       });
 
@@ -116,12 +120,12 @@ const ReminderList = () => {
     }
   };
 
-  // Refresh when user changes OR when navigating to this page
+  // Refresh when user changes OR when navigating to this page OR when viewedPatientId changes
   useEffect(() => {
     if (user) {
       fetchReminders();
     }
-  }, [user?.id, location.pathname]); // Run when user ID changes OR when pathname changes
+  }, [user?.id, viewedPatientId, location.pathname]); // Run when user ID changes OR when viewedPatientId changes OR when pathname changes
 
   // Hjälpfunktioner
   const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
@@ -159,9 +163,10 @@ const ReminderList = () => {
       )
     ) {
       try {
-        const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+        const targetUserId = viewedPatientId || user.id;
+        const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
           method: 'DELETE',
-          headers: getAuthHeaders()
+          headers: getAuthHeaders(),
         });
 
         if (response.ok) {
@@ -190,7 +195,8 @@ const ReminderList = () => {
       )
     ) {
       try {
-        const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+        const targetUserId = viewedPatientId || user.id;
+        const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
           method: 'DELETE',
           headers: getAuthHeaders()
         });
@@ -222,7 +228,8 @@ const ReminderList = () => {
 
 
     try {
-      const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+      const targetUserId = viewedPatientId || user.id;
+      const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),
@@ -272,7 +279,8 @@ const ReminderList = () => {
     };
 
     try {
-      const response = await fetch(`/api/users/${user.id}/reminders/${id}`, {
+      const targetUserId = viewedPatientId || user.id;
+      const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeaders(),

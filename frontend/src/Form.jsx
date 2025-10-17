@@ -30,15 +30,26 @@ const Form = () => {
   const [newTagInput, setNewTagInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Helper function to get the correct user ID for API calls
+  const getTargetUserId = () => {
+    if (user.userType === 'CAREGIVER' && viewedPatientId) {
+      return viewedPatientId;
+    }
+    return user.id;
+  };
 
   // Hämta sparade preferenser när komponenten monteras
   useEffect(() => {
     const fetchRequirements = async () => {
       if (!user?.id) return; // Don't fetch if user is not logged in
       
+      const targetUserId = getTargetUserId();
+      
       try {
         const response = await fetch(
-          `/api/users/${user.id}/meal-requirements`,
+          `/api/users/${targetUserId}/meal-requirements`,
           {
             headers: getAuthHeaders()
           }
@@ -81,7 +92,7 @@ const Form = () => {
     };
 
     fetchRequirements();
-  }, [user, getAuthHeaders]); // Re-fetch when user changes
+  }, [user, getAuthHeaders, viewedPatientId]); // Re-fetch when user or viewed patient changes
 
   // Flytta från tillgängliga till sparade
   const moveToSaved = (preference) => {
@@ -132,9 +143,11 @@ const Form = () => {
       requirements: dataAttSkicka,
     };
 
+    const targetUserId = getTargetUserId();
+
     try {
       const response = await fetch(
-        `/api/users/${user.id}/meal-requirements`,
+        `/api/users/${targetUserId}/meal-requirements`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -160,7 +173,8 @@ const Form = () => {
       setCustomTags(newSavedCustom);
       setCustomText(newSavedCustom.length > 0 ? newSavedCustom.join("\n") : "");
       
-      // TODO: Lägg till användarvänlig feedback här
+      // Visa framgångsmeddelande
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error:", error);
       // TODO: Lägg till felmeddelande till användaren här
@@ -274,13 +288,13 @@ const Form = () => {
             </div>
           </div>
 
-          <button type="submit" className="submit-button">
+          <button type="submit" className="submit-button" style={{ marginTop: '2rem' }}>
             Spara preferenser
           </button>
         </form>
       </section>
 
-      <div className="row mt-5">
+      <div className="row mt-2">
         <div className="col-12 d-flex justify-content-center">
           {isAdminOrCaregiver && (
             <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
@@ -312,6 +326,34 @@ const Form = () => {
           )}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Framgång!</h3>
+              <button 
+                className="modal-close-btn"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Dina kostpreferenser har sparats framgångsrikt!</p>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="modal-ok-btn"
+                onClick={() => setShowSuccessModal(false)}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

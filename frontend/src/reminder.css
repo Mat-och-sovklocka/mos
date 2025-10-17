@@ -102,28 +102,38 @@ body,
   display: flex;
   justify-content: center;
   gap: 1rem;
-  /* Ta bort width: 100% */
-  width: auto;
+  width: 100%;           /* Full width to center properly */
   margin: 2rem auto;
+  text-align: center;    /* Additional centering */
 }
 
 .reminder-button {
-  width: 260px;
-  height: 48px;
-  text-align: center;
-  white-space: nowrap;
-  background-color: #316c6f;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  /* Standardized styling to match Form.jsx buttons */
+  background-color: #e0ecec;
+  color: #316e70;
+  font-size: 0.85rem;
+  border: 1px solid #316e70;
+  border-radius: 3px;
   cursor: pointer;
-  transition: transform 0.2s ease;
-  padding: 10px 20px;
-  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  height: 48px;
+  box-sizing: border-box;
 }
 
-.reminder-button:hover {
-  transform: scale(1.05);
+/* Specific styling for "Enstaka" button - shorter text needs more padding */
+.reminder-button-once {
+  width: 280px;
+  padding: 12px 40px;    /* More horizontal padding to match visual width */
+}
+
+/* Specific styling for "Återkommande" button - longer text needs less padding */
+.reminder-button-recurring {
+  width: 280px;
+  padding: 12px 25px;    /* Less horizontal padding since text is longer */
 }
 
 .reminder-actions {
@@ -131,11 +141,12 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;  /* Additional vertical centering */
   margin-top: 2rem;
-  /* Lägg till maxbredd och centrera */
-  max-width: 400px;
+  /* Remove max-width constraint for better centering */
   margin-left: auto;
   margin-right: auto;
+  text-align: center;       /* Ensure text content is centered */
 }
 
 .reminder-actions-row {
@@ -148,8 +159,7 @@ body,
 }
 
 .reminder-button:hover {
-  background-color: #316c6f;
-  color: white;
+  background-color: #d0e0e0;
 }
 
 .custom-reminder-input {
@@ -448,16 +458,28 @@ body,
   gap: 30px;
 }
 
-.confirmation-buttons .ok-button,
-.confirmation-buttons .cancel-button {
-  width: 120px;
-  padding: 12px 0;
-  border: none;
-  border-radius: 4px;
+/* Standardized button base - matches Form.jsx styling */
+.ok-button,
+.cancel-button {
+  background-color: #e0ecec;
+  color: #316e70;
+  font-size: 0.85rem;
+  padding: 1rem 1rem;
+  border: 1px solid #316e70;
+  border-radius: 3px;
   cursor: pointer;
-  font-size: 1rem;
   font-weight: 500;
+  white-space: nowrap;
+  display: inline-block;
   text-align: center;
+  transition: background-color 0.2s ease;
+  width: 120px;
+  box-sizing: border-box;
+}
+
+.ok-button:hover,
+.cancel-button:hover {
+  background-color: #d0e0e0;
 }
 
 /* Lägg till style för sammanfattningsrubriken */
@@ -572,7 +594,7 @@ body,
   }
 
   .day-button:hover {
-    background-color: #e0e0e0;  /* Lite mörkare grå vid hover */
+    background-color: #d0e0e0;  /* Match Form.jsx hover effect */
   }
 
   .day-button.active:hover {
@@ -634,27 +656,29 @@ body,
 }
 
 .day-button {
+  /* Standardized to match Form.jsx button style */
+  background-color: #e0ecec;
+  color: #316e70;
+  font-size: 0.85rem;
   padding: 8px 12px;
-  border: 2px solid transparent;  /* Transparent border initially */
-  border-radius: 4px;
-  background-color: #eee;
-  color: #333;
+  border: 1px solid #316e70;
+  border-radius: 3px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 13px;
-  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  transition: background-color 0.2s ease;
 }
 
 .day-button:hover {
-  border-color: #007bff;  /* Blue border on hover */
-  background-color: #eee;  /* Keep original background */
-  color: #333;  /* Keep original text color */
+  background-color: #d0e0e0;
 }
 
 .day-button.active {
-  background-color: #007bff;  /* Blue background when active */
+  background-color: #316e70;  /* Darker brand color when active */
   color: white;  /* White text when active */
-  border-color: #007bff;  /* Keep border blue when active */
+  border-color: #316e70;  /* Keep consistent brand color */
 }
 
 .day-button.active:hover {
@@ -833,9 +857,7 @@ body,
 }
 
 .reminder-form .day-button:hover {
-    border-color: #007bff;
-    background-color: #eee;
-    color: #333;
+    background-color: #d0e0e0;
 }
 
 .reminder-form .day-button.active {
