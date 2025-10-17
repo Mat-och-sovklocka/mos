@@ -1,18 +1,14 @@
+.settings {
+  background-image: url('images/settings.png');
+}
 .image {
   width: 200px;
   height: 200px;
   border-radius: 50%;
   transition: transform 0.3s ease;
+  background-size: cover;
+  background-position: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Ensure inner <img> fills and is clipped to the circle */
-.image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  display: block;
 }
 
 /* Ta bort eventuell bakgrundsfärg */
@@ -59,7 +55,24 @@
 
 
 
-/* Background-images removed to avoid eager loading of large PNGs */
+.home {
+  background-image: url('images/home.png');
+}
+.allergies {
+  background-image: url('images/allergies.png');
+}
+.recepies {
+  background-image: url('images/recepies.png');
+}
+.reminders_handle {
+  background-image: url('images/reminders_handle.png');
+}
+.reminders_list {
+  background-image: url('images/reminders_list.png');
+}
+.statistics {
+  background-image: url('images/statistics.png');
+}
 
 .text.show {
   opacity: 1;

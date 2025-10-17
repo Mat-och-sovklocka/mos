@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./reminderlist.css";
+import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "./contexts/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -539,8 +539,6 @@ const ReminderList = () => {
         alt="Home"
         className="home-icon"
         onClick={() => navigate("/")}
-        loading="lazy"
-        decoding="async"
       />
     </div>
   );

@@ -872,8 +872,6 @@ const Mealsuggestions = () => {
               src={favoritesImage} 
               alt="Favoriter" 
               className="section-image"
-              loading="lazy"
-              decoding="async"
             />
             <div className="favorites-info">
               <div className="favorites-count">{favorites.length} sparade favoriter</div>
@@ -944,8 +942,6 @@ const Mealsuggestions = () => {
         alt="Home"
         className="home-icon"
         onClick={() => navigate("/")}
-        loading="lazy"
-        decoding="async"
       />
     </div>
   )
