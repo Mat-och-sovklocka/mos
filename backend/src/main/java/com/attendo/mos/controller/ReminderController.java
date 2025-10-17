@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.attendo.mos.constants.PermissionConstants;
@@ -32,6 +31,9 @@ import com.attendo.mos.dto.ReminderResponse;
 import com.attendo.mos.dto.UpdateReminderRequest;
 import com.attendo.mos.service.ReminderService;
 import com.attendo.mos.service.UserPermissionService;
+import com.attendo.mos.service.UserManagementService;
+import com.attendo.mos.entity.User;
+import com.attendo.mos.dto.UserType;
 import com.attendo.mos.config.JwtUtil;
 
 import jakarta.validation.Valid;
@@ -42,11 +44,14 @@ import jakarta.validation.Valid;
 public class ReminderController {
     private final ReminderService service;
     private final UserPermissionService userPermissionService;
+    private final UserManagementService userManagementService;
     private final JwtUtil jwtUtil;
     
-    public ReminderController(ReminderService service, UserPermissionService userPermissionService, JwtUtil jwtUtil) {
+    public ReminderController(ReminderService service, UserPermissionService userPermissionService, 
+                            UserManagementService userManagementService, JwtUtil jwtUtil) {
         this.service = service;
         this.userPermissionService = userPermissionService;
+        this.userManagementService = userManagementService;
         this.jwtUtil = jwtUtil;
     }
     // Swagger annotations
@@ -69,10 +74,10 @@ public class ReminderController {
             @RequestBody @Valid CreateReminderRequest req) {
         try {
             UUID currentUserId = getCurrentUserId(authHeader);
-            if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+            if (!canManageRemindersForUser(currentUserId, userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                     "error", "Forbidden",
-                    "message", "You don't have permission to create reminders"
+                    "message", "You don't have permission to create reminders for this user"
                 ));
             }
             
@@ -94,10 +99,10 @@ public class ReminderController {
     public ResponseEntity<?> get(@RequestHeader("Authorization") String authHeader,
             @PathVariable UUID userId) {
         UUID currentUserId = getCurrentUserId(authHeader);
-        if (!hasPermission(currentUserId, PermissionConstants.VIEW_REMINDERS)) {
+        if (!canManageRemindersForUser(currentUserId, userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                 "error", "Forbidden",
-                "message", "You don't have permission to view reminders"
+                "message", "You don't have permission to view reminders for this user"
             ));
         }
         
@@ -109,10 +114,10 @@ public class ReminderController {
     public ResponseEntity<?> delete(@RequestHeader("Authorization") String authHeader,
             @PathVariable UUID userId, @PathVariable UUID reminderId) {
         UUID currentUserId = getCurrentUserId(authHeader);
-        if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+        if (!canManageRemindersForUser(currentUserId, userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                 "error", "Forbidden",
-                "message", "You don't have permission to delete reminders"
+                "message", "You don't have permission to delete reminders for this user"
             ));
         }
         
@@ -139,10 +144,10 @@ public class ReminderController {
             @RequestBody @Valid UpdateReminderRequest req) {
         try {
             UUID currentUserId = getCurrentUserId(authHeader);
-            if (!hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS)) {
+            if (!canManageRemindersForUser(currentUserId, userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                     "error", "Forbidden",
-                    "message", "You don't have permission to update reminders"
+                    "message", "You don't have permission to update reminders for this user"
                 ));
             }
             
@@ -168,6 +173,42 @@ public class ReminderController {
     
     private boolean hasPermission(UUID userId, String permission) {
         return userPermissionService.hasPermission(userId, permission);
+    }
+    
+    /**
+     * Check if the current user can manage reminders for the target user.
+     * Authorization rules:
+     * - Admins can manage anyone's reminders
+     * - Users can manage their own reminders (if they have permission)
+     * - Caregivers can manage their assigned caretakers' reminders (override)
+     */
+    private boolean canManageRemindersForUser(UUID currentUserId, UUID targetUserId) {
+        try {
+            // Get current user info
+            User currentUser = userManagementService.findUserById(currentUserId);
+            
+            // Admins can manage anyone's reminders
+            if (currentUser.getUserType() == UserType.ADMIN) {
+                return true;
+            }
+            
+            // Users can manage their own reminders (if they have permission)
+            if (currentUserId.equals(targetUserId)) {
+                return hasPermission(currentUserId, PermissionConstants.CREATE_REMINDERS);
+            }
+            
+            // Caregivers can manage their assigned caretakers' reminders (override)
+            if (currentUser.getUserType() == UserType.CAREGIVER) {
+                List<User> assignedCaretakers = userManagementService.getCaretakersByCaregiver(currentUserId);
+                return assignedCaretakers.stream()
+                    .anyMatch(caretaker -> caretaker.getId().equals(targetUserId));
+            }
+            
+            return false;
+        } catch (Exception e) {
+            // If we can't determine authorization, deny access
+            return false;
+        }
     }
 
 }
