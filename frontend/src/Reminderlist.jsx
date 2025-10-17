@@ -543,22 +543,8 @@ const ReminderList = () => {
           </div>
         </>
       )}
-      {/* User info and patient name */}
-      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
-        <div>
-          <span className="text-muted">Welcome, </span>
-          <strong>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2">{user?.userType}</span>
-        </div>
-        {viewedPatientName && (
-          <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
-            Du tittar på {viewedPatientName} sida
-          </div>
-        )}
-      </div>
-
-      {/* Admin/Caregiver top-right logout */}
-      {isAdminOrCaregiver && (
+      {/* Admin top-right logout */}
+  {isAdminOrCaregiver && (
         <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
           <button
             onClick={() => { logout(); navigate('/login'); }}
@@ -571,13 +557,13 @@ const ReminderList = () => {
 
       <img
         src={homeIcon}
-        alt={isAdminOrCaregiver && !viewedPatientName ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-        className={`home-icon ${isAdminOrCaregiver && !viewedPatientName ? 'disabled-home' : ''}`}
-        title={isAdminOrCaregiver && !viewedPatientName ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
-        aria-label={isAdminOrCaregiver && !viewedPatientName ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
+  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
+  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
+  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
         onClick={() => {
-          if (isAdminOrCaregiver && !viewedPatientName) return; // disabled only for admins/caregivers NOT viewing patient
-          navigate('/', { state: location.state }); // preserve patient info when navigating to Home
+          if (isAdminOrCaregiver) return; // do nothing for admins or caregivers
+          navigate('/');
         }}
       />
     </div>
