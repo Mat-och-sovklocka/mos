@@ -51,6 +51,11 @@ export class NotificationService {
   getAdapterType(): string {
     return this.isCapacitorEnvironment() ? 'Capacitor' : 'Web';
   }
+
+  // Expose adapter for diagnostics
+  getAdapter(): NotificationAdapter {
+    return this.adapter;
+  }
 }
 
 // Export a singleton instance
