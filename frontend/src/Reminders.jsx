@@ -22,7 +22,10 @@ registerLocale("sv", sv);
 function Reminders() {
   const navigate = useNavigate();
   const { user, getAuthHeaders, logout } = useAuth();
+  const location = useLocation();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
+  const viewedPatientId = location?.state?.viewedPatientId || null;
   const images = [
     { src: img1, alt: "img1" },
     { src: img2, alt: "img2" },
@@ -331,6 +334,20 @@ function Reminders() {
 
   return (
     <div className="reminders-container">
+      {/* User info and patient name */}
+      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
+        <div>
+          <span className="text-muted">Welcome, </span>
+          <strong>{user?.displayName || user?.email}</strong>
+          <span className="badge bg-primary ms-2">{user?.userType}</span>
+        </div>
+        {viewedPatientName && (
+          <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
+            Du tittar på {viewedPatientName} sida
+          </div>
+        )}
+      </div>
+
       <h1 className="reminder-title">Lägg till påminnelserna</h1>
       
       <div className="image-grid">
@@ -579,10 +596,10 @@ function Reminders() {
             </div>
           )}
 
-          {isAdminOrCaregiver ? (
+          {isAdminOrCaregiver && !viewedPatientName ? (
             <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
           ) : (
-            <Link to="/">
+            <Link to="/" state={location.state}>
               <img
                 src={homeIcon}
                 alt="Tillbaka till startsidan"

@@ -105,13 +105,17 @@ const Home = () => {
                   <div className={`image ${className} disabled-home`} title="Du har inte behörighet till denna modul" aria-label="Otillgänglig modul" />
                 )
               ) : (
-                // Items without a permission requirement are visible
-                link ? (
-                  <Link to={link}>
-                    <div className={`image ${className}`}></div>
-                  </Link>
+                // Items without a permission requirement: Settings should be disabled for residents
+                className === 'settings' ? (
+                  <div className={`image ${className} disabled-home`} title="Inte tillgänglig för residents" aria-label="Otillgänglig för residents" />
                 ) : (
-                  <div className={`image ${className}`}></div>
+                  link ? (
+                    <Link to={link}>
+                      <div className={`image ${className}`}></div>
+                    </Link>
+                  ) : (
+                    <div className={`image ${className}`}></div>
+                  )
                 )
               )
             ) : (

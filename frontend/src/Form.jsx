@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"; // Lägg till useEffect här
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./form.css";
@@ -22,7 +22,10 @@ const kostAlternativ = [
 const Form = () => {
   const { user, getAuthHeaders, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
+  const viewedPatientId = location?.state?.viewedPatientId || null;
   const [savedPreferences, setSavedPreferences] = useState([]);
   const [availablePreferences, setAvailablePreferences] = useState([]);
   const [customText, setCustomText] = useState("");
@@ -296,6 +299,20 @@ const Form = () => {
 
       <div className="row mt-2">
         <div className="col-12 d-flex justify-content-center">
+          {/* User info and patient name */}
+          <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
+            <div>
+              <span className="text-muted">Welcome, </span>
+              <strong>{user?.displayName || user?.email}</strong>
+              <span className="badge bg-primary ms-2">{user?.userType}</span>
+            </div>
+            {viewedPatientName && (
+              <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
+                Du tittar på {viewedPatientName} sida
+              </div>
+            )}
+          </div>
+
           {isAdminOrCaregiver && (
             <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
               <button
@@ -306,7 +323,7 @@ const Form = () => {
               </button>
             </div>
           )}
-          {isAdminOrCaregiver ? (
+          {isAdminOrCaregiver && !viewedPatientName ? (
             <img
               src={homeIcon}
               alt="Hem (otillgänglig)"
@@ -316,7 +333,7 @@ const Form = () => {
               style={{ width: "80px" }}
             />
           ) : (
-            <Link to="/">
+            <Link to="/" state={location.state}>
               <img
                 src={homeIcon}
                 alt="Tillbaka till startsidan"

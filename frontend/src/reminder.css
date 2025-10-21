@@ -108,36 +108,39 @@ body,
 }
 
 .reminder-button {
-  /* Standardized styling to match Form.jsx buttons */
-  background-color: #e0ecec;
+  /* Bootstrap-inspirerad styling */
+  background-color: rgba(49, 110, 112, 0.1); /* Använd gamla hover-färgen som bas */
   color: #316e70;
-  font-size: 0.85rem;
-  border: 1px solid #316e70;
-  border-radius: 3px;
+  font-size: 0.9rem; /* Öka från 0.85rem */
+  border: 2px solid #316e70; /* Gör border lite tjockare */
+  border-radius: 12px; /* Rundare kanter */
   cursor: pointer;
   font-weight: 500;
   white-space: nowrap;
   display: inline-block;
   text-align: center;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease; /* Smooth transitions för alla egenskaper */
   height: 48px;
   box-sizing: border-box;
+  /* Bootstrap-liknande skugga */
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.2), 0 1px 2px rgba(49, 110, 112, 0.1);
 }
 
 /* Specific styling for "Enstaka" button - shorter text needs more padding */
 .reminder-button-once {
-  width: 280px;
+  width: 400px; /* Öka betydligt från 320px */
   padding: 12px 40px;    /* More horizontal padding to match visual width */
 }
 
 /* Specific styling for "Återkommande" button - longer text needs less padding */
 .reminder-button-recurring {
-  width: 280px;
+  width: 400px; /* Öka betydligt från 320px */
   padding: 12px 25px;    /* Less horizontal padding since text is longer */
 }
 
 .reminder-actions {
   width: 100%;
+  max-width: 100vw; /* Säkerställ att den kan använda hela viewport-bredden */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,6 +150,7 @@ body,
   margin-left: auto;
   margin-right: auto;
   text-align: center;       /* Ensure text content is centered */
+  padding: 0 10px;          /* Minimal padding */
 }
 
 .reminder-actions-row {
@@ -159,7 +163,12 @@ body,
 }
 
 .reminder-button:hover {
-  background-color: #d0e0e0;
+  background-color: #316e70; /* Mörkare grön bakgrund vid hover */
+  color: white; /* Vit text för kontrast mot mörk bakgrund */
+  border-color: #316e70;
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
 }
 
 .custom-reminder-input {
@@ -275,21 +284,65 @@ body,
 }
 
 @media (max-width: 600px) {
+  /* Tvinga full bredd på alla containrar */
+  .reminders-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
   .reminder-actions {
-    align-items: flex-start; /* Vänsterjustera allt */
-    padding-left: 16px;
+    align-items: stretch !important; /* Sträck ut elementen */
+    padding: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
   }
 
   .reminder-buttons-row {
-    justify-content: flex-start;
+    flex-direction: column !important;
+    gap: 15px !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    justify-content: stretch !important;
+    padding: 0 15px !important; /* Bara lite padding från skärmkanterna */
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .reminder-button {
-    width: 100%;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 15px 25px !important;
+    font-size: 16px !important;
+    white-space: nowrap !important;
+    line-height: 1.3 !important;
+    min-height: 50px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    /* Bootstrap-stil även på mobil */
+    background-color: transparent !important;
+    border: 2px solid #316e70 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 4px rgba(49, 110, 112, 0.2), 0 1px 2px rgba(49, 110, 112, 0.1) !important;
+    transition: all 0.3s ease !important;
+  }
+
+  /* Forcera override av specifika button klasser */
+  .reminder-button-once,
+  .reminder-button-recurring {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 15px 25px !important;
+    white-space: nowrap !important;
+    font-size: 16px !important;
   }
 
   .custom-reminder-block {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 }
 
@@ -739,11 +792,26 @@ body,
 
 /* Media query för små skärmar */
 @media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    
+    .reminders-container {
+        width: 100%;
+        padding: 0 10px;
+        position: relative;
+        left: 0;
+    }
+    
+    /* Fix both reminder layouts for mobile */
     .picker-layout,
     .reminder-layout {
-        flex-direction: column;
+        flex-direction: column !important;
         padding: 10px;
         gap: 20px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
     }
 
     .picker-inputs,
@@ -752,7 +820,193 @@ body,
     .note-column {
         width: 100%;
         margin: 0;
+        padding: 15px;
+        min-width: unset;
+        flex: none;
+    }
+    
+    /* Improve form inputs on mobile */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    /* Make DatePicker more mobile-friendly */
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+    
+    .react-datepicker__input-container input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #316e70;
+        border-radius: 4px;
+    }
+    
+    /* Mobile-friendly textarea */
+    textarea {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #316e70;
+        border-radius: 4px;
+        resize: vertical;
+    }
+    
+    /* Day selector improvements */
+    .day-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .day-button {
+        flex: 1;
+        min-width: 45px;
+        padding: 10px 5px;
+        font-size: 14px;
+        border: 1px solid #316e70;
+        border-radius: 4px;
+        background-color: #e0ecec;
+        color: #316e70;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .day-button.active {
+        background-color: #316e70;
+        color: white;
+    }
+    
+    /* Time input improvements */
+    .time-input-group {
+        margin-bottom: 20px;
+    }
+    
+    .time-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .time-input {
+        flex: 1;
         padding: 10px;
+        font-size: 16px;
+        border: 2px solid #316e70;
+        border-radius: 4px;
+    }
+    
+    .add-time-btn,
+    .delete-btn {
+        min-width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    /* Confirmation buttons mobile improvements */
+    .confirmation-buttons,
+    .form-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+        width: 100%;
+    }
+    
+    .confirmation-buttons .ok-button,
+    .confirmation-buttons .cancel-button,
+    .form-buttons .ok-button,
+    .form-buttons .cancel-button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    /* Tvinga full bredd även på tablet-storlek */
+    .reminders-container {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding: 0 !important;
+    }
+
+    /* Reminder actions improvements */
+    .reminder-actions {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding: 0 !important;
+        margin-top: 20px;
+        align-items: stretch !important;
+    }
+    
+    .reminder-buttons-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 20px !important; /* Lite mer padding på större mobil/tablet */
+        box-sizing: border-box !important;
+    }
+    
+    .reminder-button {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 18px 30px !important;
+        font-size: 17px !important;
+        min-height: 55px !important;
+        white-space: nowrap !important;
+        line-height: 1.4 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+        /* Bootstrap-stil även på tablet */
+        background-color: transparent !important;
+        border: 2px solid #316e70 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 4px rgba(49, 110, 112, 0.2), 0 1px 2px rgba(49, 110, 112, 0.1) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Forcera override av specifika button klasser */
+    .reminder-button-once,
+    .reminder-button-recurring {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 18px 30px !important;
+        white-space: nowrap !important;
+        font-size: 17px !important;
+    }
+    
+    /* Custom reminder input mobile */
+    .custom-reminder-wrapper {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .custom-reminder-wrapper input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
     }
 }
 
