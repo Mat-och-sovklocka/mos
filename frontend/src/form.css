@@ -345,6 +345,36 @@ body {
   background-color: #d0e0e0;
 }
 
+/* Modern submit button styling - matches reminder buttons */
+.modern-submit-button {
+  /* Bootstrap-inspirerad styling */
+  background-color: #316e70; /* Mörkare grön som standard */
+  color: white; /* Vit text som standard */
+  font-size: 0.9rem;
+  border: none; /* Ta bort ramen */
+  border-radius: 12px; /* Rundare kanter */
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease; /* Smooth transitions för alla egenskaper */
+  height: 48px;
+  padding: 12px 40px;
+  box-sizing: border-box;
+  /* Bootstrap-liknande skugga */
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.2), 0 1px 2px rgba(49, 110, 112, 0.1);
+  margin-top: 2rem;
+}
+
+.modern-submit-button:hover {
+  background-color: rgba(49, 110, 112, 0.1); /* Ljus genomskinlig vid hover */
+  color: #316e70; /* Mörk text vid hover */
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
+}
+
 /* Ny stil för .form-title.
    We keep a larger size for heading elements that use this class (h2/h3),
    but make labels smaller by targeting label.form-title specifically. */
@@ -424,6 +454,16 @@ label.form-title {
   .kost-form {
     padding: 0.75rem;
   }
+
+  /* Ensure home button is visible on mobile */
+  .row.mt-5 {
+    margin-top: 2rem;
+    padding: 15px 0 30px 0;
+  }
+
+  .row.mt-5 img {
+    width: 70px;
+  }
 }
 
 /* User settings specific layout: main form + admin user list */
@@ -491,6 +531,45 @@ label.form-title {
   .user-settings-grid {
     grid-template-columns: 1fr; /* stack vertically on smaller screens */
   }
+}
+
+/* Home button styles */
+.row.mt-5 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 20px 0;
+  clear: both;
+}
+
+.row.mt-5 .col-12 {
+  display: flex;
+  justify-content: center;
+}
+
+.row.mt-5 a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row.mt-5 img {
+  width: 80px;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.row.mt-5 img:hover {
+  transform: scale(1.1);
+}
+
+.disabled-home {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  filter: grayscale(100%);
 }
 
 /* Success Modal Styles */

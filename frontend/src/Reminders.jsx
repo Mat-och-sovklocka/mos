@@ -334,21 +334,68 @@ function Reminders() {
 
   return (
     <div className="reminders-container">
-      {/* User info and patient name */}
-      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
-        <div>
-          <span className="text-muted">Welcome, </span>
-          <strong>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2">{user?.userType}</span>
-        </div>
-        {viewedPatientName && (
-          <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
-            Du tittar på {viewedPatientName} sida
+      {/* Top header bar with user info and logout */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '20px', 
+        padding: '12px 0',
+        borderBottom: '1px solid #e0e0e0'
+      }}>
+        {/* User info and patient info */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.95)', 
+          padding: '12px 16px', 
+          borderRadius: '8px', 
+          fontSize: '14px', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)', 
+          border: '1px solid #e0e0e0',
+          maxWidth: '70%'
+        }}>
+          <div>
+            <span className="text-muted">Inloggad som: </span>
+            <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+            <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
           </div>
+          {viewedPatientName && (
+            <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+              <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+            </div>
+          )}
+        </div>
+
+        {/* Logout button */}
+        {isAdminOrCaregiver && (
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="btn btn-outline-danger btn-sm"
+            style={{ marginTop: '4px' }}
+          >
+            Logout
+          </button>
         )}
       </div>
 
       <h1 className="reminder-title">Lägg till påminnelserna</h1>
+      
+      {/* Patient context banner */}
+      {viewedPatientName && (
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '0 auto 40px auto', 
+          padding: '12px 24px', 
+          backgroundColor: '#e8f4f8', 
+          border: '2px solid #316e70', 
+          borderRadius: '8px', 
+          maxWidth: '600px',
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#316e70'
+        }}>
+          📋 Du skapar påminnelser för: <strong>{viewedPatientName}</strong>
+        </div>
+      )}
       
       <div className="image-grid">
         <div className="row row-spacing">
@@ -389,6 +436,7 @@ function Reminders() {
           <div className="reminder-buttons-row">
             <button
               className="reminder-button reminder-button-once"
+              data-testid="mobile-button-test"
               onClick={() => handleReminderType("once")}
             >
               Enstaka påminnelser
@@ -396,6 +444,7 @@ function Reminders() {
 
             <button
               className="reminder-button reminder-button-recurring"
+              data-testid="mobile-button-test"
               onClick={() => handleReminderType("recurring")}
             >
               Återkommande påminnelser
@@ -590,12 +639,6 @@ function Reminders() {
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">
-          {isAdminOrCaregiver && (
-            <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
-              <button className="btn btn-outline-danger btn-sm" onClick={() => { logout(); navigate('/login'); }}>Logout</button>
-            </div>
-          )}
-
           {isAdminOrCaregiver && !viewedPatientName ? (
             <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
           ) : (

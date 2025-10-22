@@ -64,12 +64,12 @@ const Home = () => {
       {/* User Info and Logout */}
       <div className="d-flex justify-content-between align-items-center w-100 mb-3 px-3">
         <div className="user-info">
-          <span className="text-muted">Welcome, </span>
-          <strong>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2">{user?.userType}</span>
+          <span className="text-muted">Inloggad som: </span>
+          <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+          <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
           {viewedPatientName && (
-            <div style={{ marginTop: '6px', fontSize: '0.95rem' }}>
-              Du tittar på {viewedPatientName} sida
+            <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70', display: 'inline-block' }}>
+              <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
             </div>
           )}
         </div>
@@ -88,6 +88,28 @@ const Home = () => {
         Mat och sov appen
       </h1>
 
+      {/* Patient context banner */}
+      {viewedPatientName && (
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '0 auto 40px auto', 
+          padding: '16px 24px', 
+          backgroundColor: '#e8f4f8', 
+          border: '2px solid #316e70', 
+          borderRadius: '12px', 
+          maxWidth: '700px',
+          fontSize: '18px',
+          fontWeight: '600',
+          color: '#316e70',
+          boxShadow: '0 2px 8px rgba(49, 110, 112, 0.1)'
+        }}>
+          🏠 Du navigerar i <strong>{viewedPatientName}s</strong> gränssnitt
+          <div style={{ fontSize: '14px', marginTop: '8px', fontWeight: '400', color: '#2a5a5c' }}>
+            Alla moduler du använder kommer att påverka denna patients data
+          </div>
+        </div>
+      )}
+
       <div className="row justify-content-center w-100">
         {items.map(({ className, label, link, perm }) => (
           <div
@@ -98,7 +120,7 @@ const Home = () => {
               // Residents: show active icon only if they have the permission; otherwise show disabled icon
               perm ? (
                 hasPerm(perm) ? (
-                  <Link to={link}>
+                  <Link to={link} state={location.state}>
                     <div className={`image ${className}`}></div>
                   </Link>
                 ) : (
@@ -110,7 +132,7 @@ const Home = () => {
                   <div className={`image ${className} disabled-home`} title="Inte tillgänglig för residents" aria-label="Otillgänglig för residents" />
                 ) : (
                   link ? (
-                    <Link to={link}>
+                    <Link to={link} state={location.state}>
                       <div className={`image ${className}`}></div>
                     </Link>
                   ) : (
@@ -121,7 +143,7 @@ const Home = () => {
             ) : (
               // Non-residents: unchanged behavior
               link ? (
-                <Link to={link}>
+                <Link to={link} state={location.state}>
                   <div className={`image ${className}`}></div>
                 </Link>
               ) : (

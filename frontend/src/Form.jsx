@@ -193,6 +193,24 @@ const Form = () => {
         Allergier och specialkost
       </h1>
 
+      {/* Patient context banner */}
+      {viewedPatientName && (
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '0 auto 40px auto', 
+          padding: '12px 24px', 
+          backgroundColor: '#e8f4f8', 
+          border: '2px solid #316e70', 
+          borderRadius: '8px', 
+          maxWidth: '600px',
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#316e70'
+        }}>
+          🍽️ Du hanterar kostpreferenser för: <strong>{viewedPatientName}</strong>
+        </div>
+      )}
+
       <section className="preference-boxes">
         <form onSubmit={hanteraSubmit}>
           <div className="boxes-container">
@@ -291,24 +309,26 @@ const Form = () => {
             </div>
           </div>
 
-          <button type="submit" className="submit-button" style={{ marginTop: '2rem' }}>
-            Spara preferenser
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <button type="submit" className="modern-submit-button">
+              Spara preferenser
+            </button>
+          </div>
         </form>
       </section>
 
-      <div className="row mt-2">
+      <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">
           {/* User info and patient name */}
-          <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
+          <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.95)', padding: '12px 16px', borderRadius: '8px', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '1px solid #e0e0e0' }}>
             <div>
-              <span className="text-muted">Welcome, </span>
-              <strong>{user?.displayName || user?.email}</strong>
-              <span className="badge bg-primary ms-2">{user?.userType}</span>
+              <span className="text-muted">Inloggad som: </span>
+              <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+              <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
             </div>
             {viewedPatientName && (
-              <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
-                Du tittar på {viewedPatientName} sida
+              <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+                <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
               </div>
             )}
           </div>

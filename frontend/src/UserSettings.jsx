@@ -377,9 +377,9 @@ export default function UserSettings() {
                       <label className="form-title">Telefon</label>
                       <input className="tag-input" type="tel" value={selectedUser.phone || ''} onChange={(e) => setSelectedUser({ ...selectedUser, phone: e.target.value })} />
                     </div>
-                    <div style={{ marginTop: '0.5rem' }}>
+                    <div className="user-settings-buttons">
                       <button type="submit" className="submit-button" disabled={saving}>{saving ? 'Sparar...' : 'Spara'}</button>
-                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => {
+                      <button type="button" className="submit-button" onClick={async () => {
                         // delete immediately
                         if (!selectedUser?.id) { setSaveMessage({ type: 'error', text: 'Ingen användare vald.' }); return; }
                         setSaving(true);
@@ -431,9 +431,9 @@ export default function UserSettings() {
                         <option value="RESIDENT">Patient</option>
                       </select>
                     </div>
-                    <div style={{ marginTop: '0.5rem' }}>
+                    <div className="user-settings-buttons">
                       <button type="submit" className="submit-button" disabled={creating || !newName || !newEmail}>{creating ? 'Skapar...' : 'Skapa användare'}</button>
-                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={() => setShowCreateModal(false)}>Avbryt</button>
+                      <button type="button" className="submit-button" onClick={() => setShowCreateModal(false)}>Avbryt</button>
                     </div>
                     {createMessage && <div className={`message ${createMessage.type}`} style={{ marginTop: '0.5rem' }}>{createMessage.text}</div>}
                   </form>
@@ -498,9 +498,9 @@ export default function UserSettings() {
                       <label className="form-title">Telefon</label>
                       <input className="tag-input" type="tel" value={selectedUser.phone || ''} onChange={(e) => setSelectedUser({ ...selectedUser, phone: e.target.value })} />
                     </div>
-                    <div style={{ marginTop: '0.5rem' }}>
+                    <div className="user-settings-buttons">
                       <button type="submit" className="submit-button" disabled={saving}>{saving ? 'Sparar...' : 'Spara'}</button>
-                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => {
+                      <button type="button" className="submit-button" onClick={async () => {
                         // delete caretaker immediately
                         if (!selectedUser?.id) { setSaveMessage({ type: 'error', text: 'Ingen användare vald.' }); return; }
                         setSaving(true);
@@ -521,7 +521,7 @@ export default function UserSettings() {
                           setSaving(false);
                         }
                       }}>Ta bort</button>
-                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => {
+                      <button type="button" className="submit-button" onClick={async () => {
                         // cancel edit and restore initial state
                         setSelectedUser(null);
                         setSaveMessage(null);
@@ -586,9 +586,9 @@ export default function UserSettings() {
                             </label>
                           ))}
                         </div>
-                        <div style={{ marginTop: '0.5rem' }}>
+                        <div className="user-settings-buttons">
                           <button type="submit" className="submit-button">Spara behörigheter</button>
-                          <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={async () => { setPatientPermissions([]); if (selectedUser?.id) await fetchPatientPermissions(selectedUser.id); setSaveMessage(null); }}>Återställ</button>
+                          <button type="button" className="submit-button" onClick={async () => { setPatientPermissions([]); if (selectedUser?.id) await fetchPatientPermissions(selectedUser.id); setSaveMessage(null); }}>Återställ</button>
                         </div>
                       </form>
                     </div>
@@ -651,9 +651,9 @@ export default function UserSettings() {
                       <label className="form-title">Telefon</label>
                       <input className="tag-input" type="tel" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
                     </div>
-                    <div style={{ marginTop: '0.5rem' }}>
+                    <div className="user-settings-buttons">
                       <button type="submit" className="submit-button" disabled={creating || !newName || !newEmail}>{creating ? 'Skapar...' : 'Skapa användare'}</button>
-                      <button type="button" className="submit-button" style={{ marginLeft: '0.5rem' }} onClick={() => { setShowCreateModal(false); setNewName(''); setNewEmail(''); setNewPhone(''); setCreateMessage(null); }}>Avbryt</button>
+                      <button type="button" className="submit-button" onClick={() => { setShowCreateModal(false); setNewName(''); setNewEmail(''); setNewPhone(''); setCreateMessage(null); }}>Avbryt</button>
                     </div>
                     {createMessage && <div className={`message ${createMessage.type}`} style={{ marginTop: '0.5rem' }}>{createMessage.text}</div>}
                   </form>

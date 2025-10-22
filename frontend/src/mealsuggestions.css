@@ -562,16 +562,41 @@
   }
 }
 
-/* Home Icon */
-.home-icon {
-  display: block;
-  margin: 20px auto;
-  cursor: pointer;
-  width: 80px;
-  height: auto;
-  transition: transform 0.3s ease;
+/* Home Icon and navigation styles */
+.row.mt-5 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 20px 0;
+  clear: both;
 }
 
-.home-icon:hover {
+.row.mt-5 .col-12 {
+  display: flex;
+  justify-content: center;
+}
+
+.row.mt-5 a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row.mt-5 img {
+  width: 80px;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.row.mt-5 img:hover {
   transform: scale(1.1);
+}
+
+.disabled-home {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  filter: grayscale(100%);
 }

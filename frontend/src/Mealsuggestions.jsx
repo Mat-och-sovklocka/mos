@@ -4,7 +4,7 @@ import { FaStar } from 'react-icons/fa'
 import { IoMdClose } from 'react-icons/io'
 import favoritesImage from './images/favorites.jpeg'
 import homeIcon from "./images/home.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from './contexts/AuthContext';
 
 // Bekräftelsemodal komponent
@@ -169,7 +169,9 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
 const Mealsuggestions = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const location = useLocation();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
 
   // States
   const [searchQuery, setSearchQuery] = useState('')
@@ -845,6 +847,24 @@ const Mealsuggestions = () => {
       <div className="mealsuggestions-container">
         <h2 className="mealsuggestions-title">Måltidsförslag</h2>
 
+        {/* Patient context banner */}
+        {viewedPatientName && (
+          <div style={{ 
+            textAlign: 'center', 
+            margin: '0 auto 40px auto', 
+            padding: '12px 24px', 
+            backgroundColor: '#e8f4f8', 
+            border: '2px solid #316e70', 
+            borderRadius: '8px', 
+            maxWidth: '600px',
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#316e70'
+          }}>
+            🍜 Du söker måltidsförslag för: <strong>{viewedPatientName}</strong>
+          </div>
+        )}
+
         {/* Söksektion */}
         <div className="search-section">
           <label htmlFor="recipe-search">Vad vill du äta?</label>
@@ -940,7 +960,21 @@ const Mealsuggestions = () => {
         )}
       </div>
 
-  {isAdminOrCaregiver && (
+      {/* User info and patient name */}
+      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.95)', padding: '12px 16px', borderRadius: '8px', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '1px solid #e0e0e0' }}>
+        <div>
+          <span className="text-muted">Inloggad som: </span>
+          <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+          <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
+        </div>
+        {viewedPatientName && (
+          <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+            <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+          </div>
+        )}
+      </div>
+
+      {isAdminOrCaregiver && (
         <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
           <button
             onClick={() => { logout(); navigate('/login'); }}
@@ -951,17 +985,21 @@ const Mealsuggestions = () => {
         </div>
       )}
 
-      <img
-        src={homeIcon}
-  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
-  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
-  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-        onClick={() => {
-          if (isAdminOrCaregiver) return;
-          navigate('/');
-        }}
-      />
+      <div className="row mt-5">
+        <div className="col-12 d-flex justify-content-center">
+          {isAdminOrCaregiver && !viewedPatientName ? (
+            <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
+          ) : (
+            <Link to="/" state={location.state}>
+              <img
+                src={homeIcon}
+                alt="Tillbaka till startsidan"
+                style={{ width: "80px", cursor: "pointer" }}
+              />
+            </Link>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
