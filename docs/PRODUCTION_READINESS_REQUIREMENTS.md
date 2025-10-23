@@ -151,7 +151,7 @@
 
 ### **3. Development Team Costs**
 - **Future Development Work**
-  - **Payment Required**: All development work after October 31, 2025 must be paid
+  - **Payment Required**: All development work after October 31, 2024 must be paid
   - **Contract Terms**: Formal development contract required for continued work
   - **Hourly Rates**: Development team rates for future enhancements
   - **Project Scope**: Clear definition of future development requirements
@@ -205,7 +205,7 @@
 - We cannot provide API documentation for external services
 
 ### **4. Unpaid Development Work**
-- We cannot provide free development work after October 31, 2025
+- We cannot provide free development work after October 31, 2024
 - We cannot continue development without formal payment agreements
 - We cannot provide ongoing support without compensation
 - We cannot make future enhancements without proper contracts
