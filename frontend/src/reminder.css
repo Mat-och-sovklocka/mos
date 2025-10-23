@@ -139,18 +139,14 @@ body,
 }
 
 .reminder-actions {
-  width: 100%;
-  max-width: 100vw; /* Säkerställ att den kan använda hela viewport-bredden */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;  /* Additional vertical centering */
-  margin-top: 2rem;
-  /* Remove max-width constraint for better centering */
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;       /* Ensure text content is centered */
-  padding: 0 10px;          /* Minimal padding */
+  width: 100vw !important;
+  max-width: none !important;
+  margin: 2rem 0 0 0;
+  display: block;
+  text-align: center;
+  padding: 0;
+  box-sizing: border-box;
+  /* background: #ffe4e1; */
 }
 
 .reminder-actions-row {
@@ -297,10 +293,12 @@ body,
   }
 
   .reminder-actions {
-    align-items: stretch !important; /* Sträck ut elementen */
-    padding: 0 !important;
-    width: 100vw !important; /* Tvinga full viewport-bredd */
-    max-width: 100vw !important;
+    align-items: stretch !important;
+    padding: 0 4vw !important;
+    width: 100vw !important;
+    max-width: 95vw !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
     box-sizing: border-box !important;
   }
 
@@ -421,8 +419,25 @@ body,
 .error-message {
   color: red;
   font-size: 14px;
-  margin-top: 8px;
+  margin: 8px 0;
   text-align: center;
+  width: 100vw !important;
+  max-width: none !important;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-height: calc(1.4em * 2);
+  overflow: hidden;
+  display: block;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  /* background: #e1f7ff; */
+  /* line-clamp för två rader */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .datetime-picker {
@@ -1294,6 +1309,28 @@ body,
   .reminders-container > div:first-child > div:first-child {
     padding: 8px 12px !important;
     font-size: 13px !important;
+  }
+  
+  .error-message {
+    font-size: 12px;
+    padding: 4px 12px;
+    margin: 8px auto;
+    max-width: 95vw;
+    width: 100%;
+    align-self: stretch;
+    line-height: 1.3;
+    max-height: calc(1.3em * 2);
+  }
+
+  /* Make day-selector buttons smaller on mobile */
+  .day-button, .reminder-form .day-button {
+    padding: 4px 4px;
+    font-size: 11px;
+    min-width: 28px;
+    border-radius: 3px;
+  }
+  .day-selector {
+    gap: 2px;
   }
 }
 

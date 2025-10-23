@@ -78,28 +78,11 @@ const Form = () => {
 
         const data = await response.json();
         // Extrahera bara requirement-värdena från response
-        const requirements = data.requirements.map((req) => req.requirement);
-        
-        // Separera standardkost från "annat"
-        const standardKost = new Set(kostAlternativ.filter((k) => k !== "Annat"));
-        const savedStandard = requirements.filter((req) => standardKost.has(req));
-        const savedCustom = requirements.filter((req) => !standardKost.has(req));
-        
-        // Sätt sparade preferenser
-        setSavedPreferences(savedStandard);
-        
-        // Sätt tillgängliga preferenser (alla standardkost som inte är sparade)
-        const available = kostAlternativ.filter((k) => k !== "Annat" && !savedStandard.includes(k));
-        setAvailablePreferences(available);
-        
-        // Sätt custom tags om det finns
-        if (savedCustom.length > 0) {
-          setCustomTags(savedCustom);
-          setCustomText(savedCustom.join("\n")); // Keep for backward compatibility
-        } else {
-          setCustomTags([]);
-          setCustomText("");
-        }
+    const newRequirements = data.requirements.map((req) => req.requirement);
+    setSavedPreferences(newRequirements);
+    setAvailablePreferences(kostAlternativ.filter((k) => k !== "Annat" && !newRequirements.includes(k)));
+    setCustomTags([]); // Töm customTags så de försvinner från "Ange annan specialkost"
+    setCustomText("");
       } catch (error) {
         console.error("Error fetching requirements:", error);
         setError("Kunde inte hämta sparade kostpreferenser", error.status);
@@ -150,10 +133,18 @@ const Form = () => {
   };
 
   const hanteraSubmit = async (e) => {
+
     e.preventDefault();
 
-    // Kombinera sparade preferenser med custom tags
-    const dataAttSkicka = [...savedPreferences, ...customTags];
+    // Om det finns något i inputfältet för specialkost, lägg till det i customTags
+    let allCustomTags = customTags;
+    const trimmedInput = newTagInput.trim();
+    if (trimmedInput && !customTags.includes(trimmedInput)) {
+      allCustomTags = [...customTags, trimmedInput];
+    }
+
+    // Kombinera sparade preferenser med custom tags (inklusive ev. input)
+    const dataAttSkicka = [...savedPreferences, ...allCustomTags];
 
     // Formattera data enligt API-specifikationen
     const requestData = {
@@ -176,20 +167,12 @@ const Form = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log("Sparade kostpreferenser:", data.requirements);
-      
-      // Uppdatera båda boxarna baserat på nya sparade preferenser
-      const newRequirements = data.requirements.map((req) => req.requirement);
-      const standardKost = new Set(kostAlternativ.filter((k) => k !== "Annat"));
-      const newSavedStandard = newRequirements.filter((req) => standardKost.has(req));
-      const newSavedCustom = newRequirements.filter((req) => !standardKost.has(req));
-      
-      setSavedPreferences(newSavedStandard);
-      setAvailablePreferences(kostAlternativ.filter((k) => k !== "Annat" && !newSavedStandard.includes(k)));
-      setCustomTags(newSavedCustom);
-      setCustomText(newSavedCustom.length > 0 ? newSavedCustom.join("\n") : "");
-      
+      // Uppdatera UI direkt med det som skickades in
+      setSavedPreferences(dataAttSkicka);
+      setAvailablePreferences(kostAlternativ.filter((k) => k !== "Annat" && !dataAttSkicka.includes(k)));
+      setCustomTags([]);
+      setCustomText("");
+
       // Visa framgångsmeddelande
       setShowSuccessModal(true);
     } catch (error) {
@@ -248,7 +231,7 @@ const Form = () => {
 
       {/* Patient context banner */}
       {viewedPatientName && (
-        <div style={{ 
+        <div className="patient-info-container" style={{ 
           textAlign: 'center', 
           margin: '0 auto 40px auto', 
           padding: '12px 24px', 
@@ -279,11 +262,11 @@ const Form = () => {
                       <span className="preference-text">{pref}</span>
                       <button
                         type="button"
-                        className="remove-btn"
+                        className="remove-btn icon-btn"
                         onClick={() => removeFromSaved(pref)}
                         title="Ta bort"
                       >
-                        ×
+                        <span className="icon-times">×</span>
                       </button>
                     </div>
                   ))
@@ -303,11 +286,11 @@ const Form = () => {
                       <span className="preference-text">{pref}</span>
                       <button
                         type="button"
-                        className="add-btn"
+                        className="add-btn icon-btn"
                         onClick={() => moveToSaved(pref)}
                         title="Lägg till"
                       >
-                        +
+                        <span className="icon-plus">+</span>
                       </button>
                     </div>
                   ))
@@ -330,11 +313,11 @@ const Form = () => {
                     {tag}
                     <button
                       type="button"
-                      className="tag-remove-btn"
+                      className="tag-remove-btn icon-btn"
                       onClick={() => removeCustomTag(tag)}
                       title="Ta bort"
                     >
-                      ×
+                      <span className="icon-times">×</span>
                     </button>
                   </span>
                 ))}
@@ -353,11 +336,11 @@ const Form = () => {
               />
               <button
                 type="button"
-                className="add-tag-btn"
+                className="add-tag-btn icon-btn"
                 onClick={addCustomTag}
                 disabled={!newTagInput.trim()}
               >
-                +
+                <span className="icon-plus">+</span>
               </button>
             </div>
           </div>
@@ -400,10 +383,10 @@ const Form = () => {
             <div className="modal-header">
               <h3>Framgång!</h3>
               <button 
-                className="modal-close-btn"
+                className="modal-close-btn icon-btn"
                 onClick={() => setShowSuccessModal(false)}
               >
-                ×
+                <span className="icon-times">×</span>
               </button>
             </div>
             <div className="modal-body">

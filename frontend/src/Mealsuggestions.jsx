@@ -777,11 +777,9 @@ const Mealsuggestions = () => {
     
     // Spara alla resultat och visa första fem
     setAllSearchResults(allMockResults);
-    setRecipes(allMockResults.slice(0, 5));
-    
-    setRecipes(mockSearchResult)
-    setCurrentPage(1)
-    setShowFavorites(false)
+  setRecipes(allMockResults.slice(0, 5));
+  setCurrentPage(1);
+  setShowFavorites(false);
   }
 
   // Konvertera ingredienser från sträng till objekt format

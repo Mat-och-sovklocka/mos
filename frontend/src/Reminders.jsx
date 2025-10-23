@@ -77,7 +77,8 @@ function Reminders() {
   const [reminderType, setReminderType] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [customReminderText, setCustomReminderText] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Behåll för ev. andra fel
+  const [warningModal, setWarningModal] = useState(false);
   const [reminderNote, setReminderNote] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
   const [reminderTimes, setReminderTimes] = useState([""]);
@@ -313,11 +314,12 @@ function Reminders() {
   };
 
   const handleReminderType = (type) => {
+
     if (
       labels[selectedIndex] === "Övrigt" &&
       customReminderText.trim() === ""
     ) {
-      setErrorMessage("Du måste ange en typ av påminnelse.");
+      setWarningModal(true);
       return;
     }
 
@@ -361,7 +363,7 @@ function Reminders() {
           type="text"
           id="customReminder"
           name="customReminder"
-          placeholder="Skriv din påminnelse..."
+          placeholder="Skriv din påminnelsetyp..."
           value={customReminderText}
           onChange={(e) => {
             setCustomReminderText(e.target.value);
@@ -482,7 +484,24 @@ function Reminders() {
               setErrorMessage
             )}
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          {/* Varningsmodal för saknad påminnelsetyp */}
+          {warningModal && (
+            <div className="modal-overlay" onClick={() => setWarningModal(false)}>
+              <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>Varning</h3>
+                  <button className="modal-close-btn" onClick={() => setWarningModal(false)}>&times;</button>
+                </div>
+                <div className="modal-body">
+                  <p>Du måste ange en typ av påminnelse.</p>
+                </div>
+                <div className="modal-footer">
+                  <button className="modal-ok-btn" onClick={() => setWarningModal(false)}>OK</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="reminder-buttons-row">
             <button
