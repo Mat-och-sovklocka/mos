@@ -77,18 +77,51 @@
   padding: 12px 24px;
   font-size: 1.1em;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .toggle-results-button.green-button {
-  background-color: #4CAF50;
+  background-color: #316e70;
   color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.3);
 }
 
 .toggle-results-button.green-button:hover {
-  background-color: #45a049;
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
+}
+
+/* Show Favorites Button - exakt samma som sök-knappen */
+.show-favorites-button {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.show-favorites-button.green-button {
+  background-color: #316e70;
+  color: white;
+  border: none;
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.3);
+}
+
+.show-favorites-button.green-button:hover {
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
 /* Search Section */
@@ -100,7 +133,7 @@
   display: block;
   font-size: 1.2em;
   margin-bottom: 10px;
-  color: #333;
+  color: #316e70;
 }
 
 .search-input-container {
@@ -123,13 +156,14 @@
 
 .search-input-container button {
   padding: 12px 20px;
-  background-color: #4CAF50;
+  background-color: #316e70;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.3);
 }
 
 @media (max-width: 480px) {
@@ -143,66 +177,142 @@
 }
 
 .search-input-container button:hover {
-  background-color: #45a049;
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
 /* Favorites Section */
 .favorites-section {
   margin: 30px 0;
+  background-color: #f0f8f8;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #d1e7dd;
+}
+
+/* Search Results Section */
+.search-results-section {
+  margin: 30px 0;
+  background-color: #fef7e6;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #f0e68c;
 }
 
 .favorites-section label {
   display: block;
   font-size: 1.2em;
-  margin-bottom: 10px;
-  color: #333;
+  margin-bottom: 15px;
+  color: #316c6f;
+  font-weight: 600;
 }
 
-.favorites-button {
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.3s ease;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.favorites-button:hover {
-  transform: scale(1.02);
-  background-color: #f5f5f5;
-}
-
-.favorites-button.active {
-  background-color: #f0f7f0;
-  border: 1px solid #e0e0e0;
-}
-
-.favorites-info {
-  margin-top: 10px;
+.favorites-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.favorites-count {
-  color: #444;
+.favorite-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+  width: 100%;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.favorite-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.favorite-name {
+  color: #333;
   font-weight: 500;
-  font-size: 0.95em;
+  flex: 1;
+  padding-right: 10px;
+  word-break: break-word;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.remove-favorite-btn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 6px;
+}
+
+.remove-favorite-btn .favorite-star {
+  font-size: 2.5em;
+}
+
+.remove-favorite-btn:hover {
+  background: rgba(255, 215, 0, 0.15);
+  transform: scale(1.05);
+}
+
+.no-favorites {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+.no-favorites p {
+  color: #666;
+  margin-bottom: 8px;
 }
 
 .favorites-hint {
-  color: #666;
-  font-size: 0.85em;
+  color: #888;
+  font-size: 0.9em;
   font-style: italic;
 }
 
 @media (max-width: 480px) {
-  .favorites-button {
-    padding: 8px;
+  .favorites-section {
+    padding: 15px;
+    margin: 20px 0;
   }
   
-  .favorites-info {
-    margin-top: 8px;
+  .favorite-item {
+    padding: 10px 12px;
+  }
+  
+  .favorite-name {
+    font-size: 0.9em;
+  }
+  
+  .remove-favorite-btn {
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+  }
+  
+  .remove-favorite-btn .favorite-star {
+    font-size: 2em;
   }
 }
 
@@ -213,8 +323,13 @@
   font-size: 1.3em;
 }
 
-.results-section {
-  margin-top: 30px;
+.recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 /* Images */
@@ -241,43 +356,64 @@
 
 /* Recipe Cards */
 .recipe-card {
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin: 0 auto 15px;
+  margin: 0 auto 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  max-width: 600px;
+  width: 100%;
 }
 
 .recipe-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  background-color: #f8f8f8;
+  padding: 12px 16px;
+  background-color: white;
   cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+  width: 100%;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+
+.recipe-header:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .recipe-header h3 {
   margin: 0;
   flex: 1;
-  font-size: 1.1em;
+  font-size: 1em;
   line-height: 1.4;
+  color: #333;
+  font-weight: 500;
+  padding-right: 10px;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 480px) {
   .recipe-header {
-    padding: 12px;
+    padding: 10px 12px;
   }
   
   .recipe-header h3 {
-    font-size: 1em;
+    font-size: 0.9em;
+  }
+  
+  .recipe-header .favorite-star {
+    font-size: 2em;
   }
 }
 
 .favorite-star {
-  font-size: 1.5em;
+  font-size: 2.5em;
   cursor: pointer;
   color: #ddd;
   transition: all 0.3s ease;
@@ -337,14 +473,15 @@
   height: 30px;
   border: none;
   border-radius: 50%;
-  background-color: #4CAF50;
+  background-color: #316e70;
   color: white;
   font-size: 1.2em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.3);
 }
 
 .portion-button:disabled {
@@ -353,7 +490,10 @@
 }
 
 .portion-button:not(:disabled):hover {
-  background-color: #45a049;
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
 .servings-count {
@@ -442,12 +582,20 @@
 
 .pagination button {
   padding: 8px 15px;
-  background-color: #4CAF50;
+  background-color: #316e70;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.3);
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
 .pagination button:disabled {
@@ -523,10 +671,11 @@
 .modal-button {
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1em;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .modal-button.cancel {
@@ -536,15 +685,20 @@
 
 .modal-button.cancel:hover {
   background-color: #e0e0e0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .modal-button.confirm {
-  background-color: #dc3545;
+  background-color: #316e70;
   color: white;
 }
 
 .modal-button.confirm:hover {
-  background-color: #c82333;
+  background-color: rgba(49, 110, 112, 0.1);
+  color: #316e70;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
 @media (max-width: 480px) {
