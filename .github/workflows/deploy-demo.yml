@@ -115,7 +115,11 @@ jobs:
         echo "Files in dist:"
         ls -la
         echo "Contents of index.html:"
-        head -20 index.html
+        cat index.html
+        echo "Checking for JavaScript files:"
+        find . -name "*.js" -type f
+        echo "Checking for CSS files:"
+        find . -name "*.css" -type f
         
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
