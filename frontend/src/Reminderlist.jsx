@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./ReminderList.css";
+import "./reminderlist.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "./contexts/AuthContext";
 import { useLocation, useNavigate, Link } from "react-router-dom";
