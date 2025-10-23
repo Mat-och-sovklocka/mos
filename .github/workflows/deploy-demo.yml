@@ -114,6 +114,8 @@ jobs:
         cd frontend/dist
         echo "Files in dist:"
         ls -la
+        echo "Files in assets:"
+        ls -la assets/
         echo "Contents of index.html:"
         cat index.html
         echo "Checking for JavaScript files:"
@@ -125,6 +127,7 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: ./frontend/dist
+        retention-days: 1
 
     - name: Deploy to GitHub Pages
       id: deployment
