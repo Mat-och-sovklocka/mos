@@ -35,16 +35,78 @@ jobs:
         cd frontend
         npm run build
         
-    - name: Copy PWA files
+    - name: Create PWA files
       run: |
-        cd frontend
-        # Copy PWA files from public to dist
-        cp public/manifest.json dist/
-        cp public/sw.js dist/
-        cp public/icon.svg dist/
-        cp public/offline.html dist/
+        cd frontend/dist
         
-        echo "PWA files copied successfully!"
+        # Create manifest.json
+        cat > manifest.json << 'EOF'
+        {
+          "name": "MOS - Mat och Sovklocka",
+          "short_name": "MOS",
+          "description": "Reminder app for meal and sleep schedules",
+          "start_url": "/",
+          "display": "standalone",
+          "background_color": "#ffffff",
+          "theme_color": "#2563eb",
+          "orientation": "portrait-primary",
+          "scope": "/",
+          "icons": [
+            {
+              "src": "/vite.svg",
+              "sizes": "any",
+              "type": "image/svg+xml"
+            }
+          ],
+          "categories": ["health", "lifestyle", "productivity"],
+          "lang": "sv",
+          "dir": "ltr"
+        }
+        EOF
+        
+        # Create service worker
+        cat > sw.js << 'EOF'
+        const CACHE_NAME = 'mos-demo-v1';
+        const urlsToCache = [
+          '/',
+          '/index.html',
+          '/manifest.json',
+          '/vite.svg'
+        ];
+        
+        self.addEventListener('install', (event) => {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then((cache) => cache.addAll(urlsToCache))
+          );
+        });
+        
+        self.addEventListener('fetch', (event) => {
+          event.respondWith(
+            caches.match(event.request)
+              .then((response) => {
+                return response || fetch(event.request);
+              })
+          );
+        });
+        EOF
+        
+        # Create offline page
+        cat > offline.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>MOS - Offline</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body>
+            <h1>MOS Demo - Offline</h1>
+            <p>This app works offline! You can still use it without internet.</p>
+        </body>
+        </html>
+        EOF
+        
+        echo "PWA files created successfully!"
         
     - name: Debug build output
       run: |
