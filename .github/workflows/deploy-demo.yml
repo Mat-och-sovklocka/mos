@@ -35,7 +35,7 @@ jobs:
         cd frontend
         rm -rf dist
         # Build with correct base path for GitHub Pages
-        npm run build -- --base=/mos/
+        npm run build -- --base=/mos/ --mode=production
         
     - name: Create PWA files
       run: |
