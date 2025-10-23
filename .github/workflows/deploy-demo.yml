@@ -35,6 +35,14 @@ jobs:
         cd frontend
         npm run build
         
+    - name: Debug build output
+      run: |
+        cd frontend/dist
+        echo "Files in dist:"
+        ls -la
+        echo "Contents of index.html:"
+        head -20 index.html
+        
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
