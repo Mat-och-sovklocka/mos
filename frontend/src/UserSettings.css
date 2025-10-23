@@ -32,13 +32,163 @@
   margin-top: 8px;
 }
 
-.user-settings button {
-  padding: 8px 16px;
-  border-radius: 4px;
-  background: #0078d4;
+/* Modern button styling for UserSettings - matches the new green standard */
+.submit-button {
+  background-color: #316e70;
   color: white;
+  font-size: 0.9rem;
   border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
   cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-button:hover {
+  /* Samma hover som reminder-button */
+  background-color: rgba(49, 110, 112, 0.1); /* Ljus genomskinlig vid hover */
+  color: #316e70; /* Mörk text vid hover */
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.submit-button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Button container layouts */
+.user-settings-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Mobile responsive button layout */
+@media (max-width: 768px) {
+  .user-settings-buttons {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .submit-button {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+/* Logout button styling */
+.btn.btn-outline-danger.btn-sm {
+  background-color: #8B1538;
+  color: white;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn.btn-outline-danger.btn-sm:hover {
+  background-color: #6F0F2B;
+  box-shadow: 0 4px 8px rgba(139, 21, 56, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Patient modal buttons */
+.patient-modal-ok {
+  background-color: #316e70;
+  color: white;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.patient-modal-ok:hover {
+  /* Samma hover som reminder-button */
+  background-color: rgba(49, 110, 112, 0.1); /* Ljus genomskinlig vid hover */
+  color: #316e70; /* Mörk text vid hover */
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
+}
+
+/* Success modal buttons */
+.modal-ok-btn {
+  background-color: #316e70;
+  color: white;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 100px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-ok-btn:hover {
+  /* Samma hover som reminder-button */
+  background-color: rgba(49, 110, 112, 0.1); /* Ljus genomskinlig vid hover */
+  color: #316e70; /* Mörk text vid hover */
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.modal-close-btn {
+  background-color: #8B1538;
+  color: white;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background-color: #6F0F2B;
+  box-shadow: 0 4px 8px rgba(139, 21, 56, 0.3);
+  transform: scale(1.1);
 }
 
 .user-settings button[disabled] {
@@ -59,9 +209,4 @@
   justify-content: center;
   gap: 0.5rem;
   margin-top: 1rem;
-}
-
-.patient-modal-ok {
-  min-width: 160px;
-  padding: 0.6rem 1rem;
 }

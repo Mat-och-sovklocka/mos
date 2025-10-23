@@ -2,10 +2,23 @@ import React, { useState, useEffect } from 'react'
 import './mealsuggestions.css'
 import { FaStar } from 'react-icons/fa'
 import { IoMdClose } from 'react-icons/io'
-import favoritesImage from './images/favorites.jpeg'
 import homeIcon from "./images/home.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from './contexts/AuthContext';
+
+// Hjälpfunktion för att översätta användarkategorier till svenska
+const translateUserType = (userType) => {
+  switch (userType) {
+    case 'ADMIN':
+      return 'Administratör';
+    case 'CAREGIVER':
+      return 'Vårdgivare';
+    case 'RESIDENT':
+      return 'Boende';
+    default:
+      return userType;
+  }
+};
 
 // Bekräftelsemodal komponent
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title }) => {
@@ -169,14 +182,16 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
 const Mealsuggestions = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const location = useLocation();
   const isAdminOrCaregiver = user?.userType === 'ADMIN' || user?.userType === 'CAREGIVER';
+  const viewedPatientName = location?.state?.viewedPatientName || null;
 
   // States
   const [searchQuery, setSearchQuery] = useState('')
   const [recipes, setRecipes] = useState([])
   const [favorites, setFavorites] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [showFavorites, setShowFavorites] = useState(false) // Favoriter visas inte direkt
+  const [showFavorites, setShowFavorites] = useState(true) // Favoriter visas direkt när sidan laddas
   const [showingFirstSet, setShowingFirstSet] = useState(true) // För att växla mellan första och andra uppsättningen recept
   const [allSearchResults, setAllSearchResults] = useState([]) // Spara alla sökresultat
   
@@ -762,11 +777,9 @@ const Mealsuggestions = () => {
     
     // Spara alla resultat och visa första fem
     setAllSearchResults(allMockResults);
-    setRecipes(allMockResults.slice(0, 5));
-    
-    setRecipes(mockSearchResult)
-    setCurrentPage(1)
-    setShowFavorites(false)
+  setRecipes(allMockResults.slice(0, 5));
+  setCurrentPage(1);
+  setShowFavorites(false);
   }
 
   // Konvertera ingredienser från sträng till objekt format
@@ -842,8 +855,68 @@ const Mealsuggestions = () => {
 
   return (
     <div className="mealsuggestions-page">
+      {/* Top bar med user info och logout - olika layout för desktop/mobil */}
+      <div className="top-bar">
+        <div className="user-info-top">
+          <div className="user-info-content">
+            <div className="user-details">
+              <div>
+                <span className="text-muted">Inloggad som: </span>
+                <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+                <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{translateUserType(user?.userType)}</span>
+              </div>
+              {viewedPatientName && (
+                <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+                  <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+                </div>
+              )}
+            </div>
+            
+            {/* Logout knapp - visas bara på mobil i samma container */}
+            {isAdminOrCaregiver && (
+              <button
+                onClick={() => { logout(); navigate('/login'); }}
+                className="btn btn-outline-danger btn-sm logout-button-mobile"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Logout knapp - visas bara på desktop som separat element */}
+        {isAdminOrCaregiver && (
+          <div className="logout-container-desktop">
+            <button
+              onClick={() => { logout(); navigate('/login'); }}
+              className="btn btn-outline-danger btn-sm"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="mealsuggestions-container">
         <h2 className="mealsuggestions-title">Måltidsförslag</h2>
+
+        {/* Patient context banner */}
+        {viewedPatientName && (
+          <div style={{ 
+            textAlign: 'center', 
+            margin: '0 auto 40px auto', 
+            padding: '12px 24px', 
+            backgroundColor: '#e8f4f8', 
+            border: '2px solid #316e70', 
+            borderRadius: '8px', 
+            maxWidth: '600px',
+            fontSize: '16px',
+            fontWeight: '600',
+            color: '#316e70'
+          }}>
+            🍜 Du söker måltidsförslag för: <strong>{viewedPatientName}</strong>
+          </div>
+        )}
 
         {/* Söksektion */}
         <div className="search-section">
@@ -860,63 +933,66 @@ const Mealsuggestions = () => {
           </div>
         </div>
 
-        {/* Favoriter-sektion */}
-        <div className="favorites-section">
-          <label>Favoriter</label>
-          <div 
-            className={`favorites-button ${showFavorites ? 'active' : ''}`}
-            onClick={() => {
-              setShowFavorites(!showFavorites)
-              setCurrentPage(1)
-              setRecipes([]) // Rensa sökresultat när vi visar favoriter
-            }}
-          >
-            <img 
-              src={favoritesImage} 
-              alt="Favoriter" 
-              className="section-image"
-            />
-            <div className="favorites-info">
-              <div className="favorites-count">{favorites.length} sparade favoriter</div>
-              <div className="favorites-hint">
-                {showFavorites ? 'Klicka för att dölja favoriter' : 'Klicka för att visa favoriter'}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Resultatlista */}
-        <div className="results-section">
+        <div className={`results-section ${showFavorites ? 'favorites-section' : 'search-results-section'}`}>
           {(showFavorites || recipes.length > 0) && (
             <>
-              <h3 className="section-title">
-                {showFavorites ? 'Dina favoritrecept' : 'Sökresultat'}
-              </h3>
-              {displayedRecipes.map(recipe => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  onToggleFavorite={handleToggleFavorite}
-                  isFavorite={favorites.some(fav => fav.id === recipe.id)}
-                />
-              ))}
+              <label className="section-title">
+                {showFavorites && favorites.length > 0 ? `Dina favoritrecept (${favorites.length} sparade)` : recipes.length > 0 ? `Sökresultat (${recipes.length} recept)` : ''}
+              </label>
+              
+              <div className="recipes-list">
+                {displayedRecipes.map(recipe => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={favorites.some(fav => fav.id === recipe.id)}
+                  />
+                ))}
+              </div>
             </>
           )}
+
+          {/* Visa hjälptext om inga favoriter finns och inga sökresultat */}
+          {showFavorites && favorites.length === 0 && recipes.length === 0 && (
+            <div className="no-favorites">
+              <p>Inga favoriter sparade än</p>
+              <p className="favorites-hint">Klicka på stjärnan på ett recept för att spara det som favorit</p>
+            </div>
+          )}
           
-          {/* Knapp för att växla mellan första och andra uppsättningen recept */}
-          {!showFavorites && recipes.length > 0 && allSearchResults.length > 5 && (
-            <button 
-              className="toggle-results-button green-button"
-              onClick={() => {
-                const startIndex = showingFirstSet ? 5 : 0;
-                const endIndex = showingFirstSet ? 10 : 5;
-                setRecipes(allSearchResults.slice(startIndex, endIndex));
-                setShowingFirstSet(!showingFirstSet);
-                setCurrentPage(1); // Återställ paginering vid växling
-              }}
-            >
-              {showingFirstSet ? "Fler förslag" : "Fem första"}
-            </button>
+          {/* Knappar för att växla mellan första och andra uppsättningen recept samt visa favoriter */}
+          {!showFavorites && recipes.length > 0 && (
+            <div className="action-buttons" style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
+              {allSearchResults.length > 5 && (
+                <button 
+                  className="toggle-results-button green-button"
+                  style={{ margin: '0' }}
+                  onClick={() => {
+                    const startIndex = showingFirstSet ? 5 : 0;
+                    const endIndex = showingFirstSet ? 10 : 5;
+                    setRecipes(allSearchResults.slice(startIndex, endIndex));
+                    setShowingFirstSet(!showingFirstSet);
+                    setCurrentPage(1); // Återställ paginering vid växling
+                  }}
+                >
+                  {showingFirstSet ? "Fler förslag" : "Fem första"}
+                </button>
+              )}
+              
+              <button 
+                className="show-favorites-button green-button"
+                style={{ margin: '0' }}
+                onClick={() => {
+                  setShowFavorites(true);
+                  setRecipes([]); // Rensa sökresultat
+                  setCurrentPage(1);
+                }}
+              >
+                Visa favoriter
+              </button>
+            </div>
           )}
         </div>
 
@@ -940,28 +1016,21 @@ const Mealsuggestions = () => {
         )}
       </div>
 
-  {isAdminOrCaregiver && (
-        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
-          <button
-            onClick={() => { logout(); navigate('/login'); }}
-            className="btn btn-outline-danger btn-sm"
-          >
-            Logout
-          </button>
+      <div className="row mt-5">
+        <div className="col-12 d-flex justify-content-center">
+          {isAdminOrCaregiver && !viewedPatientName ? (
+            <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
+          ) : (
+            <Link to="/" state={location.state}>
+              <img
+                src={homeIcon}
+                alt="Tillbaka till startsidan"
+                style={{ width: "80px", cursor: "pointer" }}
+              />
+            </Link>
+          )}
         </div>
-      )}
-
-      <img
-        src={homeIcon}
-  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
-  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
-  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-        onClick={() => {
-          if (isAdminOrCaregiver) return;
-          navigate('/');
-        }}
-      />
+      </div>
     </div>
   )
 }

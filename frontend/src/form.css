@@ -66,11 +66,12 @@ body {
 }
 
 .preference-box {
-  border: 2px solid #316c6f;
+  border: none;
   border-radius: 12px;
   padding: 1.5rem;
   background-color: #f9f9f9;
   min-height: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .saved-box {
@@ -87,7 +88,6 @@ body {
   font-weight: bold;
   margin-bottom: 1rem;
   text-align: center;
-  border-bottom: 2px solid #316c6f;
   padding-bottom: 0.5rem;
 }
 
@@ -123,28 +123,34 @@ body {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(49, 108, 111, 0.3);
 }
 
 .add-btn:hover, .remove-btn:hover {
-  background-color: #2a5a5c;
-  transform: scale(1.1);
+  background-color: rgba(49, 108, 111, 0.1);
+  color: #316c6f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 108, 111, 0.4);
 }
 
 .remove-btn {
-  background-color: #dc3545;
+  background-color: #e74c3c;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
 }
 
 .remove-btn:hover {
-  background-color: #c82333;
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
 }
 
 .empty-message {
@@ -159,7 +165,7 @@ body {
   padding: 1.5rem;
   background-color: #f9f9f9;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Tag-based input styles */
@@ -184,24 +190,25 @@ body {
 }
 
 .tag-remove-btn {
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   padding: 0;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .tag-remove-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(231, 76, 60, 0.8);
+  transform: scale(1.1);
 }
 
 .tag-input-container {
@@ -229,26 +236,30 @@ body {
   color: white;
   border: none;
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+  width: 42px;
+  height: 42px;
+  font-size: 1.3rem;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(49, 108, 111, 0.3);
 }
 
 .add-tag-btn:hover:not(:disabled) {
-  background-color: #2a5a5c;
-  transform: scale(1.05);
+  background-color: rgba(49, 108, 111, 0.1);
+  color: #316c6f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 108, 111, 0.4);
 }
 
 .add-tag-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 /* Ta bort alla andra selektorer som kan påverka .reminder-title */
@@ -345,6 +356,36 @@ body {
   background-color: #d0e0e0;
 }
 
+/* Modern submit button styling - matches reminder buttons */
+.modern-submit-button {
+  /* Bootstrap-inspirerad styling */
+  background-color: #316e70; /* Mörkare grön som standard */
+  color: white; /* Vit text som standard */
+  font-size: 0.9rem;
+  border: none; /* Ta bort ramen */
+  border-radius: 12px; /* Rundare kanter */
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.3s ease; /* Smooth transitions för alla egenskaper */
+  height: 48px;
+  padding: 12px 40px;
+  box-sizing: border-box;
+  /* Bootstrap-liknande skugga */
+  box-shadow: 0 2px 4px rgba(49, 110, 112, 0.2), 0 1px 2px rgba(49, 110, 112, 0.1);
+  margin-top: 2rem;
+}
+
+.modern-submit-button:hover {
+  background-color: rgba(49, 110, 112, 0.1); /* Ljus genomskinlig vid hover */
+  color: #316e70; /* Mörk text vid hover */
+  /* Förstärk skuggan vid hover */
+  box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4), 0 2px 4px rgba(49, 110, 112, 0.3);
+  transform: translateY(-1px); /* Subtle lift effect */
+}
+
 /* Ny stil för .form-title.
    We keep a larger size for heading elements that use this class (h2/h3),
    but make labels smaller by targeting label.form-title specifically. */
@@ -421,8 +462,24 @@ label.form-title {
     font-size: 0.85rem;
   }
 
+  .patient-info-container {
+    margin: 0 1rem 40px 1rem !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+  }
+
   .kost-form {
     padding: 0.75rem;
+  }
+
+  /* Ensure home button is visible on mobile */
+  .row.mt-5 {
+    margin-top: 2rem;
+    padding: 15px 0 30px 0;
+  }
+
+  .row.mt-5 img {
+    width: 70px;
   }
 }
 
@@ -491,6 +548,45 @@ label.form-title {
   .user-settings-grid {
     grid-template-columns: 1fr; /* stack vertically on smaller screens */
   }
+}
+
+/* Home button styles */
+.row.mt-5 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 20px 0;
+  clear: both;
+}
+
+.row.mt-5 .col-12 {
+  display: flex;
+  justify-content: center;
+}
+
+.row.mt-5 a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row.mt-5 img {
+  width: 80px;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.row.mt-5 img:hover {
+  transform: scale(1.1);
+}
+
+.disabled-home {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  filter: grayscale(100%);
 }
 
 /* Success Modal Styles */
@@ -581,4 +677,40 @@ label.form-title {
 
 .modal-ok-btn:hover {
   background-color: #d0e0e0;
+}
+
+/* CSS-baserade ikoner för bättre kompatibilitet */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-plus,
+.icon-times {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.icon-plus {
+  font-size: 1.1rem;
+}
+
+.icon-times {
+  font-size: 1.2rem;
+  font-family: monospace;
+}
+
+/* Hover effekter för ikoner */
+.add-btn:hover .icon-plus,
+.add-tag-btn:hover .icon-plus {
+  transform: scale(1.1);
+}
+
+.remove-btn:hover .icon-times,
+.tag-remove-btn:hover .icon-times,
+.modal-close-btn:hover .icon-times {
+  transform: scale(1.1);
 }

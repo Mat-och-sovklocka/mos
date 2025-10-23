@@ -4,18 +4,38 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1rem;
-  margin: 0.5rem auto 1rem;  /* Center cards and adjust vertical spacing */
+  margin: 0.5rem auto 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
-  width: 50%;           /* Set to 50% of screen width */
-  min-width: 320px;     /* Keep minimum width for smaller screens */
-  max-width: 600px;     /* Add reasonable maximum width */
+  width: 50%;
+  min-width: 320px;
+  max-width: 600px;
   box-sizing: border-box;
-  height: auto;         /* Allow height to grow */
-  min-height: 120px;    /* Minimum height for content */
+  height: auto;
+  min-height: 120px;
   display: flex;
   flex-direction: column;
+}
+
+/* Mobile-first approach for cards */
+@media (max-width: 600px) {
+  .reminder-card {
+    width: 95% !important;  /* Force full width on mobile */
+    min-width: 280px !important;  /* Reduce minimum width */
+    margin: 0.5rem auto;
+    padding: 0.5rem;  /* Reduced padding */
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .reminder-card {
+    width: 98% !important;  /* Even more space usage on small phones */
+    min-width: 250px !important;  /* Further reduce minimum width */
+    padding: 0.4rem;  /* Even less padding */
+    margin: 0.25rem auto;
+  }
 }
 
 .reminder-card:hover {
@@ -44,37 +64,136 @@
   padding: 0.5rem;
   gap: 0.5rem;
   min-height: 60px;
-  height: auto;      /* Allow content to expand */
-  margin-bottom: 0.5rem;  /* Add bottom margin for spacing */
-  flex-direction: row !important; /* Force row direction */
+  height: auto;
+  margin-bottom: 0;  /* Remove bottom margin */
+  flex-direction: row !important;
+  overflow: hidden;
 }
 
 /* === Info-kolumn === */
 .reminder-info {
   flex: 1;
-  min-width: 0;
-  max-width: calc(100% - 50px);
+  min-width: 0;  /* Critical for flex items to shrink properly */
+  max-width: calc(100% - 60px);
   overflow-wrap: break-word;
   word-wrap: break-word;
+  hyphens: auto;
+  word-break: break-word;  /* Force word breaking if necessary */
+  padding: 0;  /* Remove any default padding */
 }
 
 .reminder-info p {
-  margin: 0.25rem 0;  /* Reduced from 0.5rem */
+  margin: 0.15rem 0;  /* Small but consistent margins */
   word-break: break-word;
   overflow-wrap: break-word;
-  line-height: 1.4;  /* Add line height control */
+  line-height: 1.5;
+  white-space: normal;
+  text-align: left;
+  display: block;
+}
+
+.reminder-info p:last-child {
+  margin-bottom: 0;  /* No margin on last paragraph */
+}
+
+.reminder-info strong {
+  white-space: nowrap;
+  margin-right: 0.5rem;
+  display: inline;
+}
+
+/* Better text handling for small screens */
+@media (max-width: 480px) {
+  .reminder-info {
+    max-width: calc(100% - 40px) !important;  /* Even more space for text */
+    font-size: 0.85rem;  /* Smaller text */
+  }
+
+  .reminder-info p {
+    line-height: 1.3;  /* Tighter spacing */
+    margin: 0.1rem 0;
+    font-size: 0.85rem;
+  }
+
+  .reminder-info strong {
+    font-size: 0.8rem;
+    display: inline;  /* Keep labels inline */
+    margin-right: 0.2rem;
+  }
+
+  .reminder-body {
+    padding: 0.2rem !important;
+    gap: 0.3rem !important;
+    margin-bottom: 0 !important;  /* No bottom margin */
+  }
+
+  .reminder-actions {
+    width: 35px !important;
+  }
+
+  .reminder-actions svg {
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small screens - very aggressive space usage */
+@media (max-width: 360px) {
+  .reminder-card {
+    padding: 0.3rem !important;  /* Minimal padding */
+    margin: 0.2rem auto !important;
+  }
+
+  .reminder-info {
+    max-width: calc(100% - 35px) !important;
+    font-size: 0.8rem;
+  }
+
+  .reminder-info p {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    margin: 0.05rem 0;  /* Minimal margins */
+  }
+
+  .reminder-info p:last-child {
+    margin-bottom: 0;  /* No margin on last paragraph */
+  }
+
+  .reminder-info strong {
+    font-size: 0.75rem;
+  }
+
+  .reminder-actions {
+    width: 30px !important;
+  }
+
+  .reminder-actions svg {
+    font-size: 0.8rem;
+  }
 }
 
 /* === Ikon-kolumn === */
 .reminder-actions {
   display: flex;
-  gap: 0.25rem; /* Reduced from 0.5rem */
-  align-items: flex-start;  /* Changed from center to flex-start */
+  gap: 0.25rem;
+  align-items: flex-start;
   justify-content: flex-end;
-  width: 45px;  /* Reduced from 70px */
+  width: 50px;  /* Increased from 45px to give more breathing room */
   flex-shrink: 0;
   margin-left: auto;
-  padding-top: 2px;  /* Add small padding to align with date text */
+  padding-top: 2px;
+  flex-direction: column;  /* Stack icons vertically for better space usage */
+}
+
+.reminder-actions svg {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #316c6f;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.reminder-actions svg:hover {
+  color: #255559;
+  transform: scale(1.1);
 }
 
 /* === Visa mer-länk === */
@@ -270,11 +389,17 @@
 .day-selector,
 .time-selector {
   display: flex;
-  flex-wrap: nowrap; /* 🔄 ändra från wrap till nowrap */
-  gap: 8px;
-  overflow-x: auto; /* 🔄 tillåter scroll om det blir trångt */
-  margin-bottom: 12px; /* behåll eller justera efter behov */
-  padding-bottom: 4px; /* valfritt för lite luft under raden */
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.day-selector {
+  justify-content: center; /* Centrera dagknapparna */
 }
 
 .time-list {
@@ -314,93 +439,139 @@
 
 /* Ej vald dag – ljusgrå */
 .day-button {
-  padding: 6px 12px;
-  border: 1px solid #eee;
-  background-color: #eee;
-  color: #333;
+  padding: 8px 14px;
+  border: 2px solid #ddd;
+  background-color: #f8f9fa;
+  color: #555;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin: 2px;
+  min-width: 45px;
+  text-align: center;
 }
 
-/* Vald dag – stark grön */
+.day-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+}
+
+/* Vald dag – stark grön med vit ram */
 .day-button.selected {
-  background-color: #28a745; /* Bootstrap-grön */
-  color: white;
-  border-color: #28a745;
-  font-weight: bold;
-  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+  background-color: #316e70 !important; /* Appens gröna tema */
+  color: white !important;
+  border: 2px solid white !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 0 2px #316e70, 0 4px 12px rgba(49, 110, 112, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.day-button.selected:hover {
+  background-color: #2a5c5e !important;
+  box-shadow: 0 0 0 2px #2a5c5e, 0 6px 16px rgba(49, 110, 112, 0.5) !important;
 }
 
 /* === Mobilanpassning === */
 @media (max-width: 600px) {
   .reminder-card {
+    width: 100%;
     padding: 0.75rem;
     font-size: 0.95rem;
-    min-height: auto;    /* Remove fixed minimum height */
-    height: auto;        /* Allow flexible height */
-    margin: 0.75rem 0;   /* Consistent margins */
+    min-height: auto;
+    height: auto;
+    margin: 0.75rem 0;
   }
 
   .reminder-body {
     flex-direction: row !important;
-    padding: 0.5rem;
-    min-height: auto;    /* Remove fixed minimum height */
-    height: auto;        /* Allow content to determine height */
-    margin-bottom: 0.25rem;
+    padding: 0.25rem;  /* Reduced padding for more space */
+    min-height: auto;
+    height: auto;
+    margin-bottom: 0;  /* Remove bottom margin on mobile */
+    gap: 0.5rem;  /* Reduced gap for more text space */
   }
 
   .reminder-info {
-    font-size: 0.95rem;
-    padding-bottom: 0.5rem;  /* Add space before card end */
+    font-size: 0.9rem;  /* Slightly smaller text */
+    padding-bottom: 0;  /* Remove bottom padding */
+    max-width: calc(100% - 45px) !important;  /* More space for text */
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .reminder-info p {
+    line-height: 1.4;  /* Tighter line height for more content */
+    word-spacing: normal;
+    letter-spacing: normal;
+    margin: 0.1rem 0;  /* Much smaller margins */
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .reminder-info p:last-child {
+    margin-bottom: 0;  /* Remove margin from last paragraph */
+  }
+
+  .reminder-info strong {
+    display: inline-block;
+    margin-right: 0.25rem;
+    font-size: 0.85rem;
   }
 
   .reminder-actions {
-    align-self: flex-start;  /* Keep icons at top */
-    margin-top: 0;           /* Remove top margin */
+    align-self: flex-start;
+    margin-top: 0;
+    width: 40px;  /* Smaller icon area */
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .reminder-actions svg {
+    font-size: 1rem;  /* Smaller icons */
   }
 }
 
 @media (max-width: 768px) {
     .reminder-section {
-        max-width: 98%;  /* Increased from 95% to 98% */
-        padding: 0 5px;  /* Reduced padding to use more screen space */
+        max-width: 98%;
+        padding: 0 5px;
+        margin: 0.5rem auto;
     }
 
     .reminder-card {
+        width: 100%;
         padding: 1rem;
         font-size: 1rem;
         margin-bottom: 1.2rem;
+    }
+
+    .reminder-info {
+        max-width: calc(100% - 55px);  /* Consistent with mobile breakpoint */
+    }
+
+    .reminder-body {
+        gap: 0.75rem;  /* Consistent spacing */
     }
 }
 
 /* Uppdatera sektionens bredd och padding */
 .reminder-section {
-    max-width: 85%;  /* Increased from 70% */
-    margin: 0 auto;
-    padding: 0 10px;  /* Reduced and made equal padding */
+    max-width: 90%;  /* Balanced width for good readability */
+    margin: 1rem auto;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* Uppdatera sidbehållare */
-.reminder-page {
-    max-width: 1400px;  /* Increased from 1200px */
-    margin: 0 auto;
-    padding: 10px 20px;  /* Adjusted padding */
-}
-
-/* Page container */
 .reminder-page {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
     padding: 1rem;
-    box-sizing: border-box;
-}
-
-/* Section styling */
-.reminder-section {
-    width: 100%;
-    margin: 1rem auto;
-    padding: 0;  /* Remove default padding */
     box-sizing: border-box;
 }
 
@@ -416,75 +587,34 @@
     height: auto;       /* Allow flexible height */
 }
 
-/* Mobile adjustments */
+/* Mobile adjustments for smaller screens */
 @media (max-width: 600px) {
     .reminder-page {
         padding: 0.5rem;
     }
 
     .reminder-section {
-        width: 95%;
+        max-width: 95%;
         margin: 0.5rem auto;
     }
 
-    .reminder-card {
-        width: 100%;
-        padding: 0.75rem;
-        margin: 0.5rem 0;
-    }
-}
-
-/* Update reminder body layout */
-.reminder-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    min-height: 60px;
-    height: auto;      /* Allow content to expand */
-    margin-bottom: 0.5rem;  /* Add bottom margin for spacing */
-    flex-direction: row !important;
-}
-
-.reminder-info {
-    flex: 1;
-    min-width: 0;
-    max-width: calc(100% - 50px);
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-}
-
-.reminder-actions {
-    display: flex;
-    gap: 0.25rem;
-    align-items: flex-start;  /* Changed from center to flex-start */
-    justify-content: flex-end;
-    width: 45px;
-    flex-shrink: 0;
-    margin-left: auto;
-    padding-top: 2px;  /* Add small padding to align with date text */
-}
-
-/* Update mobile styles */
-@media (max-width: 600px) {
-    .reminder-body {
-        flex-direction: row !important;
-        padding: 0.5rem;
-        min-height: auto;    /* Remove fixed minimum height */
-        height: auto;        /* Allow content to determine height */
-        margin-bottom: 0.25rem;
+    /* Dagknappar för mobil */
+    .day-button {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        min-width: 40px;
+        margin: 1px;
     }
 
-    .reminder-info {
-        font-size: 0.95rem;
-        padding-bottom: 0.5rem;  /* Add space before card end */
+    .day-selector {
+        gap: 4px;
+        padding: 6px;
     }
 
-    .reminder-actions {
-        align-self: flex-start;  /* Keep icons at top */
-        margin-top: 0;           /* Remove top margin */
+    /* Behåll samma starka visuella kontrast för markerade dagar på mobil */
+    .day-button.selected {
+        padding: 6px 10px;
+        box-shadow: 0 0 0 1px white, 0 2px 8px rgba(49, 110, 112, 0.4) !important;
     }
 }
 
@@ -500,7 +630,7 @@
     height: auto;       /* Allow flexible height */
 }
 
-/* Category-specific colors */
+/* Category-specific colors (updated with better contrast) */
 .meal-card { background-color: #e6f3ff; }
 .medication-card { background-color: #fff2e6; }
 .exercise-card { background-color: #e6ffe6; }
@@ -509,87 +639,51 @@
 .shower-card { background-color: #e6ffff; }
 .meeting-card { background-color: #fff6e6; }
 
-/* Content layout */
-.reminder-body {
-    display: flex;
-    width: 100%;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    min-height: 60px;
-    height: auto;      /* Allow content to expand */
-    margin-bottom: 0.5rem;  /* Add bottom margin for spacing */
-    align-items: flex-start;
-}
-
-/* Info section */
-.reminder-info {
-    flex: 1;
-    min-width: 0;
-    max-width: calc(100% - 50px);
-}
-
-.reminder-info p {
-    margin: 0.25rem 0;
-}
-
-/* Icons section */
-.reminder-actions {
-    width: 45px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: center;
-    margin-top: 2px;  /* Align with date text */
-}
-
-.reminder-actions svg {
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #316c6f;
-}
-
-/* Mobile adjustments */
-@media (max-width: 600px) {
-    .reminder-section {
-        width: 95%;
-        margin: 0.5rem auto;
-    }
-
-    .reminder-card {
-        width: 100%;
-        padding: 0.75rem;
-    }
-
-    .reminder-body {
-        flex-direction: row !important;
-        padding: 0.5rem;
-        min-height: auto;    /* Remove fixed minimum height */
-        height: auto;        /* Allow content to determine height */
-        margin-bottom: 0.25rem;
-    }
-
-    .reminder-info {
-        font-size: 0.95rem;
-    }
-}
-
 /* Main title styling */
 .reminder-title {
     color: #316c6f;
     font-weight: bold;
     font-size: 2.5rem;
     text-align: center;
-    margin-bottom: 80px;
+    margin-bottom: 40px;  /* Reduced from 80px since we have header now */
 }
 
 /* Section headers (subheaders) */
 .reminder-section h2 {
     color: #316c6f;
     font-weight: bold;
-    font-size: 1.8rem;  /* Smaller than main title */
+    font-size: 1.8rem;
     text-align: center;
-    margin-bottom: 30px;  /* Less margin than main title */
+    margin-bottom: 30px;
+}
+
+/* Header bar responsive design */
+@media (max-width: 768px) {
+  .reminder-page > div:first-child {
+    flex-direction: column !important;
+    gap: 15px;
+  }
+  
+  .reminder-page > div:first-child > div:first-child {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .reminder-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  
+  .reminder-page > div:first-child {
+    padding: 8px 0 !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .reminder-page > div:first-child > div:first-child {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
 }
 
 /* === Refresh Button === */
@@ -623,16 +717,182 @@
   transform: scale(0.95);
 }
 
-/* === Home Icon === */
-.home-icon {
-  display: block;
-  margin: 20px auto;
-  cursor: pointer;
-  width: 80px;
-  height: 50px;
-  transition: transform 0.3s ease;
+/* === Home Icon and navigation styles === */
+.row.mt-5 {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 20px 0;
+  clear: both;
 }
 
-.home-icon:hover {
+.row.mt-5 .col-12 {
+  display: flex;
+  justify-content: center;
+}
+
+.row.mt-5 a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row.mt-5 img {
+  width: 80px;
+  cursor: pointer;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.row.mt-5 img:hover {
   transform: scale(1.1);
+}
+
+.disabled-home {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  filter: grayscale(100%);
+}
+
+/* === Modal Styles === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  backdrop-filter: blur(2px);
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  width: 90%;
+  max-width: 500px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-footer {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.modal-btn-primary {
+  background: #316e70;
+  color: white;
+}
+
+.modal-btn-primary:hover {
+  background: #2a5c5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(49, 110, 112, 0.3);
+}
+
+.modal-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.modal-btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.modal-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.modal-btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Mobile responsiveness for modal */
+@media (max-width: 600px) {
+  .modal-container {
+    width: 95%;
+    max-width: none;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-btn {
+    width: 100%;
+    margin: 0;
+  }
 }

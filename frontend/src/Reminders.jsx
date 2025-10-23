@@ -7,6 +7,20 @@ import sv from "date-fns/locale/sv";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
+// Hjälpfunktion för att översätta användarkategorier till svenska
+const translateUserType = (userType) => {
+  switch (userType) {
+    case 'ADMIN':
+      return 'Administratör';
+    case 'CAREGIVER':
+      return 'Vårdgivare';
+    case 'RESIDENT':
+      return 'Boende';
+    default:
+      return userType;
+  }
+};
+
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
 import img3 from "./images/img3.png";
@@ -63,12 +77,14 @@ function Reminders() {
   const [reminderType, setReminderType] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [customReminderText, setCustomReminderText] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Behåll för ev. andra fel
+  const [warningModal, setWarningModal] = useState(false);
   const [reminderNote, setReminderNote] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
   const [reminderTimes, setReminderTimes] = useState([""]);
   const [confirmationSummary, setConfirmationSummary] = useState("");
   const [recurringNote, setRecurringNote] = useState("");
+  const [modal, setModal] = useState({ show: false, type: '', message: '', onConfirm: null });
   const summaryNote =
     reminderType === "recurring" ? recurringNote : customReminderText;
 
@@ -103,6 +119,22 @@ function Reminders() {
     setRecurringNote("");
   };
 
+  // Modal helper functions
+  const showModal = (type, message, onConfirm = null) => {
+    setModal({ show: true, type, message, onConfirm });
+  };
+
+  const hideModal = () => {
+    setModal({ show: false, type: '', message: '', onConfirm: null });
+  };
+
+  const handleModalConfirm = () => {
+    if (modal.onConfirm) {
+      modal.onConfirm();
+    }
+    hideModal();
+  };
+
   // För enstaka påminnelser
   const handleConfirmReminder = async () => {
     if (selectedIndex === null || !labels[selectedIndex]) {
@@ -115,6 +147,17 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
+    // Skapa kombinerad note för Övrigt-kategorin
+    let combinedNote = reminderNote.trim() || null;
+    if (labels[selectedIndex] === "Övrigt" && customReminderText) {
+      const customText = customReminderText.trim();
+      const originalNote = reminderNote.trim();
+      // Format: "*customText*originalNote"
+      combinedNote = originalNote 
+        ? `*${customText}*${originalNote}`
+        : `*${customText}*`;
+    }
+
     // Debug logs removed for production
 
     const payload = {
@@ -123,7 +166,7 @@ function Reminders() {
       dateTime: selectedDateTime.toISOString(),
       days: [],
       times: [],
-      note: reminderNote.trim() || null,
+      note: combinedNote,
     };
 
     // Debug logs removed for production
@@ -145,7 +188,7 @@ function Reminders() {
 
       const data = await response.json();
       // Success response logged
-      alert("Påminnelse har skapats!");
+      showModal('success', 'Påminnelse har skapats!');
 
       // Reset form after successful creation
       setSelectedIndex(null);
@@ -156,7 +199,7 @@ function Reminders() {
       setErrorMessage("");
     } catch (error) {
       console.error("Detailed error:", error);
-      alert(`Ett fel uppstod: ${error.message}`);
+      showModal('error', `Ett fel uppstod: ${error.message}`);
     }
   };
 
@@ -181,6 +224,17 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
+    // Skapa kombinerad note för Övrigt-kategorin (återkommande)
+    let combinedNote = recurringNote.trim() || null;
+    if (labels[selectedIndex] === "Övrigt" && customReminderText) {
+      const customText = customReminderText.trim();
+      const originalNote = recurringNote.trim();
+      // Format: "*customText*originalNote"
+      combinedNote = originalNote 
+        ? `*${customText}*${originalNote}`
+        : `*${customText}*`;
+    }
+
     // Debug logs removed for production
 
     const payload = {
@@ -189,7 +243,7 @@ function Reminders() {
       dateTime: null,
       days: selectedDays,
       times: reminderTimes.filter((time) => time !== ""),
-      note: recurringNote.trim() || null,
+      note: combinedNote,
     };
 
     try {
@@ -206,7 +260,7 @@ function Reminders() {
 
       const data = await response.json();
       // Reminder created successfully
-      alert("Påminnelse har skapats!");
+      showModal('success', 'Påminnelse har skapats!');
 
       // Återställ formuläret
       setSelectedIndex(null);
@@ -219,7 +273,7 @@ function Reminders() {
       setConfirmationSummary("");
     } catch (error) {
       console.error("Error:", error);
-      alert("Ett fel uppstod när påminnelsen skulle skapas.");
+      showModal('error', 'Ett fel uppstod när påminnelsen skulle skapas.');
     }
   };
 
@@ -260,11 +314,12 @@ function Reminders() {
   };
 
   const handleReminderType = (type) => {
+
     if (
       labels[selectedIndex] === "Övrigt" &&
       customReminderText.trim() === ""
     ) {
-      setErrorMessage("Du måste ange en typ av påminnelse.");
+      setWarningModal(true);
       return;
     }
 
@@ -308,7 +363,7 @@ function Reminders() {
           type="text"
           id="customReminder"
           name="customReminder"
-          placeholder="Skriv din påminnelse..."
+          placeholder="Skriv din påminnelsetyp..."
           value={customReminderText}
           onChange={(e) => {
             setCustomReminderText(e.target.value);
@@ -334,21 +389,66 @@ function Reminders() {
 
   return (
     <div className="reminders-container">
-      {/* User info and patient name */}
-      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '4px', fontSize: '14px' }}>
-        <div>
-          <span className="text-muted">Welcome, </span>
-          <strong>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2">{user?.userType}</span>
-        </div>
-        {viewedPatientName && (
-          <div style={{ marginTop: '4px', fontSize: '13px', color: '#666' }}>
-            Du tittar på {viewedPatientName} sida
+      {/* Top header bar with user info and logout - samma som Home.jsx */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: '20px', 
+        padding: '0 12px'
+      }}>
+        {/* User info and patient info */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.95)', 
+          padding: '12px 16px', 
+          borderRadius: '8px', 
+          fontSize: '14px', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)', 
+          border: '1px solid #e0e0e0'
+        }}>
+          <div>
+            <span className="text-muted">Inloggad som: </span>
+            <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+            <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{translateUserType(user?.userType)}</span>
           </div>
+          {viewedPatientName && (
+            <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+              <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+            </div>
+          )}
+        </div>
+
+        {/* Logout button */}
+        {isAdminOrCaregiver && (
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="btn btn-outline-danger btn-sm"
+          >
+            Logout
+          </button>
         )}
       </div>
 
       <h1 className="reminder-title">Lägg till påminnelserna</h1>
+      
+      {/* Patient context banner */}
+      {viewedPatientName && (
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '0 auto 40px auto', 
+          padding: '12px 24px', 
+          backgroundColor: '#e8f4f8', 
+          border: '2px solid #316e70', 
+          borderRadius: '8px', 
+          maxWidth: '600px',
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#316e70'
+        }}>
+          📋 Du skapar påminnelser för: <strong>{viewedPatientName}</strong>
+        </div>
+      )}
       
       <div className="image-grid">
         <div className="row row-spacing">
@@ -384,11 +484,29 @@ function Reminders() {
               setErrorMessage
             )}
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          {/* Varningsmodal för saknad påminnelsetyp */}
+          {warningModal && (
+            <div className="modal-overlay" onClick={() => setWarningModal(false)}>
+              <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>Varning</h3>
+                  <button className="modal-close-btn" onClick={() => setWarningModal(false)}>&times;</button>
+                </div>
+                <div className="modal-body">
+                  <p>Du måste ange en typ av påminnelse.</p>
+                </div>
+                <div className="modal-footer">
+                  <button className="modal-ok-btn" onClick={() => setWarningModal(false)}>OK</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="reminder-buttons-row">
             <button
               className="reminder-button reminder-button-once"
+              data-testid="mobile-button-test"
               onClick={() => handleReminderType("once")}
             >
               Enstaka påminnelser
@@ -396,6 +514,7 @@ function Reminders() {
 
             <button
               className="reminder-button reminder-button-recurring"
+              data-testid="mobile-button-test"
               onClick={() => handleReminderType("recurring")}
             >
               Återkommande påminnelser
@@ -590,12 +709,6 @@ function Reminders() {
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">
-          {isAdminOrCaregiver && (
-            <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
-              <button className="btn btn-outline-danger btn-sm" onClick={() => { logout(); navigate('/login'); }}>Logout</button>
-            </div>
-          )}
-
           {isAdminOrCaregiver && !viewedPatientName ? (
             <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
           ) : (
@@ -609,6 +722,67 @@ function Reminders() {
           )}
         </div>
       </div>
+
+      {/* Modal */}
+      {modal.show && (
+        <>
+          <div className="modal-overlay" onClick={modal.type !== 'confirm' ? hideModal : undefined} />
+          <div className="modal-container">
+            <div className="modal-content">
+              <div className="modal-header">
+                {modal.type === 'confirm' && (
+                  <h3>Bekräfta</h3>
+                )}
+                {modal.type === 'success' && (
+                  <h3 style={{ color: '#28a745' }}>✓ Klart!</h3>
+                )}
+                {modal.type === 'error' && (
+                  <h3 style={{ color: '#dc3545' }}>⚠ Fel</h3>
+                )}
+              </div>
+              
+              <div className="modal-body">
+                <p style={{ 
+                  whiteSpace: 'pre-line', 
+                  lineHeight: '1.5',
+                  margin: '0 0 20px 0'
+                }}>
+                  {modal.message}
+                </p>
+              </div>
+
+              <div className="modal-footer">
+                {modal.type === 'confirm' ? (
+                  <>
+                    <button 
+                      type="button" 
+                      className="modal-btn modal-btn-secondary"
+                      onClick={hideModal}
+                    >
+                      Avbryt
+                    </button>
+                    <button 
+                      type="button" 
+                      className="modal-btn modal-btn-primary"
+                      onClick={handleModalConfirm}
+                    >
+                      OK
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    type="button" 
+                    className="modal-btn modal-btn-primary"
+                    onClick={hideModal}
+                  >
+                    OK
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

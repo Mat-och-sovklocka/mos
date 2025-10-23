@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./ReminderList.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useAuth } from "./contexts/AuthContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import homeIcon from "./images/home.png";
 
 // Removed old login function - now using AuthContext
@@ -19,6 +19,7 @@ const ReminderList = () => {
   const [editingId, setEditingId] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedTimes, setSelectedTimes] = useState([]);
+  const [modal, setModal] = useState({ show: false, type: '', message: '', onConfirm: null });
   const cardRefs = useRef([]);
 
   const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
@@ -40,6 +41,77 @@ const ReminderList = () => {
     SHOWER: "Dusch",
     CLEANING: "Städning",
     OTHER: "Övrigt",
+  };
+
+  // Helper function to extract custom category text and remaining note
+  const extractCustomText = (note, category) => {
+    if (category !== 'OTHER' || !note) {
+      return { customText: null, remainingNote: note };
+    }
+    
+    // Check if note starts with *customText* format
+    const match = note.match(/^\*([^*]+)\*(.*)$/);
+    if (match) {
+      return {
+        customText: match[1],
+        remainingNote: match[2] || null
+      };
+    }
+    
+    return { customText: null, remainingNote: note };
+  };
+
+  // Helper function to get category display text
+  const getCategoryDisplay = (reminder) => {
+    const { customText } = extractCustomText(reminder.note, reminder.category);
+    if (customText) {
+      return customText;
+    }
+    return categoryToLabel[reminder.category] || reminder.category;
+  };
+
+  // Helper function to get note display text
+  const getNoteDisplay = (reminder) => {
+    const { remainingNote } = extractCustomText(reminder.note, reminder.category);
+    return remainingNote;
+  };
+
+  // Helper function to normalize day names to long format for display
+  const normalizeDaysForDisplay = (days) => {
+    const shortToFull = {
+      Mån: "Måndag",
+      Tis: "Tisdag", 
+      Ons: "Onsdag",
+      Tor: "Torsdag",
+      Fre: "Fredag",
+      Lör: "Lördag",
+      Sön: "Söndag",
+    };
+    
+    return days.map(day => {
+      // Om det är kort namn, konvertera till långt
+      if (shortToFull[day]) {
+        return shortToFull[day];
+      }
+      // Om det redan är långt namn, behåll det
+      return day;
+    });
+  };
+
+  // Modal helper functions
+  const showModal = (type, message, onConfirm = null) => {
+    setModal({ show: true, type, message, onConfirm });
+  };
+
+  const hideModal = () => {
+    setModal({ show: false, type: '', message: '', onConfirm: null });
+  };
+
+  const handleModalConfirm = () => {
+    if (modal.onConfirm) {
+      modal.onConfirm();
+    }
+    hideModal();
   };
 
   const onceReminders = data.filter((r) => r.type === "once");
@@ -79,7 +151,20 @@ const ReminderList = () => {
       ? currentReminder.days
       : currentReminder.days.split(",").map((d) => d.trim());
 
-    setSelectedDays(daysArray.map((full) => fullToShort[full]).filter(Boolean));
+    console.log("Original days from reminder:", daysArray);
+
+    // Hantera både korta och långa dagnamn
+    const mappedDays = daysArray.map((day) => {
+      // Om det redan är ett kort namn, använd det direkt
+      if (["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].includes(day)) {
+        return day;
+      }
+      // Annars mappa från långt till kort namn
+      return fullToShort[day];
+    }).filter(Boolean);
+
+    console.log("Mapped days for selection:", mappedDays);
+    setSelectedDays(mappedDays);
 
     setSelectedTimes(currentReminder.times || []);
   }, [editingId]);
@@ -153,15 +238,13 @@ const ReminderList = () => {
   // Handlers
   const handleDeleteOnce = async (id) => {
     const rem = data.find((r) => r.id === id);
-    if (
-      window.confirm(
-        `Ta bort enstaka påminnelse?\n\nKategori: ${
-          rem.category
-        }\nDatum: ${formatDate(rem.dateTime)}\nTid: ${formatTime(
-          rem.dateTime
-        )}\n${rem.note || ""}`
-      )
-    ) {
+    const confirmMessage = `Ta bort enstaka påminnelse?\n\nKategori: ${
+      getCategoryDisplay(rem)
+    }\nDatum: ${formatDate(rem.dateTime)}\nTid: ${formatTime(
+      rem.dateTime
+    )}\n${getNoteDisplay(rem) || ""}`;
+
+    const performDelete = async () => {
       try {
         const targetUserId = viewedPatientId || user.id;
         const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
@@ -172,28 +255,28 @@ const ReminderList = () => {
         if (response.ok) {
           // Only update frontend state after successful API call
           setData((prev) => prev.filter((r) => r.id !== id));
-          alert('Påminnelse har tagits bort!');
+          showModal('success', 'Påminnelse har tagits bort!');
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       } catch (error) {
         console.error('Error deleting reminder:', error);
-        alert('Ett fel uppstod när påminnelsen skulle tas bort.');
+        showModal('error', 'Ett fel uppstod när påminnelsen skulle tas bort.');
       }
-    }
+    };
+
+    showModal('confirm', confirmMessage, performDelete);
   };
 
   const handleDeleteRecurring = async (id) => {
     const rem = data.find((r) => r.id === id);
-    if (
-      window.confirm(
-        `Ta bort återkommande påminnelse?\n\nKategori: ${
-          rem.category
-        }\nDagar: ${rem.days.join(", ")}\nTider: ${rem.times.join(", ")}\n${
-          rem.note || ""
-        }`
-      )
-    ) {
+    const confirmMessage = `Ta bort återkommande påminnelse?\n\nKategori: ${
+      getCategoryDisplay(rem)
+    }\nDagar: ${normalizeDaysForDisplay(rem.days).join(", ")}\nTider: ${rem.times.join(", ")}\n${
+      getNoteDisplay(rem) || ""
+    }`;
+
+    const performDelete = async () => {
       try {
         const targetUserId = viewedPatientId || user.id;
         const response = await fetch(`/api/users/${targetUserId}/reminders/${id}`, {
@@ -204,15 +287,17 @@ const ReminderList = () => {
         if (response.ok) {
           // Only update frontend state after successful API call
           setData((prev) => prev.filter((r) => r.id !== id));
-          alert('Påminnelse har tagits bort!');
+          showModal('success', 'Påminnelse har tagits bort!');
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
       } catch (error) {
         console.error('Error deleting reminder:', error);
-        alert('Ett fel uppstod när påminnelsen skulle tas bort.');
+        showModal('error', 'Ett fel uppstod när påminnelsen skulle tas bort.');
       }
-    }
+    };
+
+    showModal('confirm', confirmMessage, performDelete);
   };
 
   const handleEditSubmit = async (e, id) => {
@@ -246,7 +331,7 @@ const ReminderList = () => {
         // Only update frontend state after successful API call
         setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
         setEditingId(null);
-        alert('Påminnelse har uppdaterats!');
+        showModal('success', 'Påminnelse har uppdaterats!');
       } else {
         const errorText = await response.text();
         console.error('Edit failed:', response.status, errorText);
@@ -254,7 +339,7 @@ const ReminderList = () => {
       }
     } catch (error) {
       console.error('Error updating reminder:', error);
-      alert('Ett fel uppstod när påminnelsen skulle uppdateras.');
+      showModal('error', 'Ett fel uppstod när påminnelsen skulle uppdateras.');
     }
   };
 
@@ -293,19 +378,80 @@ const ReminderList = () => {
         // Only update frontend state after successful API call
         setData((prev) => prev.map((r) => (r.id === id ? updatedReminder : r)));
         setEditingId(null);
-        alert('Påminnelse har uppdaterats!');
+        showModal('success', 'Påminnelse har uppdaterats!');
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error updating reminder:', error);
-      alert('Ett fel uppstod när påminnelsen skulle uppdateras.');
+      showModal('error', 'Ett fel uppstod när påminnelsen skulle uppdateras.');
     }
   };
 
   return (
     <div className="reminder-page">
+      {/* Top header bar with user info and logout */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '20px', 
+        padding: '12px 0',
+        borderBottom: '1px solid #e0e0e0'
+      }}>
+        {/* User info and patient info */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.95)', 
+          padding: '12px 16px', 
+          borderRadius: '8px', 
+          fontSize: '14px', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)', 
+          border: '1px solid #e0e0e0',
+          maxWidth: '70%'
+        }}>
+          <div>
+            <span className="text-muted">Inloggad som: </span>
+            <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+            <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
+          </div>
+          {viewedPatientName && (
+            <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+              <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+            </div>
+          )}
+        </div>
+
+        {/* Logout button */}
+        {isAdminOrCaregiver && (
+          <button
+            onClick={() => { logout(); navigate('/login'); }}
+            className="btn btn-outline-danger btn-sm"
+            style={{ marginTop: '4px' }}
+          >
+            Logout
+          </button>
+        )}
+      </div>
+
       <h1 className="reminder-title">Påminnelselista</h1>
+
+      {/* Patient context banner */}
+      {viewedPatientName && (
+        <div style={{ 
+          textAlign: 'center', 
+          margin: '0 auto 40px auto', 
+          padding: '12px 24px', 
+          backgroundColor: '#e8f4f8', 
+          border: '2px solid #316e70', 
+          borderRadius: '8px', 
+          maxWidth: '600px',
+          fontSize: '16px',
+          fontWeight: '600',
+          color: '#316e70'
+        }}>
+          📝 Du tittar på påminnelser för: <strong>{viewedPatientName}</strong>
+        </div>
+      )}
 
       {/* Enstaka */}
       <section className="reminder-section">
@@ -317,7 +463,7 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
+              <h3>{getCategoryDisplay(rem)}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
@@ -327,13 +473,13 @@ const ReminderList = () => {
                 <p>
                   <strong>Tid:</strong> {formatTime(rem.dateTime)}
                 </p>
-                {rem.note && (
+                {getNoteDisplay(rem) && (
                   <p>
                     <strong>Notering:</strong>{" "}
-                    {expandedNoteId === rem.id || rem.note.length < 80
-                      ? rem.note
-                      : rem.note.slice(0, 80) + "... "}
-                    {rem.note.length >= 80 && (
+                    {expandedNoteId === rem.id || getNoteDisplay(rem).length < 80
+                      ? getNoteDisplay(rem)
+                      : getNoteDisplay(rem).slice(0, 80) + "... "}
+                    {getNoteDisplay(rem).length >= 80 && (
                       <span
                         className="toggle-note"
                         onClick={() => toggleNote(rem.id)}
@@ -377,19 +523,19 @@ const ReminderList = () => {
             className={`reminder-card ${categoryClassMap[rem.category]}`}
           >
             <div className="reminder-header">
-              <h3>{categoryToLabel[rem.category] || rem.category}</h3>
+              <h3>{getCategoryDisplay(rem)}</h3>
             </div>
             <div className="reminder-body">
               <div className="reminder-info">
                 <p>
-                  <strong>Dagar:</strong> {rem.days.join(", ")}
+                  <strong>Dagar:</strong> {normalizeDaysForDisplay(rem.days).join(", ")}
                 </p>
                 <p>
                   <strong>Tider:</strong> {rem.times.join(", ")}
                 </p>
-                {rem.note && (
+                {getNoteDisplay(rem) && (
                   <p>
-                    <strong>Notering:</strong> {rem.note}
+                    <strong>Notering:</strong> {getNoteDisplay(rem)}
                   </p>
                 )}
               </div>
@@ -452,7 +598,7 @@ const ReminderList = () => {
                   id="note"
                   name="note"
                   type="text"
-                  defaultValue={currentReminder.note}
+                  defaultValue={getNoteDisplay(currentReminder)}
                   placeholder="Redigera notering"
                 />
               </div>
@@ -529,7 +675,7 @@ const ReminderList = () => {
                   id="note"
                   name="note"
                   type="text"
-                  defaultValue={currentReminder.note}
+                  defaultValue={getNoteDisplay(currentReminder)}
                   placeholder="Redigera notering"
                 />
               </div>
@@ -543,29 +689,83 @@ const ReminderList = () => {
           </div>
         </>
       )}
-      {/* Admin top-right logout */}
-  {isAdminOrCaregiver && (
-        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
-          <button
-            onClick={() => { logout(); navigate('/login'); }}
-            className="btn btn-outline-danger btn-sm"
-          >
-            Logout
-          </button>
-        </div>
-      )}
 
-      <img
-        src={homeIcon}
-  alt={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-  className={`home-icon ${isAdminOrCaregiver ? 'disabled-home' : ''}`}
-  title={isAdminOrCaregiver ? 'Inte tillgänglig för administratörer eller vårdgivare' : 'Gå till startsidan'}
-  aria-label={isAdminOrCaregiver ? 'Hem (otillgänglig för administratörer eller vårdgivare)' : 'Home'}
-        onClick={() => {
-          if (isAdminOrCaregiver) return; // do nothing for admins or caregivers
-          navigate('/');
-        }}
-      />
+      <div className="row mt-5">
+        <div className="col-12 d-flex justify-content-center">
+          {isAdminOrCaregiver && !viewedPatientName ? (
+            <img src={homeIcon} alt="Hem (otillgänglig)" className="disabled-home" title="Inte tillgänglig för administratörer eller vårdgivare" aria-label="Hem (otillgänglig för administratörer eller vårdgivare)" style={{ width: "80px" }} />
+          ) : (
+            <Link to="/" state={location.state}>
+              <img
+                src={homeIcon}
+                alt="Tillbaka till startsidan"
+                style={{ width: "80px", cursor: "pointer" }}
+              />
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Modal */}
+      {modal.show && (
+        <>
+          <div className="modal-overlay" onClick={modal.type !== 'confirm' ? hideModal : undefined} />
+          <div className="modal-container">
+            <div className="modal-content">
+              <div className="modal-header">
+                {modal.type === 'confirm' && (
+                  <h3>Bekräfta</h3>
+                )}
+                {modal.type === 'success' && (
+                  <h3 style={{ color: '#28a745' }}>✓ Klart!</h3>
+                )}
+                {modal.type === 'error' && (
+                  <h3 style={{ color: '#dc3545' }}>⚠ Fel</h3>
+                )}
+              </div>
+              
+              <div className="modal-body">
+                <p style={{ 
+                  whiteSpace: 'pre-line', 
+                  lineHeight: '1.5',
+                  margin: '0 0 20px 0'
+                }}>
+                  {modal.message}
+                </p>
+              </div>
+
+              <div className="modal-footer">
+                {modal.type === 'confirm' ? (
+                  <>
+                    <button 
+                      type="button" 
+                      className="modal-btn modal-btn-secondary"
+                      onClick={hideModal}
+                    >
+                      Avbryt
+                    </button>
+                    <button 
+                      type="button" 
+                      className="modal-btn modal-btn-danger"
+                      onClick={handleModalConfirm}
+                    >
+                      Ta bort
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    type="button" 
+                    className="modal-btn modal-btn-primary"
+                    onClick={hideModal}
+                  >
+                    OK
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
