@@ -35,6 +35,14 @@ jobs:
         cd frontend
         npm run build
         
+    - name: Copy PWA files
+      run: |
+        cd frontend
+        cp public/manifest.json dist/
+        cp public/sw.js dist/
+        cp public/icon.svg dist/
+        cp public/offline.html dist/
+        
     - name: Debug build output
       run: |
         cd frontend/dist
