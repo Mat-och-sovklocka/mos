@@ -30,9 +30,10 @@ jobs:
         cd frontend
         npm ci --legacy-peer-deps
         
-    - name: Build PWA
+    - name: Clean and Build PWA
       run: |
         cd frontend
+        rm -rf dist
         npm run build
         
     - name: Create PWA files
@@ -124,3 +125,5 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
