@@ -6,6 +6,20 @@ import homeIcon from "./images/home.png";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from './contexts/AuthContext';
 
+// Hjälpfunktion för att översätta användarkategorier till svenska
+const translateUserType = (userType) => {
+  switch (userType) {
+    case 'ADMIN':
+      return 'Administratör';
+    case 'CAREGIVER':
+      return 'Vårdgivare';
+    case 'RESIDENT':
+      return 'Boende';
+    default:
+      return userType;
+  }
+};
+
 // Bekräftelsemodal komponent
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title }) => {
   if (!isOpen) return null;
@@ -843,6 +857,48 @@ const Mealsuggestions = () => {
 
   return (
     <div className="mealsuggestions-page">
+      {/* Top bar med user info och logout - olika layout för desktop/mobil */}
+      <div className="top-bar">
+        <div className="user-info-top">
+          <div className="user-info-content">
+            <div className="user-details">
+              <div>
+                <span className="text-muted">Inloggad som: </span>
+                <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
+                <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{translateUserType(user?.userType)}</span>
+              </div>
+              {viewedPatientName && (
+                <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
+                  <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
+                </div>
+              )}
+            </div>
+            
+            {/* Logout knapp - visas bara på mobil i samma container */}
+            {isAdminOrCaregiver && (
+              <button
+                onClick={() => { logout(); navigate('/login'); }}
+                className="btn btn-outline-danger btn-sm logout-button-mobile"
+              >
+                Logout
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {/* Logout knapp - visas bara på desktop som separat element */}
+        {isAdminOrCaregiver && (
+          <div className="logout-container-desktop">
+            <button
+              onClick={() => { logout(); navigate('/login'); }}
+              className="btn btn-outline-danger btn-sm"
+            >
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="mealsuggestions-container">
         <h2 className="mealsuggestions-title">Måltidsförslag</h2>
 
@@ -961,31 +1017,6 @@ const Mealsuggestions = () => {
           </div>
         )}
       </div>
-
-      {/* User info and patient name */}
-      <div style={{ position: 'fixed', top: 12, left: 12, zIndex: 2000, backgroundColor: 'rgba(255,255,255,0.95)', padding: '12px 16px', borderRadius: '8px', fontSize: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '1px solid #e0e0e0' }}>
-        <div>
-          <span className="text-muted">Inloggad som: </span>
-          <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
-        </div>
-        {viewedPatientName && (
-          <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
-            <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>
-          </div>
-        )}
-      </div>
-
-      {isAdminOrCaregiver && (
-        <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2000 }}>
-          <button
-            onClick={() => { logout(); navigate('/login'); }}
-            className="btn btn-outline-danger btn-sm"
-          >
-            Logout
-          </button>
-        </div>
-      )}
 
       <div className="row mt-5">
         <div className="col-12 d-flex justify-content-center">

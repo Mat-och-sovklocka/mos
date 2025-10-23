@@ -124,6 +124,73 @@
   box-shadow: 0 4px 8px rgba(49, 110, 112, 0.4);
 }
 
+/* Top bar layout - samma som Home.jsx */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0 12px;
+}
+
+/* User Info Top */
+.user-info-top {
+  background-color: rgba(255,255,255,0.95);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border: 1px solid #e0e0e0;
+}
+
+.user-info-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-details {
+  flex: 1;
+}
+
+/* Desktop logout knapp - enkel styling som Home.jsx */
+.logout-container-desktop {
+  flex-shrink: 0;
+}
+
+/* Mobil logout knapp - dold på stora skärmar */
+.logout-button-mobile {
+  display: none;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+/* Responsiv design för mindre skärmar */
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .user-info-top {
+    max-width: 100%;
+  }
+  
+  /* På mobil: visa logout i samma container */
+  .logout-button-mobile {
+    display: block;
+    align-self: flex-end;
+    margin-right: 0;
+  }
+  
+  /* På mobil: dölj separat logout container */
+  .logout-container-desktop {
+    display: none;
+  }
+}
+
 /* Search Section */
 .search-section {
   margin: 30px 0;

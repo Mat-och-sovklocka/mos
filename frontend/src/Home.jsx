@@ -5,6 +5,20 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
 
+// Hjälpfunktion för att översätta användarkategorier till svenska
+const translateUserType = (userType) => {
+  switch (userType) {
+    case 'ADMIN':
+      return 'Administratör';
+    case 'CAREGIVER':
+      return 'Vårdgivare';
+    case 'RESIDENT':
+      return 'Boende';
+    default:
+      return userType;
+  }
+};
+
 
 const Home = () => {
   const { user, logout } = useAuth();
@@ -66,7 +80,7 @@ const Home = () => {
         <div className="user-info">
           <span className="text-muted">Inloggad som: </span>
           <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
-          <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
+          <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{translateUserType(user?.userType)}</span>
           {viewedPatientName && (
             <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70', display: 'inline-block' }}>
               <strong style={{ color: '#316e70', fontSize: '14px' }}>👤 Patient: {viewedPatientName}</strong>

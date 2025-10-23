@@ -7,6 +7,20 @@ import sv from "date-fns/locale/sv";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
+// Hjälpfunktion för att översätta användarkategorier till svenska
+const translateUserType = (userType) => {
+  switch (userType) {
+    case 'ADMIN':
+      return 'Administratör';
+    case 'CAREGIVER':
+      return 'Vårdgivare';
+    case 'RESIDENT':
+      return 'Boende';
+    default:
+      return userType;
+  }
+};
+
 import img1 from "./images/img1.png";
 import img2 from "./images/img2.png";
 import img3 from "./images/img3.png";
@@ -373,14 +387,14 @@ function Reminders() {
 
   return (
     <div className="reminders-container">
-      {/* Top header bar with user info and logout */}
+      {/* Top header bar with user info and logout - samma som Home.jsx */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        width: '100%',
         marginBottom: '20px', 
-        padding: '12px 0',
-        borderBottom: '1px solid #e0e0e0'
+        padding: '0 12px'
       }}>
         {/* User info and patient info */}
         <div style={{ 
@@ -389,13 +403,12 @@ function Reminders() {
           borderRadius: '8px', 
           fontSize: '14px', 
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)', 
-          border: '1px solid #e0e0e0',
-          maxWidth: '70%'
+          border: '1px solid #e0e0e0'
         }}>
           <div>
             <span className="text-muted">Inloggad som: </span>
             <strong style={{ color: '#316e70' }}>{user?.displayName || user?.email}</strong>
-            <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{user?.userType}</span>
+            <span className="badge bg-primary ms-2" style={{ fontSize: '11px' }}>{translateUserType(user?.userType)}</span>
           </div>
           {viewedPatientName && (
             <div style={{ marginTop: '8px', padding: '6px 8px', backgroundColor: '#e8f4f8', borderRadius: '4px', border: '1px solid #316e70' }}>
@@ -409,7 +422,6 @@ function Reminders() {
           <button
             onClick={() => { logout(); navigate('/login'); }}
             className="btn btn-outline-danger btn-sm"
-            style={{ marginTop: '4px' }}
           >
             Logout
           </button>
