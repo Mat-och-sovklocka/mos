@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOS Demo - Redirect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+        }
+        h1 { color: #ffd700; }
+        .qr-code {
+            margin: 30px 0;
+        }
+        .button {
+            background: #ffd700;
+            color: #333;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        .button:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+        }
+        .features {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .features li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 MOS Demo</h1>
+        <h2>Progressive Web App</h2>
+        
+        <div class="qr-code">
+            <h3>📱 Scan QR Code to Install</h3>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://mat-och-sovklocka.github.io/mos/" alt="QR Code">
+        </div>
+        
+        <a href="https://mat-och-sovklocka.github.io/mos/" class="button">🌐 Open Demo App</a>
+        
+        <div class="features">
+            <h3>✨ Features:</h3>
+            <ul>
+                <li>📱 Works on iPhone, iPad, Android, PC</li>
+                <li>🔌 Completely offline after installation</li>
+                <li>🏠 Add to Home Screen like a native app</li>
+                <li>🔔 Push notifications support</li>
+                <li>💾 Local data storage</li>
+            </ul>
+        </div>
+        
+        <p><strong>🎯 Perfect for testing without any setup!</strong></p>
+    </div>
+
+    <script>
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+            window.location.href = 'https://mat-och-sovklocka.github.io/mos/';
+        }, 3000);
+    </script>
+</body>
+</html>

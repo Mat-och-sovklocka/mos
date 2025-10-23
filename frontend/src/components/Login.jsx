@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import DemoInstructions from './DemoInstructions';
 import './Login.css';
 
 const Login = () => {
@@ -102,9 +103,7 @@ const Login = () => {
         </form>
         
         <div className="login-footer">
-          <p>Demo-uppgifter:</p>
-          <p><strong>Admin:</strong> admin@mos.test / password123</p>
-          <p><strong>Beware:</strong> resident1@mos.test / password123</p>
+          <DemoInstructions />
         </div>
       </div>
     </div>
