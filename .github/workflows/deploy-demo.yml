@@ -3,7 +3,9 @@ name: Deploy MOS Demo to GitHub Pages
 on:
   push:
     branches: [ main ]
-    paths: [ 'frontend/dist/**' ]
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
