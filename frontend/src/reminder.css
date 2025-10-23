@@ -217,9 +217,13 @@ body,
 .custom-reminder-block {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 260px;
+  width: calc(100vw - 100px) !important; /* Samma lösning som wrapper */
+  max-width: 800px !important;
   margin-bottom: 40px; /* ⬅️ Mer utrymme under hela blocket */
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  box-sizing: border-box !important;
 }
 
 .custom-reminder-block input {
@@ -389,9 +393,13 @@ body,
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 260px;
+  width: calc(100vw - 100px) !important; /* Bryt ut ur föräldern, lämna 50px marginal på varje sida */
+  max-width: 800px !important; /* Men begränsa till max 800px på stora skärmar */
   margin-bottom: 40px; /* ⬅️ Viktigt! Ger luft under inputfältet */
+  position: relative !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* Centrera trots att vi bryter ut */
+  box-sizing: border-box !important;
 }
 
 .custom-reminder-wrapper label {
@@ -1092,16 +1100,22 @@ body,
     }
     
     /* Custom reminder input mobile */
+    /* Custom reminder input mobile fix */
     .custom-reminder-wrapper {
-        width: 100%;
-        max-width: 100%;
+        width: calc(100vw - 40px) !important; /* Samma bredd som knapparna */
+        max-width: none !important;
         margin-bottom: 20px;
+        position: relative !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        box-sizing: border-box !important;
     }
     
     .custom-reminder-wrapper input {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
     }
 }
 
@@ -1318,4 +1332,145 @@ body,
 .row.mt-5 img:hover {
     transform: scale(1.1);
     transition: transform 0.2s ease;
+}
+
+/* === Modal Styles === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  backdrop-filter: blur(2px);
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  width: 90%;
+  max-width: 500px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-footer {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.modal-btn-primary {
+  background: #316e70;
+  color: white;
+}
+
+.modal-btn-primary:hover {
+  background: #2a5c5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(49, 110, 112, 0.3);
+}
+
+.modal-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.modal-btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.modal-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.modal-btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Mobile responsiveness for modal */
+@media (max-width: 600px) {
+  .modal-container {
+    width: 95%;
+    max-width: none;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-btn {
+    width: 100%;
+    margin: 0;
+  }
 }

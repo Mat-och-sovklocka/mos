@@ -389,11 +389,17 @@
 .day-selector,
 .time-selector {
   display: flex;
-  flex-wrap: nowrap; /* 🔄 ändra från wrap till nowrap */
-  gap: 8px;
-  overflow-x: auto; /* 🔄 tillåter scroll om det blir trångt */
-  margin-bottom: 12px; /* behåll eller justera efter behov */
-  padding-bottom: 4px; /* valfritt för lite luft under raden */
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.day-selector {
+  justify-content: center; /* Centrera dagknapparna */
 }
 
 .time-list {
@@ -433,21 +439,39 @@
 
 /* Ej vald dag – ljusgrå */
 .day-button {
-  padding: 6px 12px;
-  border: 1px solid #eee;
-  background-color: #eee;
-  color: #333;
+  padding: 8px 14px;
+  border: 2px solid #ddd;
+  background-color: #f8f9fa;
+  color: #555;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin: 2px;
+  min-width: 45px;
+  text-align: center;
 }
 
-/* Vald dag – stark grön */
+.day-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+}
+
+/* Vald dag – stark grön med vit ram */
 .day-button.selected {
-  background-color: #28a745; /* Bootstrap-grön */
-  color: white;
-  border-color: #28a745;
-  font-weight: bold;
-  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+  background-color: #316e70 !important; /* Appens gröna tema */
+  color: white !important;
+  border: 2px solid white !important;
+  font-weight: bold !important;
+  box-shadow: 0 0 0 2px #316e70, 0 4px 12px rgba(49, 110, 112, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.day-button.selected:hover {
+  background-color: #2a5c5e !important;
+  box-shadow: 0 0 0 2px #2a5c5e, 0 6px 16px rgba(49, 110, 112, 0.5) !important;
 }
 
 /* === Mobilanpassning === */
@@ -572,6 +596,25 @@
     .reminder-section {
         max-width: 95%;
         margin: 0.5rem auto;
+    }
+
+    /* Dagknappar för mobil */
+    .day-button {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+        min-width: 40px;
+        margin: 1px;
+    }
+
+    .day-selector {
+        gap: 4px;
+        padding: 6px;
+    }
+
+    /* Behåll samma starka visuella kontrast för markerade dagar på mobil */
+    .day-button.selected {
+        padding: 6px 10px;
+        box-shadow: 0 0 0 1px white, 0 2px 8px rgba(49, 110, 112, 0.4) !important;
     }
 }
 
@@ -711,4 +754,145 @@
   opacity: 0.5;
   cursor: not-allowed !important;
   filter: grayscale(100%);
+}
+
+/* === Modal Styles === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  backdrop-filter: blur(2px);
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  width: 90%;
+  max-width: 500px;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e9ecef;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body p {
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-footer {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.modal-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.modal-btn-primary {
+  background: #316e70;
+  color: white;
+}
+
+.modal-btn-primary:hover {
+  background: #2a5c5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(49, 110, 112, 0.3);
+}
+
+.modal-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.modal-btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.modal-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.modal-btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Mobile responsiveness for modal */
+@media (max-width: 600px) {
+  .modal-container {
+    width: 95%;
+    max-width: none;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-btn {
+    width: 100%;
+    margin: 0;
+  }
 }
