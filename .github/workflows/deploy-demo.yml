@@ -38,10 +38,13 @@ jobs:
     - name: Copy PWA files
       run: |
         cd frontend
+        # Copy PWA files from public to dist
         cp public/manifest.json dist/
         cp public/sw.js dist/
         cp public/icon.svg dist/
         cp public/offline.html dist/
+        
+        echo "PWA files copied successfully!"
         
     - name: Debug build output
       run: |
