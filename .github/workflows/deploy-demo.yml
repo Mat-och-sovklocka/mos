@@ -34,11 +34,19 @@ jobs:
       run: |
         cd frontend
         rm -rf dist
-        npm run build
+        # Build with correct base path for GitHub Pages
+        npm run build -- --base=/mos/
         
     - name: Create PWA files
       run: |
         cd frontend/dist
+        
+        # Create .htaccess for proper MIME types (though GitHub Pages doesn't support it, worth trying)
+        cat > .htaccess << 'EOF'
+        AddType application/javascript .js
+        AddType text/css .css
+        AddType image/svg+xml .svg
+        EOF
         
         # Create manifest.json
         cat > manifest.json << 'EOF'
@@ -132,5 +140,6 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+      environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
