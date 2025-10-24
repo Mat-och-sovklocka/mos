@@ -76,6 +76,12 @@ const ReminderList = () => {
     return remainingNote;
   };
 
+  // Sanitize text to remove newlines and collapse multiple spaces
+  const sanitizeText = (s) => {
+    if (!s && s !== "") return s;
+    return String(s).replace(/\s+/g, " ").trim();
+  };
+
   // Helper function to normalize day names to long format for display
   const normalizeDaysForDisplay = (days) => {
     const shortToFull = {
@@ -170,14 +176,8 @@ const ReminderList = () => {
   }, [editingId]);
 
   // Synka höjder på kort
-  useEffect(() => {
-    if (cardRefs.current.length === 0) return;
-    const heights = cardRefs.current.map((r) => r?.offsetHeight || 0);
-    const maxHeight = Math.max(...heights);
-    cardRefs.current.forEach((r) => {
-      if (r) r.style.height = `${maxHeight}px`;
-    });
-  }, [data, window.innerWidth]);
+  // Previously we equalized card heights which caused clipping on large screens.
+  // Remove that behavior so each card sizes to its content naturally.
 
   // Hämtar påminnelser från backend - only when user changes (login/logout)
   const fetchReminders = async () => {
@@ -468,17 +468,17 @@ const ReminderList = () => {
             <div className="reminder-body">
               <div className="reminder-info">
                 <p>
-                  <strong>Datum:</strong> {formatDate(rem.dateTime)}
+                  <strong>Datum:</strong> <span className="nowrap">{formatDate(rem.dateTime)}</span>
                 </p>
                 <p>
-                  <strong>Tid:</strong> {formatTime(rem.dateTime)}
+                  <strong>Tid:</strong> <span className="nowrap">{formatTime(rem.dateTime)}</span>
                 </p>
                 {getNoteDisplay(rem) && (
                   <p>
                     <strong>Notering:</strong>{" "}
                     {expandedNoteId === rem.id || getNoteDisplay(rem).length < 80
-                      ? getNoteDisplay(rem)
-                      : getNoteDisplay(rem).slice(0, 80) + "... "}
+                      ? sanitizeText(getNoteDisplay(rem))
+                      : sanitizeText(getNoteDisplay(rem).slice(0, 80)) + "... "}
                     {getNoteDisplay(rem).length >= 80 && (
                       <span
                         className="toggle-note"
