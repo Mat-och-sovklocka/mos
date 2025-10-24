@@ -84,19 +84,52 @@ jobs:
         ];
         
         self.addEventListener('install', (event) => {
+          console.log('[SW] Installing...');
           event.waitUntil(
             caches.open(CACHE_NAME)
-              .then((cache) => cache.addAll(urlsToCache))
+              .then((cache) => {
+                console.log('[SW] Caching files');
+                return cache.addAll(urlsToCache);
+              })
+              .then(() => {
+                console.log('[SW] Installation complete');
+                return self.skipWaiting();
+              })
+          );
+        });
+        
+        self.addEventListener('activate', (event) => {
+          console.log('[SW] Activating...');
+          event.waitUntil(
+            caches.keys().then((cacheNames) => {
+              return Promise.all(
+                cacheNames.map((cacheName) => {
+                  if (cacheName !== CACHE_NAME) {
+                    console.log('[SW] Deleting old cache:', cacheName);
+                    return caches.delete(cacheName);
+                  }
+                })
+              );
+            }).then(() => {
+              console.log('[SW] Activation complete');
+              return self.clients.claim();
+            })
           );
         });
         
         self.addEventListener('fetch', (event) => {
-          event.respondWith(
-            caches.match(event.request)
-              .then((response) => {
-                return response || fetch(event.request);
-              })
-          );
+          // Only handle navigation requests, let other requests pass through
+          if (event.request.mode === 'navigate') {
+            event.respondWith(
+              caches.match(event.request)
+                .then((response) => {
+                  return response || fetch(event.request);
+                })
+                .catch(() => {
+                  return caches.match('/offline.html');
+                })
+            );
+          }
         });
         EOF
         
@@ -113,6 +146,25 @@ jobs:
             <p>This app works offline! You can still use it without internet.</p>
         </body>
         </html>
+        EOF
+        
+        # Create a simple service worker registration script
+        cat > sw-register.js << 'EOF'
+        // Simple service worker registration with delay
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            // Add a small delay to ensure React loads first
+            setTimeout(() => {
+              navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                  console.log('SW registered: ', registration);
+                })
+                .catch((error) => {
+                  console.log('SW registration failed: ', error);
+                });
+            }, 100);
+          });
+        }
         EOF
         
         echo "PWA files created successfully!"
