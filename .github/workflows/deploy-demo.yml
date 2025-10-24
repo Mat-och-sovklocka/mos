@@ -2,12 +2,7 @@ name: Deploy MOS Demo to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    types: [ closed ]
-    branches: [ main ]
-  workflow_dispatch:
-
+    branches: [ oooops ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
