@@ -45,9 +45,11 @@ const RoleProtectedRoute = ({ children, allowedRoles = [] }) => {
 };
 
 function App() {
+  const basePath = import.meta.env.BASE_URL || '/';
+
   return (
     <AuthProvider>
-      <Router>
+      <Router basename={basePath}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={
