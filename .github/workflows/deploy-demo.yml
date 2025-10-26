@@ -10,6 +10,8 @@ jobs:
       contents: read
       pages: write
       id-token: write
+    env:
+      BASE_PATH: /mos/
     
     steps:
     - name: Checkout
@@ -30,7 +32,7 @@ jobs:
         cd frontend
         rm -rf dist
         # Build with correct base path for GitHub Pages
-        npm run build -- --base=/mos/ --mode=production
+        npm run build -- --base=${BASE_PATH} --mode=production
         
     - name: Create PWA files
       run: |
@@ -44,20 +46,20 @@ jobs:
         EOF
         
         # Create manifest.json
-        cat > manifest.json << 'EOF'
+        cat > manifest.json << EOF
         {
           "name": "MOS - Mat och Sovklocka",
           "short_name": "MOS",
           "description": "Reminder app for meal and sleep schedules",
-          "start_url": "/",
+          "start_url": "./",
           "display": "standalone",
           "background_color": "#ffffff",
           "theme_color": "#2563eb",
           "orientation": "portrait-primary",
-          "scope": "/",
+          "scope": "./",
           "icons": [
             {
-              "src": "/vite.svg",
+              "src": "vite.svg",
               "sizes": "any",
               "type": "image/svg+xml"
             }
@@ -71,20 +73,21 @@ jobs:
         # Create service worker
         cat > sw.js << 'EOF'
         const CACHE_NAME = 'mos-demo-v1';
+        const scopePath = self.location.pathname.replace(/sw\.js$/, '');
         const urlsToCache = [
-          '/',
-          '/index.html',
-          '/manifest.json',
-          '/vite.svg'
+          scopePath,
+          `${scopePath}index.html`,
+          `${scopePath}manifest.json`,
+          `${scopePath}vite.svg`,
         ];
-        
+
         self.addEventListener('install', (event) => {
           event.waitUntil(
             caches.open(CACHE_NAME)
               .then((cache) => cache.addAll(urlsToCache))
           );
         });
-        
+
         self.addEventListener('fetch', (event) => {
           event.respondWith(
             caches.match(event.request)

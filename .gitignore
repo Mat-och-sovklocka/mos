@@ -92,14 +92,5 @@ SESSION_SUMMARY.md
 
 *.code-workspace
 
-/frontend/vite.config.js
-
 # Keep files
 .gitkeep
-
-# Vite config
-/frontend/vite.config.js
-*.code-workspace
-*.code-workspace
-
-/frontend/vite.config.js

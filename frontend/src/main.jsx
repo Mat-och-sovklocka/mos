@@ -7,7 +7,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Register Service Worker for PWA functionality
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    const serviceWorkerUrl = new URL(`${import.meta.env.BASE_URL}sw.js`, window.location.origin);
+    navigator.serviceWorker.register(serviceWorkerUrl.pathname)
       .then((registration) => {
         console.log('SW registered: ', registration);
       })
