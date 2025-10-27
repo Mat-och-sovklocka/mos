@@ -22,6 +22,17 @@ const ReminderList = () => {
   const [modal, setModal] = useState({ show: false, type: '', message: '', onConfirm: null });
   const cardRefs = useRef([]);
 
+  // Prevent background scrolling when an edit modal is open
+  useEffect(() => {
+    if (editingId !== null) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    // cleanup on unmount
+    return () => document.body.classList.remove('modal-open');
+  }, [editingId]);
+
   const days = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"];
   const categoryClassMap = {
     MEAL: "meal-card",
