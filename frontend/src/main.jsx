@@ -1,7 +1,7 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import App from './App.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Register Service Worker for PWA functionality
@@ -18,8 +18,17 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+async function bootstrap() {
+  if (import.meta.env.VITE_DEMO_MODE === 'true') {
+    const { enableDemoMode } = await import('./demo/mockServer.js');
+    await enableDemoMode();
+  }
+
+  createRoot(document.getElementById('root')).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}
+
+bootstrap();

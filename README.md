@@ -128,3 +128,4 @@ See the `docs/` folder for detailed documentation:
 - Authentication flow
 - Development setup guides
 - Requirements specification
+- Demo backend strategy (`docs/demo-backend.md`)
