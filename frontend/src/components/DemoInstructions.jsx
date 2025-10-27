@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 
 const DemoInstructions = () => {
   const [showInstructions, setShowInstructions] = useState(false);
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
-  const demoCredentials = {
-    admin: { email: "admin@demo.mos", password: "demo123", role: "Administratör" },
-    caregiver: { email: "caregiver@demo.mos", password: "demo123", role: "Vårdgivare" },
-    resident: { email: "resident@demo.mos", password: "demo123", role: "Boende" }
-  };
+  const demoCredentials = isDemoMode
+    ? {
+        resident: { email: 'resident.demo@mos', password: 'demo123', role: 'Boende' },
+      }
+    : {
+        admin: { email: 'admin@demo.mos', password: 'demo123', role: 'Administratör' },
+        caregiver: { email: 'caregiver@demo.mos', password: 'demo123', role: 'Vårdgivare' },
+        resident: { email: 'resident@demo.mos', password: 'demo123', role: 'Boende' },
+      };
+
+  const tipMessage = isDemoMode
+    ? 'Demo-läget fokuserar på boendets upplevelse. Administrationsflöden kräver backend och ingår inte i den här sidan.'
+    : 'Testa olika roller för att se alla funktioner. Appen fungerar även offline efter första laddningen.';
 
   return (
     <div className="demo-instructions">
@@ -27,6 +36,11 @@ const DemoInstructions = () => {
             <div className="row">
               <div className="col-md-6">
                 <h6>🔐 Demo-inloggningar:</h6>
+                {isDemoMode && (
+                  <p className="small text-muted mb-2">
+                    Demo-läget använder enbart boenderollen för att efterlikna GitHub Pages-versionen.
+                  </p>
+                )}
                 <div className="demo-credentials">
                   {Object.entries(demoCredentials).map(([key, creds]) => (
                     <div key={key} className="mb-2 p-2 border rounded">
@@ -53,15 +67,14 @@ const DemoInstructions = () => {
                   <li>✅ Offline-funktionalitet</li>
                   <li>✅ Push-notifikationer</li>
                   <li>✅ Responsiv design</li>
-                  <li>✅ Demo-data för alla roller</li>
+                  <li>✅ {isDemoMode ? 'Demo-data för boenderollen' : 'Demo-data för alla roller'}</li>
                 </ul>
               </div>
             </div>
             
             <div className="mt-3 p-2 bg-light rounded">
               <small className="text-muted">
-                <strong>Tips:</strong> Testa olika roller för att se olika funktioner. 
-                Appen fungerar även offline efter första laddningen.
+                <strong>Tips:</strong> {tipMessage}
               </small>
             </div>
           </div>

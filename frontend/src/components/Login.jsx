@@ -5,8 +5,9 @@ import DemoInstructions from './DemoInstructions';
 import './Login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+  const [email, setEmail] = useState(isDemoMode ? 'resident.demo@mos' : '');
+  const [password, setPassword] = useState(isDemoMode ? 'demo123' : '');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -90,6 +91,12 @@ const Login = () => {
           {error && (
             <div className="error-message">
               {error}
+            </div>
+          )}
+
+          {isDemoMode && (
+            <div className="demo-hint text-muted small" style={{ marginBottom: '0.75rem' }}>
+              Endast boenderollen används i demo-läget. Lämna de förifyllda uppgifterna för att logga in.
             </div>
           )}
           
