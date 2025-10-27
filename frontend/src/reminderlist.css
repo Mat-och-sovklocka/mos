@@ -142,6 +142,25 @@
   width: 60px !important;
 }
 
+/* Ensure day buttons won't stretch to fill remaining space (fixes Sön being very wide) */
+.reminder-card .day-selector .day-button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 64px !important; /* cap width so no single button becomes too wide */
+  min-width: 28px !important;
+  padding: 6px 8px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 480px) {
+  .reminder-card .day-selector .day-button {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+    max-width: 40px !important;
+    min-width: 28px !important;
+  }
+}
+
 .reminder-info p {
   margin: 0.15rem 0;  /* Small but consistent margins */
   /* Use conservative breaking rules so words/dates don't split unexpectedly */
@@ -966,5 +985,35 @@ body.modal-open {
   .modal-btn {
     width: 100%;
     margin: 0;
+  }
+}
+
+/* Strong mobile overrides to prevent a single day button from stretching to full width */
+@media (max-width: 600px) {
+  /* Apply to both layouts and the edit form container */
+  .reminder-layout .day-selector,
+  .edit-form-container .day-selector,
+  .reminder-card .day-selector {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    justify-content: flex-start !important;
+  }
+
+  .reminder-layout .day-button,
+  .edit-form-container .day-button,
+  .reminder-card .day-selector .day-button {
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+    width: auto !important;
+    max-width: 48px !important;
+    min-width: 28px !important;
+    padding: 6px 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* If there are more buttons than fit, allow them to wrap into multiple rows evenly */
+  .reminder-layout .day-selector .day-button:nth-child(n) {
+    margin-right: 4px !important;
   }
 }
