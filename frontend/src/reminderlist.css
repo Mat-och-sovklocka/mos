@@ -7,7 +7,6 @@
   margin: 0.5rem auto 1rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
-  cursor: pointer;
   width: 50%;
   min-width: 320px;
   max-width: 600px;
@@ -67,7 +66,8 @@
   height: auto;
   margin-bottom: 0;  /* Remove bottom margin */
   flex-direction: row !important;
-  overflow: hidden;
+  /* Allow content to flow naturally; hiding overflow caused clipping and unexpected wrapping */
+  overflow: visible;
 }
 
 /* === Info-kolumn === */
@@ -77,21 +77,100 @@
   max-width: calc(100% - 60px);
   overflow-wrap: break-word;
   word-wrap: break-word;
-  hyphens: auto;
-  word-break: break-word;  /* Force word breaking if necessary */
+  white-space: normal;
   padding: 0;  /* Remove any default padding */
+}
+
+/* Defensive overrides: ensure normal horizontal text flow inside info column */
+.reminder-info,
+.reminder-info * {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  letter-spacing: normal !important;
+}
+
+/* Prevent dates/times from wrapping into multiple lines */
+.nowrap {
+  white-space: nowrap !important;
+}
+
+/* Strong, high-specificity overrides to ensure normal horizontal text flow on large screens.
+   These live at the end of the file so they override other rules. */
+.reminder-card, .reminder-card * {
+  overflow: visible !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  unicode-bidi: isolate !important; /* keep isolation but don't force vertical layout */
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.reminder-card .reminder-body {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  overflow: visible !important;
+}
+
+.reminder-card .reminder-info {
+  min-width: 0 !important;
+  max-width: calc(100% - 70px) !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.reminder-card .reminder-info p,
+.reminder-card .reminder-info span,
+.reminder-card .reminder-info strong {
+  display: block !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  hyphens: none !important;
+}
+
+/* Finally ensure the actions column doesn't overlap contents */
+.reminder-card .reminder-actions {
+  flex-shrink: 0 !important;
+  width: 60px !important;
+}
+
+/* Ensure day buttons won't stretch to fill remaining space (fixes Sön being very wide) */
+.reminder-card .day-selector .day-button {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: 64px !important; /* cap width so no single button becomes too wide */
+  min-width: 28px !important;
+  padding: 6px 8px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 480px) {
+  .reminder-card .day-selector .day-button {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+    max-width: 40px !important;
+    min-width: 28px !important;
+  }
 }
 
 .reminder-info p {
   margin: 0.15rem 0;  /* Small but consistent margins */
-  word-break: break-word;
-  overflow-wrap: break-word;
+  /* Use conservative breaking rules so words/dates don't split unexpectedly */
+  word-break: normal;
+  overflow-wrap: normal;
   line-height: 1.5;
   white-space: normal;
   text-align: left;
   display: block;
 }
-
 .reminder-info p:last-child {
   margin-bottom: 0;  /* No margin on last paragraph */
 }
@@ -260,6 +339,7 @@
 }
 
 /* === Overlay och modal === */
+
 .form-overlay {
   position: fixed;
   top: 0;
@@ -270,16 +350,27 @@
   z-index: 998;
 }
 
+/* Modal / fixed form container - ensure it sits above the overlay and is scrollable if tall */
 .fixed-form {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 999;
-  background-color: white;
-  padding: 2rem;
+  z-index: 9999; /* above overlay */
+  background-color: #fff;
+  padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  max-width: 95vw;
+  width: 520px;
+  max-height: 90vh;
+  overflow: auto; /* allow internal scrolling instead of page scroll */
+  box-sizing: border-box;
+}
+
+/* When modal is open, prevent body from scrolling (applied via JS if desired) */
+body.modal-open {
+  overflow: hidden;
 }
 
 /* === Färgkodning per kategori === */
@@ -894,5 +985,35 @@
   .modal-btn {
     width: 100%;
     margin: 0;
+  }
+}
+
+/* Strong mobile overrides to prevent a single day button from stretching to full width */
+@media (max-width: 600px) {
+  /* Apply to both layouts and the edit form container */
+  .reminder-layout .day-selector,
+  .edit-form-container .day-selector,
+  .reminder-card .day-selector {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    justify-content: flex-start !important;
+  }
+
+  .reminder-layout .day-button,
+  .edit-form-container .day-button,
+  .reminder-card .day-selector .day-button {
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+    width: auto !important;
+    max-width: 48px !important;
+    min-width: 28px !important;
+    padding: 6px 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* If there are more buttons than fit, allow them to wrap into multiple rows evenly */
+  .reminder-layout .day-selector .day-button:nth-child(n) {
+    margin-right: 4px !important;
   }
 }
