@@ -32,7 +32,7 @@ jobs:
         cd frontend
         rm -rf dist
         # Build with correct base path for GitHub Pages
-        VITE_DEMO_MODE=true npm run build -- --base=${BASE_PATH} --mode=production
+        VITE_BASE_PATH=${BASE_PATH} VITE_DEMO_MODE=true npm run build -- --mode=production
         
     - name: Create PWA files
       run: |
