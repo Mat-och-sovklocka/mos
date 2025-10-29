@@ -38,7 +38,7 @@ const DemoInstructions = () => {
                 <h6>🔐 Demo-inloggningar:</h6>
                 {isDemoMode && (
                   <p className="small text-muted mb-2">
-                    Demo-läget använder enbart boenderollen för att efterlikna GitHub Pages-versionen.
+                    Demo-läget använder enbart boenderollen för att hålla det enkelt.
                   </p>
                 )}
                 <div className="demo-credentials">
