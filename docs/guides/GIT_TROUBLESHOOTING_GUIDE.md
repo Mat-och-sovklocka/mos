@@ -20,6 +20,21 @@ git fetch origin
 git merge origin/main
 # OR
 git rebase origin/main
+
+# List remote tracking branchess
+git branch -r
+
+# List local branches
+git branch
+
+# List all branches (local and remote)
+git branch -a
+
+# List all branches (local and remote)
+git branch -av
+
+#fetch remote branches
+git fetch origin
 ```
 
 ### ⚡ **Quick Branch Switch (Keep Local Changes)**
@@ -182,10 +197,7 @@ docker-compose up --build
 - **`--force-with-lease` is safer than `--force`** - it checks if someone else pushed
 - **When in doubt, ask before force-pushing** - especially on shared branches
 - **Use `git log --oneline` to see recent history** - helps understand what happened
-- **Always delete local branches after merging** - it's a good practice to keep your local repository clean
-```bash
-git branch -d your-branch
-```
+- **Always delete local branches after merging `git branch -d your-branch`** - it's a good practice to keep your local repository clean
 
 ## 🆘 **When All Else Fails**
 
