@@ -182,6 +182,10 @@ docker-compose up --build
 - **`--force-with-lease` is safer than `--force`** - it checks if someone else pushed
 - **When in doubt, ask before force-pushing** - especially on shared branches
 - **Use `git log --oneline` to see recent history** - helps understand what happened
+- **Always delete local branches after merging** - it's a good practice to keep your local repository clean
+```bash
+git branch -d your-branch
+```
 
 ## 🆘 **When All Else Fails**
 
