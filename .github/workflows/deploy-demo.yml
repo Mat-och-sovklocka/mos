@@ -2,7 +2,7 @@ name: Deploy MOS Demo to GitHub Pages
 
 on:
   push:
-    branches: [ oooops ]
+    branches: [ feature/gh-pages-demo ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
