@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { notificationService } from './notifications/NotificationService';
 
 // Register Service Worker for PWA functionality
 if ('serviceWorker' in navigator) {
@@ -25,7 +26,6 @@ async function bootstrap() {
 
     // Demo-mode: check for missed reminders on app start and periodically
     try {
-      const { notificationService } = await import('./notifications/NotificationService');
       // Ask for permission early to improve UX
       if ('Notification' in window && Notification.permission === 'default') {
         try { await notificationService.requestPermission(); } catch {}
