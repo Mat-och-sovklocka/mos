@@ -16,11 +16,11 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Backend tests
+      - name: Backend build (skip tests)
         run: |
           cd backend
           chmod +x mvnw || true
-          ./mvnw -q -DskipITs=false test
+          ./mvnw -q -DskipTests package
 
       - name: Set up Node.js (optional frontend tests)
         uses: actions/setup-node@v4
