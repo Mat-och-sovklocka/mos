@@ -123,6 +123,13 @@ git rebase -i HEAD~3  # Last 3 commits
 
 # Force push (only if you're sure!)
 git push --force-with-lease
+
+# Force-push pushes only if the remote branch tip is exactly what your local thinks it is.
+# If someone else pushed new commits you don’t have, it refuses instead of overwriting them.
+# Use after a rebase of your feature branch, to update the remote without creating merge commits. Typical flow:
+git fetch origin
+git rebase origin/main
+git push --force-with-lease
 ```
 
 ### 🎯 **Quick Status Check**
