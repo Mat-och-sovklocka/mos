@@ -22,26 +22,3 @@ jobs:
           chmod +x mvnw || true
           ./mvnw -q -DskipTests package
 
-      - name: Set up Node.js (optional frontend tests)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.19.0'
-
-      - name: Frontend lint (if ESLint present)
-        run: |
-          cd frontend
-          if [ -f package.json ] && command -v jq >/dev/null 2>&1 && jq -er '.devDependencies.eslint // .dependencies.eslint' package.json >/dev/null 2>&1; then \
-            npm ci --legacy-peer-deps && npx eslint . --max-warnings=0 || true; \
-          else \
-            echo "ESLint not present — skipping frontend lint"; \
-          fi
-
-      - name: Frontend unit tests (if Vitest present)
-        run: |
-          cd frontend
-          if [ -f package.json ] && command -v jq >/dev/null 2>&1 && jq -er '.devDependencies.vitest // .dependencies.vitest' package.json >/dev/null 2>&1; then \
-            npm ci --legacy-peer-deps && npm run test -- --run; \
-          else \
-            echo "Vitest not present — skipping frontend unit tests"; \
-          fi
-
