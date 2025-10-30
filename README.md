@@ -1,3 +1,73 @@
+## MOS – Mat och Sovklocka
+
+A lightweight reminder app for meals and sleep with an offline-first PWA demo and a Docker-first development workflow.
+
+### Highlights
+- PWA demo (offline, Add to Home Screen, native-like feel)
+- Simple role-based access (Caregiver/Resident)
+- LocalStorage-backed demo data, no backend required for demo
+- Optional notification simulation in demo mode
+- Full backend available (Spring Boot + Postgres) for real environments
+
+### Live Demo (GitHub Pages)
+- Branch: `feature/gh-pages-demo`
+- URL: `https://mat-och-sovklocka.github.io/mos/`
+- Demo login (shown in app): Caregiver (Erik) and Resident (Anna)
+- Note: The demo runs entirely in the browser and works offline once loaded.
+
+If you install to your home screen on Android/iOS, the app will behave like a native app (standalone, icon, splash). Swedish demo instructions are shown on the demo landing page.
+
+### Quickstart (Docker-first)
+Prerequisites: Docker + Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+- Backend: Spring Boot with hot reload (`backend/`)
+- Frontend: Vite dev server proxied through Docker (`frontend/`)
+
+If you prefer running the frontend locally (for Vite HMR), ensure it does not conflict with Docker networking. The repo defaults to Docker-first; see `docs/` for notes on local HMR tradeoffs.
+
+### Tech Stack
+- Frontend: React + Vite, PWA (Service Worker + Manifest)
+- Backend: Spring Boot, Flyway, Postgres (Docker)
+- CI/CD: GitHub Actions (Node 20), GitHub Pages for demo branch
+
+### Repository Structure
+```
+backend/        # Spring Boot API
+frontend/       # React + Vite app
+docs/           # Guides and internal documentation
+.github/        # Workflows (demo deploy on dedicated branch)
+```
+
+### Development
+- Frontend dev (Docker): `docker-compose up --build`
+- Frontend dev (local) optional: `cd frontend && npm ci && npm run dev`
+  - Use only if you need local HMR; Docker remains the source of truth.
+- Backend dev: `cd backend && ./mvnw spring-boot:run`
+
+### Testing
+- Backend: `cd backend && ./mvnw test`
+- Frontend unit: `cd frontend && npm run test -- --run` (if enabled)
+- E2E: Playwright specs exist historically; see `docs/` for current status. Some tests may be quarantined as demo-scope evolved.
+
+### Documentation
+- Production readiness checklist: `docs/PRODUCTION_READINESS_REQUIREMENTS.md`
+- Confluence links (SSOT): `docs/CONFLUENCE.md`
+- PWA/Notifications overview: `docs/guides/PWA_IMPLEMENTATION_GUIDE.md`
+
+### Demo Mode Notes
+- `VITE_DEMO_MODE=true` enables:
+  - LocalStorage persistence for reminders/users
+  - Foreground notification simulation and missed-reminder checks
+- The demo deployment uses a fixed base path for GitHub Pages.
+
+### License and Contributions
+- License: MIT (or project default)
+- Contributions: Please use short, imperative commit messages and PRs with a brief user-facing summary. See `CONTRIBUTING.md` (if present) and Confluence for conventions.
+
 # Mat och Sovklocka (MOS) - Meal and Sleep Reminder System
 
 A full-stack application for managing meal reminders and sleep schedules, designed for care facilities and residents.
@@ -128,3 +198,4 @@ See the `docs/` folder for detailed documentation:
 - Authentication flow
 - Development setup guides
 - Requirements specification
+- Demo backend strategy (`docs/demo-backend.md`)
