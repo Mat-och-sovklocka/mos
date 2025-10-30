@@ -6,12 +6,28 @@ import { NotificationAdapter } from './NotificationAdapter';
 
 export class WebNotificationAdapter implements NotificationAdapter {
   private scheduledReminders: Map<string, { when: Date; title: string; body: string }> = new Map();
+  private storageKey = 'mos_demo_scheduled_reminders';
 
   async scheduleReminder(id: string, when: Date, title: string, body: string): Promise<void> {
     console.log(`[Web] Schedule reminder: ${title} at ${when.toISOString()}`);
     
     // Store the reminder for potential future use
     this.scheduledReminders.set(id, { when, title, body });
+
+    // Persist for demo-mode missed reminder checks
+    try {
+      const list = this.readStorage();
+      const existingIndex = list.findIndex(r => r.id === id);
+      const record = { id, when: when.toISOString(), title, body, delivered: false };
+      if (existingIndex >= 0) {
+        list[existingIndex] = record;
+      } else {
+        list.push(record);
+      }
+      localStorage.setItem(this.storageKey, JSON.stringify(list));
+    } catch (e) {
+      console.warn('[Web] Failed to persist scheduled reminder', e);
+    }
 
     // For now, just log - in the future this could:
     // 1. Generate an .ics file for calendar apps
@@ -23,11 +39,16 @@ export class WebNotificationAdapter implements NotificationAdapter {
       const delay = when.getTime() - Date.now();
       if (delay > 0) {
         setTimeout(() => {
-          new Notification(title, {
-            body,
-            icon: '/icons/icon-192x192.png',
-            tag: id
-          });
+          try {
+            new Notification(title, {
+              body,
+              icon: '/icons/icon-192x192.png',
+              tag: id
+            });
+            this.markDelivered(id);
+          } catch (e) {
+            console.warn('[Web] Notification show failed', e);
+          }
         }, delay);
       }
     }
@@ -107,5 +128,56 @@ export class WebNotificationAdapter implements NotificationAdapter {
     
     console.log('[WebNotificationAdapter] Diagnostic info:', info);
     return info;
+  }
+
+  /** Demo-mode: check for past-due reminders and show them now. */
+  async checkAndShowMissedReminders(): Promise<number> {
+    if (!this.isSupported() || typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+      return 0;
+    }
+    const now = Date.now();
+    const list = this.readStorage();
+    let shown = 0;
+    for (const r of list) {
+      if (!r.delivered && new Date(r.when).getTime() <= now) {
+        try {
+          new Notification(r.title, {
+            body: r.body,
+            icon: '/icons/icon-192x192.png',
+            tag: r.id
+          });
+          r.delivered = true;
+          shown++;
+        } catch (e) {
+          console.warn('[Web] Missed reminder notification failed', e);
+        }
+      }
+    }
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(list));
+    } catch {}
+    return shown;
+  }
+
+  private readStorage(): Array<{ id: string; when: string; title: string; body: string; delivered: boolean }>{
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private markDelivered(id: string) {
+    try {
+      const list = this.readStorage();
+      const idx = list.findIndex(r => r.id === id);
+      if (idx >= 0) {
+        list[idx].delivered = true;
+        localStorage.setItem(this.storageKey, JSON.stringify(list));
+      }
+    } catch {}
   }
 }

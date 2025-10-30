@@ -22,6 +22,22 @@ async function bootstrap() {
   if (import.meta.env.VITE_DEMO_MODE === 'true') {
     const { enableDemoMode } = await import('./demo/mockServer.js');
     await enableDemoMode();
+
+    // Demo-mode: check for missed reminders on app start and periodically
+    try {
+      const { notificationService } = await import('./notifications/NotificationService');
+      // Ask for permission early to improve UX
+      if ('Notification' in window && Notification.permission === 'default') {
+        try { await notificationService.requestPermission(); } catch {}
+      }
+      await notificationService.checkAndShowMissedReminders();
+      // Poll every 60s while app is open
+      setInterval(() => {
+        notificationService.checkAndShowMissedReminders().catch(() => {});
+      }, 60000);
+    } catch (e) {
+      console.warn('[Demo] Missed reminder bootstrap failed', e);
+    }
   }
 
   createRoot(document.getElementById('root')).render(

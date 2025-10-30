@@ -268,3 +268,45 @@ function App() {
 **Status**: ✅ **Foundation Complete** - Ready for testing and integration!
 
 **Next**: Test PWA features and integrate with reminder creation flow.
+
+---
+
+## 🇸🇪 Snabbguide för demo (PWA‑simulering)
+
+Den här delen beskriver hur demo‑appen fungerar. Allt fungerar offline och kan installeras som en app på telefonens hemskärm.
+
+### Installera som app (Lägg till på hemskärmen)
+- Öppna länken till demon i din mobilwebbläsare (Chrome/Edge/Firefox).
+- Godkänn eventuella frågor om aviseringar (notiser).
+- Öppna webbläsarens meny och välj “Lägg till på hemskärmen”.
+- Starta appen från ikonen som nu ligger på hemskärmen.
+
+### Notiser i demon (simulerade)
+- Du kan testa notiser via knappen “Testa notis” i appen.
+- Schemalagda påminnelser visas när appen är öppen eller nyligen aktiv.
+- Om en påminnelse passerar när appen är stängd visas den nästa gång du öppnar appen ("missad påminnelse").
+- Exakta notiser på klockslaget när appen är helt stängd kräver antingen en server (web push) eller en native‑app. I demon är detta simulerat.
+
+### Offline‑läge
+- Appen fungerar offline efter första besöket (innehåll och gränssnitt är cachat).
+- Du kan skapa/visa/redigera påminnelser utan internet. Datan sparas lokalt i din enhet (ingen server krävs).
+- När du öppnar appen igen utan internet kan du fortsatt använda den som vanligt.
+
+### Roller i demon
+- **Anna (Boende/Resident)**: Kan se sina påminnelser (läs‑läge).
+- **Erik (Vårdgivare/Caregiver)**: Kan skapa, ändra och ta bort påminnelser för tilldelade boende samt skapa/ta bort boende.
+
+### Begränsningar i PWA‑demot
+- Exakta bakgrundsnotiser på minutnivå när appen är stängd stöds inte fullt ut i webbläsare utan server/native.
+- Push‑notiser kräver en push‑tjänst (t.ex. Web Push via server) och är inte aktiverat i demon.
+- iOS har vissa begränsningar för PWA jämfört med Android.
+
+### Tips vid problem
+- Om notiser inte syns: Kontrollera att aviseringar är tillåtna för appens webbplats i webbläsarens inställningar.
+- Om appen inte startar offline: Öppna den en gång online först så att den hinner cacha innehållet.
+- Om något ”fastnar”: Stäng appen helt och starta om, eller rensa cache för just den PWA‑appen och försök igen.
+
+### Vanliga frågor
+- "Fungerar det utan internet?" – Ja, hela demon fungerar offline efter första besöket.
+- "Kommer notisen exakt 12:00 när appen är stängd?" – I demon: inte garanterat. Den visas när appen öppnas igen (missad påminnelse). För exakt leverans krävs native‑app eller push‑tjänst.
+- "Sparas min data någonstans?" – Nej. All demo‑data sparas lokalt i din enhet och delas inte.

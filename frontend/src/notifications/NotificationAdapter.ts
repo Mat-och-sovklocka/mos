@@ -26,4 +26,10 @@ export interface NotificationAdapter {
    * Request notification permissions
    */
   requestPermission(): Promise<boolean>;
+
+  /**
+   * Demo-mode helper: check for reminders that are past due and show them now.
+   * Returns the number of reminders shown.
+   */
+  checkAndShowMissedReminders?(): Promise<number>;
 }

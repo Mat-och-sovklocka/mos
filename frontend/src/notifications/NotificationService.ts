@@ -56,6 +56,14 @@ export class NotificationService {
   getAdapter(): NotificationAdapter {
     return this.adapter;
   }
+
+  // Demo-mode helper: surface missed reminders check via service
+  async checkAndShowMissedReminders(): Promise<number> {
+    if (typeof (this.adapter as any).checkAndShowMissedReminders === 'function') {
+      return (this.adapter as any).checkAndShowMissedReminders();
+    }
+    return 0;
+  }
 }
 
 // Export a singleton instance

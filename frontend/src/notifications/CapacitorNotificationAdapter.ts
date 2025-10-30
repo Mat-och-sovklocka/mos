@@ -97,4 +97,9 @@ export class CapacitorNotificationAdapter implements NotificationAdapter {
       str.split('').reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0)
     ) % 2147483647; // Max 32-bit signed integer
   }
+
+  // Demo-mode no-op for Capacitor: native local notifications would handle delivery
+  async checkAndShowMissedReminders(): Promise<number> {
+    return 0;
+  }
 }
