@@ -1,5 +1,8 @@
 ## MOS – Mat och Sovklocka
 
+![CI](https://github.com/Mat-och-sovklocka/mos/actions/workflows/ci.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A lightweight reminder app for meals and sleep with an offline-first PWA demo and a Docker-first development workflow.
 
 ### Highlights
@@ -55,8 +58,14 @@ docs/           # Guides and internal documentation
 
 ### Documentation
 - Production readiness checklist: `docs/PRODUCTION_READINESS_REQUIREMENTS.md`
+- Architecture overview: `docs/ARCHITECTURE_OVERVIEW.md`
 - Confluence links (SSOT): `docs/CONFLUENCE.md`
 - PWA/Notifications overview: `docs/guides/PWA_IMPLEMENTATION_GUIDE.md`
+ - Changelog: `CHANGELOG.md`
+
+### Developer workflow (Docker-first)
+- Preferred: run full stack with Docker (`docker-compose up --build`).
+- Optional: local frontend HMR with Vite is supported but secondary; see `docs/guides/dev-cheatsheet.md` for tradeoffs and tips.
 
 ### Demo Mode Notes
 - `VITE_DEMO_MODE=true` enables:
