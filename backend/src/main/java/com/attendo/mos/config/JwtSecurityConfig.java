@@ -1,6 +1,7 @@
 package com.attendo.mos.config;
 
 import java.util.List;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +24,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class JwtSecurityConfig {
 
     private final JwtUtil jwtUtil;
+
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    private String allowedOriginsCsv;
 
     public JwtSecurityConfig(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -54,12 +59,9 @@ public class JwtSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        // Frontend dev origins — add/remove as needed
-        cfg.setAllowedOrigins(List.of(
-                "http://localhost:5173", // Vite dev
-                "http://localhost:3000" // if you ever use 3000
-        // add e.g. "http://frontend:3000" or your Docker host if applicable
-        ));
+        // Frontend dev origins — configurable via application properties
+        List<String> origins = Arrays.asList(allowedOriginsCsv.split(","));
+        cfg.setAllowedOrigins(origins);
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("*"));
         cfg.setAllowCredentials(true);

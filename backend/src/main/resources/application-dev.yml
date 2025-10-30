@@ -20,5 +20,10 @@ spring:
 
 # JWT Configuration
 jwt:
-  secret: mySecretKeyThatIsAtLeast64CharactersLongForJWT512AlgorithmSecurityRequirements
+  secret: ${JWT_SECRET:change-me}
   expiration: 86400  # 24 hours in seconds
+
+# App-specific settings
+app:
+  cors:
+    allowed-origins: "http://localhost:5173,http://localhost:3000"
