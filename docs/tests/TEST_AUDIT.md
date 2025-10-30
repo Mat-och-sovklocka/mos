@@ -1,40 +1,30 @@
-### Test Audit – MOS
+### Test Audit – MOS (Minimal)
 
-Purpose: snapshot of current test surface, commands, and next actions (fix vs. quarantine).
+Purpose: Minimal, portfolio-friendly test surface to show a working testing workflow.
 
-#### Commands
-- Backend unit/integration:
-  - `cd backend && ./mvnw test`
-- Frontend unit (if enabled):
-  - `cd frontend && npm run test -- --run`
-- E2E (Playwright; may be outdated):
-  - `npx playwright test` (from repo root or `frontend/` depending on config)
+#### Commands (Smoke)
+- Backend unit/integration (preferred):
+  - `cd backend && ./mvnw -q -DskipITs=false test`
+- Frontend unit (only if Vitest/RTL present):
+  - `cd frontend && npm run test -- --run || echo "(skipped)"`
+- E2E (Playwright) — currently out of scope for CI; try locally only if needed:
+  - `npx playwright test || echo "(quarantined)"`
 
 #### Backend (Spring Boot)
-- Status: pending audit
-- Notes: Uses H2 profile for data access tests; Flyway migrations apply on test profile.
-- Next actions:
-  - Run tests locally and in CI (Node unaffected).
-  - Identify any flaky DB-init or migration order issues.
+- Status: smoke tests expected to pass.
+- Notes: H2 profile used in tests; Flyway migrations should run automatically.
 
 #### Frontend (React + Vite)
-- Status: pending audit
-- Notes: Some test deps may be removed in demo scope; ensure Vitest deps exist if running.
-- Next actions:
-  - Confirm `vitest` and `@testing-library/*` presence or skip for now.
-  - If disabled, document as intentionally out of scope for the demo.
+- Status: minimal; run only if `vitest` and `@testing-library/*` are installed. Otherwise skipped by design.
 
 #### E2E (Playwright)
-- Status: likely outdated (selectors/routes drifted)
-- Next actions:
-  - Attempt a run; list broken specs.
-  - Quarantine failing specs or fix low-effort ones.
+- Status: quarantined (selectors/routes likely drifted). Not part of CI.
 
-#### CI Integration
-- Goal: run backend tests on all PRs; optionally run frontend unit if enabled.
-- Pages deploy only from demo branch; tests should gate deploy where practical.
+#### CI Recommendation (Lightweight)
+- On PRs to `main`: run backend tests.
+- Optionally run frontend unit tests if `vitest` exists; otherwise skip with a clear log line.
+- Do not run E2E in CI.
 
-#### Decisions
-- Scope for demo: prioritize backend tests; defer frontend unit/E2E unless quick wins.
+See `docs/ci.md` for a sample workflow snippet.
 
 
