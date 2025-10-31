@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
-// @Profile("dev")  // Temporarily removed for debugging
 public class JwtSecurityConfig {
 
     private final JwtUtil jwtUtil;

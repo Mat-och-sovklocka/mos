@@ -16,11 +16,11 @@ Last updated: 2025-01-30
   - `/frontend/vite.config.js` appears 3 times (lines 100, 106, 110)
 - **Status**: Will be cleaned up
 
-### 3. ⚠️ Debug Code in Production Paths
+### 3. ✅ Debug Code in Production Paths
 - **Location**: `backend/src/main/java/com/attendo/mos/service/UserManagementService.java`
 - **Issue**: `System.out.println` debug statements (lines 109-111)
-- **Severity**: Low (dev code, but should use logger)
-- **Recommendation**: Replace with logger, or remove if no longer needed
+- **Status**: ✅ Fixed - Replaced with proper SLF4J logger
+- **Fix**: Added logger instance and replaced `System.out.println` with `logger.debug()`
 
 ### 4. ⚠️ TODO Comments
 - **Location**: `UserManagementService.java` (lines 41, 122)
