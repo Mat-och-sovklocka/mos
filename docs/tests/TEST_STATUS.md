@@ -116,21 +116,30 @@ Last updated: 2025-01-30
 
 ## Frontend Tests
 
+### Status Summary
+
+- **Total tests**: 10 tests across 2 files
+- **Current**: 8 passing, 2 failing (outdated expectations)
+- **CI status**: Not yet integrated
+- See `docs/tests/FRONTEND_TEST_STATUS.md` for detailed analysis
+
 ### Test Files
 
 1. **Login.test.jsx** - Login component tests
-   - Status: Unknown (needs verification)
+   - Status: ⚠️ 2 tests failing (outdated - expects old demo credentials format)
    - Framework: Vitest + React Testing Library
+   - Issue: Component changed (clickable demo buttons vs plain text)
 
 2. **ReminderList.test.jsx** - Reminder list component tests
-   - Status: Unknown (needs verification)
+   - Status: ⚠️ 2 tests failing (mock expectations don't match implementation)
    - Framework: Vitest + React Testing Library
+   - Issue: Component may use localStorage in demo mode vs API calls
 
-### Frontend Test Status
+### Recommendation
 
-- Tests exist but may be outdated (components have changed significantly)
-- Require Vitest setup and dependencies
-- May need updating for current component structure
+- **For now**: Keep frontend tests for local development, skip in CI
+- **Later**: Update tests to match current component structure (~30 min fix)
+- Frontend tests need updating but core functionality is covered
 
 ## Running Tests
 
@@ -174,6 +183,11 @@ npx vitest run
 - **Database**: `jdbc:h2:mem:testdb`
 - **Security**: Disabled in test profile (`SecurityAutoConfiguration` excluded)
 - **Flyway**: Disabled in test profile
+
+### Known Limitations / Warnings
+
+- **JSONB column warnings**: The `Reminder.recurrence` field uses `columnDefinition = "jsonb"` (PostgreSQL-specific). H2 logs errors about this during schema creation, but tests pass because Hibernate handles the JSON mapping via `@JdbcTypeCode(SqlTypes.JSON)`. These warnings can be safely ignored.
+- **H2 vs PostgreSQL**: Some PostgreSQL-specific features (like JSONB) generate warnings in H2, but core functionality is tested and working.
 
 ## Next Steps
 
