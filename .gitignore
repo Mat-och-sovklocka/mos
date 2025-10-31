@@ -101,3 +101,4 @@ build/
 # Keep files
 .gitkeep
 docs/RECRUITMENT_CHECKLIST.md
+/docs/_archive/RECRUITMENT_CHECKLIST.md
