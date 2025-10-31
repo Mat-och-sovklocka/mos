@@ -15,8 +15,8 @@ Last updated: 2025-01-30
 
 1. **MosApplicationTests** - Context loading test (smoke test)
    - Status: ✅ **PASSES** (1 test)
-   - Profile: None (uses default, connects to Docker Postgres)
-   - Notes: Minimal smoke test, verified working
+   - Profile: `test` (uses H2 in-memory, Flyway disabled)
+   - Notes: Minimal smoke test, verified working. Fixed to use test profile for CI compatibility.
 
 2. **JwtUtilTest** - JWT utility unit tests
    - Status: ✅ **PASSES** (6 tests)

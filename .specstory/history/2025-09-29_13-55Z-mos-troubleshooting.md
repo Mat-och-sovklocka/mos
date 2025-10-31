@@ -21094,3 +21094,185 @@ Ready for the next PR to verify the CI run.
 
 ---
 
+_**User (2025-10-31 12:31Z)**_
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'flywayInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/autoconfigure/flyway/FlywayAutoConfiguration$FlywayConfiguration.class]: Unable to obtain connection from database: Connection to localhost:5432 refused. Check that the hostname and port are correct and that the postmaster is accepting TCP/IP connections.
+
+---
+
+_**Assistant (default)**_
+
+
+
+---
+
+
+The `MosApplicationTests` is connecting to Postgres (localhost:5432) instead of H2, which isn't available in CI. Updating it to use the test profile (H2 in-memory) so it doesn't require a database:
+
+
+---
+
+Tool use: **read_file**
+
+Read file: backend/src/test/java/com/attendo/mos/MosApplicationTests.java
+
+---
+
+Tool use: **read_file**
+
+Read file: backend/src/test/resources/application-test.properties
+
+---
+
+
+
+---
+
+Adding `@ActiveProfiles("test")` so it uses H2 and disables Flyway:
+
+
+---
+
+Tool use: **search_replace**
+
+
+<details><summary>Edit file: backend/src/test/java/com/attendo/mos/MosApplicationTests.java</summary>
+
+**Chunk 1**
+Lines added: 2, lines removed: undefined
+
+```diff
+@@ -3,6 +3,8 @@
+  import org.junit.jupiter.api.Test;
+  import org.springframework.boot.test.context.SpringBootTest;
++ import org.springframework.test.context.ActiveProfiles;
+  
+  @SpringBootTest
++ @ActiveProfiles("test")
+  class MosApplicationTests {
+  
+```
+
+</details>
+
+---
+
+Tool use: **run_terminal_cmd**
+
+```bash
+./mvnw test -Dtest=MosApplicationTests 2>&1 | tail -20
+```
+
+```
+$ ./mvnw test -Dtest=MosApplicationTests 2>&1 | tail -20
+2025-10-31T15:30:15.390+01:00  INFO 26832 --- [mos] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager                      
+2025-10-31T15:30:16.120+01:00  INFO 26832 --- [mos] [           main] com.attendo.mos.MosApplicationTests      : Started MosApplicationTests in 8.571 seconds (process running for 9.943)                                                       
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3              
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended                               
+WARNING: A Java agent has been loaded dynamically (C:\Users\eliza\.m2\repository\net\bytebuddy\byte-buddy-agent\1.17.7\byte-buddy-agent-1.17.7.jar)             
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning                                                
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information                                               
+WARNING: Dynamic loading of agents will be disallowed by default in a future release                                                                            
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.690 s -- in com.attendo.mos.MosApplicationTests                                        
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------ 
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------ 
+[INFO] Total time:  13.720 s
+[INFO] Finished at: 2025-10-31T15:30:16+01:00
+[INFO] ------------------------------------------------------------------------ 
+```
+
+---
+
+
+
+---
+
+Test passes with the test profile. Verifying all tests together:
+
+
+---
+
+Tool use: **run_terminal_cmd**
+
+```bash
+./mvnw test -Dtest=MosApplicationTests,JwtUtilTest,ReminderServiceUpdateTest,AuthenticationServiceTest 2>&1 | tail -20
+```
+
+```
+This generated password is for development use only. Your security configuration must be updated before running your application in production.                 
+
+2025-10-31T15:30:40.584+01:00  INFO 24684 --- [mos] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager                      
+2025-10-31T15:30:41.393+01:00  INFO 24684 --- [mos] [           main] com.attendo.mos.MosApplicationTests      : Started MosApplicationTests in 7.869 seconds (process running for 10.356)                                                      
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.427 s -- in com.attendo.mos.MosApplicationTests                                        
+[INFO] Running com.attendo.mos.service.AuthenticationServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.746 s -- in com.attendo.mos.service.AuthenticationServiceTest                          
+[INFO] Running com.attendo.mos.service.ReminderServiceUpdateTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.234 s -- in com.attendo.mos.service.ReminderServiceUpdateTest                          
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+[INFO]
+[INFO] ------------------------------------------------------------------------ 
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------ 
+[INFO] Total time:  14.428 s
+[INFO] Finished at: 2025-10-31T15:30:42+01:00
+[INFO] ------------------------------------------------------------------------ 
+```
+
+---
+
+Tool use: **search_replace**
+
+
+<details><summary>Edit file: docs/tests/TEST_STATUS.md</summary>
+
+**Chunk 1**
+Lines added: 2, lines removed: 2
+
+```diff
+@@ -16,6 +16,6 @@
+  1. **MosApplicationTests** - Context loading test (smoke test)
+     - Status: ✅ **PASSES** (1 test)
+-    - Profile: None (uses default, connects to Docker Postgres)
+-    - Notes: Minimal smoke test, verified working
++    - Profile: `test` (uses H2 in-memory, Flyway disabled)
++    - Notes: Minimal smoke test, verified working. Fixed to use test profile for CI compatibility.
+  
+  2. **JwtUtilTest** - JWT utility unit tests
+```
+
+</details>
+
+---
+
+
+
+---
+
+All 15 tests still pass.
+
+## Fixed CI database connection issue
+
+**Problem**: `MosApplicationTests` was trying to connect to Postgres (localhost:5432) which isn't available in CI.
+
+**Solution**: Added `@ActiveProfiles("test")` to `MosApplicationTests` so it uses:
+- H2 in-memory database (via `application-test.properties`)
+- Flyway disabled (excluded in test profile)
+
+The test now:
+- Runs locally with H2 (no Docker Postgres needed)
+- Runs in CI without database setup
+- Still verifies Spring context loads correctly
+
+All 15 tests pass together and are CI-ready. The tests will run in GitHub Actions without needing a Postgres database.
+
+---
+
