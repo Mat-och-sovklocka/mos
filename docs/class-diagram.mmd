@@ -13,6 +13,7 @@ classDiagram
 
   class Reminder {
     +UUID id
+    +User user
     +OffsetDateTime time
     +Category category
     +String note
@@ -23,6 +24,7 @@ classDiagram
 
   class MealRequirement {
     +UUID id
+    +User user
     +MealRequirementType type
     +String notes
     +OffsetDateTime createdAt
@@ -32,16 +34,16 @@ classDiagram
     +UUID id
     +User caregiver
     +User caretaker
-    +OffsetDateTime assignedAt
+    +LocalDateTime assignedAt
   }
 
   class UserPermission {
     +UUID id
     +User user
     +String permissionName
-    +boolean isEnabled
+    +Boolean isEnabled
     +User grantedBy
-    +OffsetDateTime grantedAt
+    +LocalDateTime grantedAt
   }
 
   class Category {

@@ -276,6 +276,18 @@ Get all permissions for the current authenticated user.
 ["CREATE_REMINDERS", "VIEW_REMINDERS", "MEAL_REQUIREMENTS"]
 ```
 
+### Get All Users (Admin Only)
+**GET** `/api/user-management/admin/users`
+
+Get a list of all users in the system. Requires admin role.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Responses:**
+- **200:** List of users (UserInfoResponse objects)
+- **401:** Unauthorized
+- **403:** Forbidden - admin role required
+
 ### Create User (Admin Only)
 **POST** `/api/user-management/admin/users`
 
