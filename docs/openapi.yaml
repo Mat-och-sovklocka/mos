@@ -917,6 +917,51 @@ paths:
                     example: "Internal server error"
 
   /api/user-management/admin/users:
+    get:
+      tags:
+      - user-management
+      summary: Get all users (Admin only)
+      description: Get a list of all users in the system. Requires admin role.
+      operationId: getAllUsers
+      security:
+      - bearerAuth: []
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserInfoResponse"
+              example:
+                - id: "550e8400-e29b-41d4-a716-446655440001"
+                  email: "admin@mos.test"
+                  displayName: "System Administrator"
+                  phone: "+46 70 123 4567"
+                  userType: "ADMIN"
+                  isActive: true
+                  createdAt: "2025-10-07T11:35:30.000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+        "403":
+          description: Forbidden - admin role required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Forbidden"
     post:
       tags:
       - user-management

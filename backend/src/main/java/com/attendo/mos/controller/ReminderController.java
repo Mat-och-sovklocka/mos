@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/users/{userId}/reminders")
 @CrossOrigin(origins = "http://localhost:3000")
+@Tag(name = "Reminders", description = "Reminder management endpoints")
 public class ReminderController {
     private final ReminderService service;
     private final UserPermissionService userPermissionService;
@@ -95,6 +97,11 @@ public class ReminderController {
             ));
         }
     }
+    @Operation(summary = "Get reminders", description = "Get all reminders for a user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reminders retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
+    })
     @GetMapping
     public ResponseEntity<?> get(@RequestHeader("Authorization") String authHeader,
             @PathVariable UUID userId) {
@@ -110,6 +117,12 @@ public class ReminderController {
         return ResponseEntity.ok(reminders);
     }
 
+    @Operation(summary = "Delete a reminder", description = "Delete an existing reminder")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Reminder deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Reminder not found")
+    })
     @DeleteMapping("/{reminderId}")
     public ResponseEntity<?> delete(@RequestHeader("Authorization") String authHeader,
             @PathVariable UUID userId, @PathVariable UUID reminderId) {

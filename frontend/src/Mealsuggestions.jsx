@@ -6,7 +6,7 @@ import homeIcon from "./images/home.png";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from './contexts/AuthContext';
 
-// Hjälpfunktion för att översätta användarkategorier till svenska
+// Helper function to translate user types to Swedish (for UI display)
 const translateUserType = (userType) => {
   switch (userType) {
     case 'ADMIN':
@@ -20,7 +20,7 @@ const translateUserType = (userType) => {
   }
 };
 
-// Bekräftelsemodal komponent
+// Confirmation modal component
 const ConfirmModal = ({ isOpen, onClose, onConfirm, title }) => {
   if (!isOpen) return null;
 
@@ -45,7 +45,7 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [servings, setServings] = useState(recipe.defaultServings || 2)
-  const [defaultServings] = useState(recipe.defaultServings || 2)  // Spara ursprungligt antal portioner
+  const [defaultServings] = useState(recipe.defaultServings || 2)  // Save original number of servings
 
   const handleStarClick = () => {
     if (isFavorite) {
@@ -68,15 +68,15 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
   }
 
   const calculateAmount = (ingredient) => {
-    // För favoriter som är i strängformat
+    // For favorites in string format
     if (typeof ingredient === 'string') return '';
     
-    // För ingredienser med amount property
+    // For ingredients with amount property
     if (ingredient && ingredient.amount) {
       const ratio = servings / defaultServings;
       const adjustedAmount = ingredient.amount * ratio;
       
-      // Formatera numret snyggt (max 2 decimaler, ta bort onödiga decimaler)
+      // Format number nicely (max 2 decimals, remove unnecessary decimals)
       return Number(adjustedAmount.toFixed(2)).toString();
     }
     
@@ -134,10 +134,10 @@ const RecipeCard = ({ recipe, onToggleFavorite, isFavorite }) => {
                 recipe.ingredients.map((ingredient, index) => (
                   <li key={index}>
                     {typeof ingredient === 'string' ? (
-                      // Hantera enkelt strängformat för favoriter
+                      // Handle simple string format for favorites
                       <span className="ingredient-item">{ingredient}</span>
                     ) : (
-                      // Hantera objekt-format för sökresultat med mängder
+                      // Handle object format for search results with quantities
                       <>
                         {ingredient.amount && (
                           <span className="ingredient-amount">
@@ -191,24 +191,24 @@ const Mealsuggestions = () => {
   const [recipes, setRecipes] = useState([])
   const [favorites, setFavorites] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [showFavorites, setShowFavorites] = useState(true) // Favoriter visas direkt när sidan laddas
-  const [showingFirstSet, setShowingFirstSet] = useState(true) // För att växla mellan första och andra uppsättningen recept
-  const [allSearchResults, setAllSearchResults] = useState([]) // Spara alla sökresultat
+  const [showFavorites, setShowFavorites] = useState(true) // Favorites shown directly when page loads
+  const [showingFirstSet, setShowingFirstSet] = useState(true) // To toggle between first and second set of recipes
+  const [allSearchResults, setAllSearchResults] = useState([]) // Save all search results
   
   const recipesPerPage = 5
   const totalPages = Math.ceil((showFavorites ? favorites : recipes).length / recipesPerPage)
   
-  // BACKEND_INTEGRATION: Hämta användarens sparade favoritrecept från backend
+  // BACKEND_INTEGRATION: Fetch user's saved favorite recipes from backend
   // GET /api/favorites
   // Response: Array<Recipe>
   useEffect(() => {
-    // TODO: Ersätt denna mock med ett riktigt API-anrop
+    // TODO: Replace this mock with a real API call
     // fetch('/api/favorites')
     //   .then(response => response.json())
     //   .then(data => setFavorites(data))
-    //   .catch(error => console.error('Kunde inte hämta favoritrecept:', error));
+    //   .catch(error => console.error('Could not fetch favorite recipes:', error));
 
-    // Mock-data som simulerar response från API
+    // Mock data that simulates response from API
     const mockFavorites = [
       {
         id: 1,
@@ -456,14 +456,14 @@ const Mealsuggestions = () => {
     setFavorites(mockFavorites);
   }, [])
 
-  // BACKEND_INTEGRATION: Sök efter recept som matchar både söktermen och användarens kostpreferenser
-  // 1. SÖKNING AV RECEPT
+  // BACKEND_INTEGRATION: Search for recipes matching both search term and user's dietary preferences
+  // 1. RECIPE SEARCH
   // POST /api/recipes/search
   // Request body: {
-  //   query: string,          // Användarens söktext, t.ex. "pasta"
-  //   preferences: string[],  // Array med kostpreferenser, t.ex. ["Vegetarisk", "Glutenfri"]
-  //   page?: number,         // Sidnummer för paginering (optional)
-  //   pageSize?: number      // Antal resultat per sida (optional)
+  //   query: string,          // User's search text, e.g. "pasta"
+  //   preferences: string[],  // Array with dietary preferences, e.g. ["Vegetarisk", "Glutenfri"]
+  //   page?: number,         // Page number for pagination (optional)
+  //   pageSize?: number      // Number of results per page (optional)
   // }
   // Response: {
   //   success: boolean,
@@ -487,7 +487,7 @@ const Mealsuggestions = () => {
   //   }
   // }
   //
-  // Exempel på API-anrop:
+  // Example API call:
   // fetch('/api/recipes/search', {
   //   method: 'POST',
   //   headers: {
@@ -519,11 +519,11 @@ const Mealsuggestions = () => {
   const handleSearch = () => {
     if (!searchQuery.trim()) return
     
-    // Dölj favoriter och rensa sökfältet efter sökning
+    // Hide favorites and clear search field after search
     setShowFavorites(false)
     setSearchQuery('')
 
-    // TODO: Ersätt denna mock med riktigt API-anrop enligt ovan specifikation
+    // TODO: Replace this mock with real API call according to above specification
     // const searchData = {
     //   query: searchQuery,
     //   preferences: dietaryPreferences
@@ -547,7 +547,7 @@ const Mealsuggestions = () => {
     //   })
     //   .catch(error => console.error('Fel vid sökning:', error));
 
-    // TODO: Ersätt denna mock med ett riktigt API-anrop
+    // TODO: Replace this mock with a real API call
     // const searchParams = new URLSearchParams({
     //   query: searchQuery,
     //   preferences: dietaryPreferences.join(',')
@@ -570,7 +570,7 @@ const Mealsuggestions = () => {
     //     // Här kan vi hantera fel, t.ex. visa ett felmeddelande för användaren
     //   });
 
-    // Mock-data som simulerar response från API - Två uppsättningar av 5 recept
+    // Mock data that simulates response from API - Two sets of 5 recipes
     const allMockResults = [
       {
         id: 100,
@@ -674,7 +674,7 @@ const Mealsuggestions = () => {
         ],
         tips: "Fungerar perfekt att förbereda dagen innan."
       },
-      // Andra uppsättningen (visas när man klickar på "Fler förslag")
+      // Second set (shown when clicking "Fler förslag")
       {
         id: 105,
         title: "Kyckling Teriyaki",
@@ -772,19 +772,19 @@ const Mealsuggestions = () => {
       }
     ];
 
-    // Återställ till första uppsättningen vid ny sökning
+    // Reset to first set on new search
     setShowingFirstSet(true);
     
-    // Spara alla resultat och visa första fem
+    // Save all results and show first five
     setAllSearchResults(allMockResults);
   setRecipes(allMockResults.slice(0, 5));
   setCurrentPage(1);
   setShowFavorites(false);
   }
 
-  // Konvertera ingredienser från sträng till objekt format
+  // Convert ingredients from string to object format
   const parseIngredientString = (ingredientStr) => {
-    // Regex för att matcha mängd, enhet och ingrediens
+    // Regex to match quantity, unit and ingredient
     const regex = /^([\d,.]+)\s*([a-zA-Zåäö]+)?\s*(.+)$/;
     const match = ingredientStr.match(regex);
     
@@ -796,16 +796,16 @@ const Mealsuggestions = () => {
         item: item.trim()
       };
     }
-    // Om strängen inte matchar formatet, returnera bara ingrediensen som item
+    // If string doesn't match format, return only ingredient as item
     return {
       item: ingredientStr.trim()
     };
   }
 
-  // BACKEND_INTEGRATION: Hantera favoriter
-  // Två separata endpoints för att lägga till och ta bort favoriter:
+  // BACKEND_INTEGRATION: Handle favorites
+  // Two separate endpoints for adding and removing favorites:
   //
-  // 1. LÄGG TILL FAVORIT
+  // 1. ADD FAVORITE
   // POST /api/favorites/add
   // Request body: { 
   //   recipeId: number,
@@ -826,7 +826,7 @@ const Mealsuggestions = () => {
   // - Success: { success: true, message: "Favorit sparad" }
   // - Error: { success: false, error: string }
   //
-  // 2. TA BORT FAVORIT
+  // 2. REMOVE FAVORITE
   // DELETE /api/favorites/{recipeId}
   // Response:
   // - Success: { success: true, message: "Favorit borttagen" }
@@ -836,20 +836,20 @@ const Mealsuggestions = () => {
     const isFavorite = favorites.some(fav => fav.id === recipe.id);
 
     if (isFavorite) {
-      // Ta bort receptet från favoriter
+      // Remove recipe from favorites
       setFavorites(prev => prev.filter(fav => fav.id !== recipe.id));
     } else {
-      // Lägg till receptet i favoriter om det inte redan finns
+      // Add recipe to favorites if it doesn't already exist
       setFavorites(prev => {
         if (!prev.some(fav => fav.id === recipe.id)) {
           return [...prev, recipe];
         }
-        return prev; // Om receptet redan finns, gör inget
+        return prev; // If recipe already exists, do nothing
       });
     }
   }
 
-  // Beräkna vilka recept som ska visas på nuvarande sida
+  // Calculate which recipes to display on current page
   const displayedRecipes = (showFavorites ? favorites : recipes)
     .slice((currentPage - 1) * recipesPerPage, currentPage * recipesPerPage)
 
@@ -974,7 +974,7 @@ const Mealsuggestions = () => {
                     const endIndex = showingFirstSet ? 10 : 5;
                     setRecipes(allSearchResults.slice(startIndex, endIndex));
                     setShowingFirstSet(!showingFirstSet);
-                    setCurrentPage(1); // Återställ paginering vid växling
+                    setCurrentPage(1); // Reset pagination when switching
                   }}
                 >
                   {showingFirstSet ? "Fler förslag" : "Fem första"}
@@ -986,7 +986,7 @@ const Mealsuggestions = () => {
                 style={{ margin: '0' }}
                 onClick={() => {
                   setShowFavorites(true);
-                  setRecipes([]); // Rensa sökresultat
+                  setRecipes([]); // Clear search results
                   setCurrentPage(1);
                 }}
               >

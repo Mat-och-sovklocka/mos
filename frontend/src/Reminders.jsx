@@ -7,7 +7,7 @@ import sv from "date-fns/locale/sv";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 
-// Hjälpfunktion för att översätta användarkategorier till svenska
+// Helper function to translate user types to Swedish (for UI display)
 const translateUserType = (userType) => {
   switch (userType) {
     case 'ADMIN':
@@ -77,7 +77,7 @@ function Reminders() {
   const [reminderType, setReminderType] = useState(null);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [customReminderText, setCustomReminderText] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Behåll för ev. andra fel
+  const [errorMessage, setErrorMessage] = useState(""); // Keep for other errors
   const [warningModal, setWarningModal] = useState(false);
   const [reminderNote, setReminderNote] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
@@ -99,11 +99,11 @@ function Reminders() {
       summary.push(`Tider: ${reminderTimes.join(", ")}`);
     }
 
-    // Uppdatera noteringen direkt, även om den är tom
+    // Update the note directly, even if it's empty
     summary.push(`Notering: "${recurringNote}"`);
 
     setConfirmationSummary(summary.join("\n"));
-  }, [selectedDays, reminderTimes, recurringNote]); // Se till att recurringNote är med i dependencies
+  }, [selectedDays, reminderTimes, recurringNote]); // Make sure recurringNote is in dependencies
 
   useEffect(() => {
     setReminderType(null);
@@ -111,11 +111,11 @@ function Reminders() {
   }, [selectedIndex]);
 
   const resetRecurringForm = () => {
-    setSelectedDays([]); // Rensa dagar
-    setReminderTimes([""]); // Rensa tider
-    // setExtraTimePickers([]); // TA BORT DENNA RAD!
-    setCustomReminderText(""); // Rensa notering
-    setReminderNote(""); // Om du har separat note-state
+    setSelectedDays([]); // Clear days
+    setReminderTimes([""]); // Clear times
+    // setExtraTimePickers([]); // REMOVE THIS LINE!
+    setCustomReminderText(""); // Clear note
+    setReminderNote(""); // If you have separate note-state
     setRecurringNote("");
   };
 
@@ -135,7 +135,7 @@ function Reminders() {
     hideModal();
   };
 
-  // För enstaka påminnelser
+  // For one-time reminders
   const handleConfirmReminder = async () => {
     if (selectedIndex === null || !labels[selectedIndex]) {
       setErrorMessage("Du måste välja en kategori.");
@@ -147,7 +147,7 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
-    // Skapa kombinerad note för Övrigt-kategorin
+    // Create combined note for Other category
     let combinedNote = reminderNote.trim() || null;
     if (labels[selectedIndex] === "Övrigt" && customReminderText) {
       const customText = customReminderText.trim();
@@ -224,7 +224,7 @@ function Reminders() {
         ? "OTHER"
         : categoryMapping[labels[selectedIndex]];
 
-    // Skapa kombinerad note för Övrigt-kategorin (återkommande)
+    // Create combined note for Other category (recurring)
     let combinedNote = recurringNote.trim() || null;
     if (labels[selectedIndex] === "Övrigt" && customReminderText) {
       const customText = customReminderText.trim();
@@ -262,7 +262,7 @@ function Reminders() {
       // Reminder created successfully
       showModal('success', 'Påminnelse har skapats!');
 
-      // Återställ formuläret
+      // Reset the form
       setSelectedIndex(null);
       setReminderType(null);
       setCustomReminderText("");
