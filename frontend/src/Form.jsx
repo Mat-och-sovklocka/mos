@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"; // Lägg till useEffect här
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import homeIcon from "./images/home.png";
 import "./form.css";
 
-// Hjälpfunktion för att översätta användarkategorier till svenska
+// Helper function to translate user types to Swedish (for UI display)
 const translateUserType = (userType) => {
   switch (userType) {
     case 'ADMIN':
@@ -57,7 +57,7 @@ const Form = () => {
     return user.id;
   };
 
-  // Hämta sparade preferenser när komponenten monteras
+  // Fetch saved preferences when component mounts
   useEffect(() => {
     const fetchRequirements = async () => {
       if (!user?.id) return; // Don't fetch if user is not logged in
@@ -77,11 +77,11 @@ const Form = () => {
         }
 
         const data = await response.json();
-        // Extrahera bara requirement-värdena från response
+        // Extract only requirement values from response
     const newRequirements = data.requirements.map((req) => req.requirement);
     setSavedPreferences(newRequirements);
     setAvailablePreferences(kostAlternativ.filter((k) => k !== "Annat" && !newRequirements.includes(k)));
-    setCustomTags([]); // Töm customTags så de försvinner från "Ange annan specialkost"
+    setCustomTags([]); // Clear customTags so they disappear from "Ange annan specialkost"
     setCustomText("");
       } catch (error) {
         console.error("Error fetching requirements:", error);
@@ -94,19 +94,19 @@ const Form = () => {
     fetchRequirements();
   }, [user, getAuthHeaders, viewedPatientId]); // Re-fetch when user or viewed patient changes
 
-  // Flytta från tillgängliga till sparade
+  // Move from available to saved
   const moveToSaved = (preference) => {
     setAvailablePreferences(prev => prev.filter(p => p !== preference));
     setSavedPreferences(prev => [...prev, preference]);
   };
 
-  // Flytta från sparade till tillgängliga
+  // Move from saved to available
   const moveToAvailable = (preference) => {
     setSavedPreferences(prev => prev.filter(p => p !== preference));
     setAvailablePreferences(prev => [...prev, preference]);
   };
 
-  // Ta bort från sparade
+  // Remove from saved
   const removeFromSaved = (preference) => {
     setSavedPreferences(prev => prev.filter(p => p !== preference));
     setAvailablePreferences(prev => [...prev, preference]);
@@ -136,17 +136,17 @@ const Form = () => {
 
     e.preventDefault();
 
-    // Om det finns något i inputfältet för specialkost, lägg till det i customTags
+    // If there's something in the special diet input field, add it to customTags
     let allCustomTags = customTags;
     const trimmedInput = newTagInput.trim();
     if (trimmedInput && !customTags.includes(trimmedInput)) {
       allCustomTags = [...customTags, trimmedInput];
     }
 
-    // Kombinera sparade preferenser med custom tags (inklusive ev. input)
+    // Combine saved preferences with custom tags (including any input)
     const dataAttSkicka = [...savedPreferences, ...allCustomTags];
 
-    // Formattera data enligt API-specifikationen
+    // Format data according to API specification
     const requestData = {
       requirements: dataAttSkicka,
     };
@@ -167,17 +167,17 @@ const Form = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Uppdatera UI direkt med det som skickades in
+      // Update UI directly with what was sent
       setSavedPreferences(dataAttSkicka);
       setAvailablePreferences(kostAlternativ.filter((k) => k !== "Annat" && !dataAttSkicka.includes(k)));
       setCustomTags([]);
       setCustomText("");
 
-      // Visa framgångsmeddelande
+      // Show success message
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error:", error);
-      // TODO: Lägg till felmeddelande till användaren här
+      // TODO: Add error message to user here
     }
   };
 

@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import NotificationTest from './components/NotificationTest';
 
-// Hjälpfunktion för att översätta användarkategorier till svenska
+// Helper function to translate user types to Swedish (for UI display)
 const translateUserType = (userType) => {
   switch (userType) {
     case 'ADMIN':

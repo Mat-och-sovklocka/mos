@@ -106,11 +106,11 @@ const ReminderList = () => {
     };
     
     return days.map(day => {
-      // Om det är kort namn, konvertera till långt
+      // If it's a short name, convert to full name
       if (shortToFull[day]) {
         return shortToFull[day];
       }
-      // Om det redan är långt namn, behåll det
+      // If it's already a full name, keep it
       return day;
     });
   };
@@ -135,17 +135,12 @@ const ReminderList = () => {
   const recurringReminders = data.filter((r) => r.type === "recurring");
   const currentReminder = data.find((r) => r.id === editingId);
 
-  // 🛠 Central “skicka till backend”-trigger
+  // Central "send to backend" trigger (disabled - legacy debug code)
   useEffect(() => {
-    // if (data !== reminderData) {
-    //   alert(
-    //     "Skickar uppdaterad lista till backend:\n\n" +
-    //       JSON.stringify(data, null, 2)
-    //   );
-    // }
+    // Legacy debug code - removed
   }, [data]);
 
-  // Mappa fullständiga dag-namn → korta när man öppnar edit för recurring
+  // Map full day names to short names when opening edit for recurring reminders
   useEffect(() => {
     if (!currentReminder || currentReminder.type !== "recurring") {
       setSelectedDays([]);
@@ -163,20 +158,20 @@ const ReminderList = () => {
       Söndag: "Sön",
     };
 
-    // Gör om till array om det är en sträng
+    // Convert to array if it's a string
     const daysArray = Array.isArray(currentReminder.days)
       ? currentReminder.days
       : currentReminder.days.split(",").map((d) => d.trim());
 
     console.log("Original days from reminder:", daysArray);
 
-    // Hantera både korta och långa dagnamn
+    // Handle both short and full day names
     const mappedDays = daysArray.map((day) => {
-      // Om det redan är ett kort namn, använd det direkt
+      // If it's already a short name, use it directly
       if (["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"].includes(day)) {
         return day;
       }
-      // Annars mappa från långt till kort namn
+      // Otherwise map from full to short name
       return fullToShort[day];
     }).filter(Boolean);
 
@@ -186,11 +181,11 @@ const ReminderList = () => {
     setSelectedTimes(currentReminder.times || []);
   }, [editingId]);
 
-  // Synka höjder på kort
+  // Sync card heights
   // Previously we equalized card heights which caused clipping on large screens.
   // Remove that behavior so each card sizes to its content naturally.
 
-  // Hämtar påminnelser från backend - only when user changes (login/logout)
+  // Fetch reminders from backend - only when user changes (login/logout)
   const fetchReminders = async () => {
     if (!user) {
       setData([]); // Clear data when user logs out
@@ -223,7 +218,7 @@ const ReminderList = () => {
     }
   }, [user?.id, viewedPatientId, location.pathname]); // Run when user ID changes OR when viewedPatientId changes OR when pathname changes
 
-  // Hjälpfunktioner
+  // Helper functions
   const formatDate = (iso) => new Date(iso).toLocaleDateString("sv-SE");
   const formatTime = (iso) =>
     new Date(iso).toLocaleTimeString("sv-SE", {
