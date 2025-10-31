@@ -143,7 +143,7 @@ class AuthenticationServiceTest {
         assertThat(response.id()).isEqualTo(testUserId);
         assertThat(response.email()).isEqualTo(testEmail);
         assertThat(response.displayName()).isEqualTo("Test User");
-        assertThat(response.userType()).isEqualTo("ADMIN");
+        assertThat(response.userType()).isEqualTo(UserType.ADMIN);
         assertThat(response.createdAt()).isEqualTo(testUser.getCreatedAt());
         assertThat(response.lastLoginAt()).isEqualTo(testUser.getLastLoginAt());
 

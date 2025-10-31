@@ -16,9 +16,14 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Backend build (skip tests)
+      - name: Backend tests (minimal suite)
         run: |
           cd backend
           chmod +x mvnw || true
+          ./mvnw -q test -Dtest=MosApplicationTests,JwtUtilTest,ReminderServiceUpdateTest,AuthenticationServiceTest
+
+      - name: Backend build
+        run: |
+          cd backend
           ./mvnw -q -DskipTests package
 
