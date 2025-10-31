@@ -33,7 +33,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.specstory/*
 
 # Maven
 target/
@@ -101,10 +100,3 @@ build/
 
 # Keep files
 .gitkeep
-
-# Vite config
-/frontend/vite.config.js
-*.code-workspace
-*.code-workspace
-
-/frontend/vite.config.js
