@@ -5,6 +5,11 @@ import com.attendo.mos.dto.UserType;
 import com.attendo.mos.service.UserManagementService;
 import com.attendo.mos.service.UserPermissionService;
 import com.attendo.mos.config.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/user-management")
 @CrossOrigin(origins = "http://localhost:3000")
+@Tag(name = "User Management", description = "User and caretaker management endpoints")
 public class UserManagementController {
     
     private final UserManagementService userManagementService;
@@ -29,6 +35,11 @@ public class UserManagementController {
         this.jwtUtil = jwtUtil;
     }
     
+    @Operation(summary = "Create a caretaker", description = "Create a new caretaker assigned to the current caregiver")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Caretaker created successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PostMapping("/caretakers")
     public ResponseEntity<User> createCaretaker(@RequestHeader("Authorization") String authHeader,
                                                   @RequestBody CreateCaretakerRequest request) {
@@ -42,6 +53,11 @@ public class UserManagementController {
         return ResponseEntity.ok(caretaker);
     }
     
+    @Operation(summary = "Get caretakers", description = "Get all caretakers assigned to the current caregiver")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Caretakers retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping("/caretakers")
     public ResponseEntity<List<User>> getCaretakers(@RequestHeader("Authorization") String authHeader) {
         UUID caregiverId = getCurrentUserId(authHeader);
@@ -49,6 +65,12 @@ public class UserManagementController {
         return ResponseEntity.ok(caretakers);
     }
     
+    @Operation(summary = "Get caretaker permissions", description = "Get all permissions for a specific caretaker")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Permissions retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - caretaker not managed by current user"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping("/caretakers/{caretakerId}/permissions")
     public ResponseEntity<List<String>> getCaretakerPermissions(@RequestHeader("Authorization") String authHeader,
                                                                @PathVariable UUID caretakerId) {
@@ -64,6 +86,12 @@ public class UserManagementController {
         return ResponseEntity.ok(permissions);
     }
     
+    @Operation(summary = "Set caretaker permissions", description = "Update permissions for a specific caretaker")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Permissions updated successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - caretaker not managed by current user"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PutMapping("/caretakers/{caretakerId}/permissions")
     public ResponseEntity<Void> setCaretakerPermissions(@RequestHeader("Authorization") String authHeader,
                                                        @PathVariable UUID caretakerId,
@@ -80,6 +108,12 @@ public class UserManagementController {
         return ResponseEntity.ok().build();
     }
     
+    @Operation(summary = "Delete a caretaker", description = "Delete a caretaker assigned to the current caregiver")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Caretaker deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - caretaker not managed by current user"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @DeleteMapping("/caretakers/{caretakerId}")
     public ResponseEntity<Void> deleteCaretaker(@RequestHeader("Authorization") String authHeader,
                                                @PathVariable UUID caretakerId) {
@@ -95,6 +129,11 @@ public class UserManagementController {
         return ResponseEntity.ok().build();
     }
     
+    @Operation(summary = "Get current user permissions", description = "Get all permissions for the currently authenticated user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Permissions retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping("/permissions")
     public ResponseEntity<List<String>> getCurrentUserPermissions(@RequestHeader("Authorization") String authHeader) {
         UUID userId = getCurrentUserId(authHeader);
@@ -102,6 +141,12 @@ public class UserManagementController {
         return ResponseEntity.ok(permissions);
     }
     
+    @Operation(summary = "Get all users (Admin only)", description = "Get a list of all users in the system. Requires admin role.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - admin role required"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @GetMapping("/admin/users")
     public ResponseEntity<List<com.attendo.mos.dto.UserInfoResponse>> getAllUsers(@RequestHeader("Authorization") String authHeader) {
         UUID adminId = getCurrentUserId(authHeader);
@@ -116,6 +161,12 @@ public class UserManagementController {
         return ResponseEntity.ok(users);
     }
     
+    @Operation(summary = "Create a user (Admin only)", description = "Create a new user of any type. Requires admin role.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User created successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - admin role required"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PostMapping("/admin/users")
     public ResponseEntity<User> createUser(@RequestHeader("Authorization") String authHeader,
                                          @RequestBody CreateUserRequest request) {
@@ -135,6 +186,14 @@ public class UserManagementController {
         }
     }
     
+    @Operation(summary = "Delete a user (Admin only)", description = "Delete a user from the system. Requires admin role. Cannot delete users with dependencies.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad Request - user has dependencies"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - admin role required"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @DeleteMapping("/admin/users/{userId}")
     public ResponseEntity<Map<String, String>> deleteUser(@RequestHeader("Authorization") String authHeader,
                                                          @PathVariable UUID userId) {
@@ -156,6 +215,13 @@ public class UserManagementController {
         }
     }
     
+    @Operation(summary = "Update a user (Admin only)", description = "Update user information. Requires admin role.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User updated successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - admin role required"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PutMapping("/admin/users/{userId}")
     public ResponseEntity<User> updateUser(@RequestHeader("Authorization") String authHeader,
                                          @PathVariable UUID userId,
@@ -182,6 +248,13 @@ public class UserManagementController {
         }
     }
     
+    @Operation(summary = "Update a caretaker", description = "Update information for a caretaker assigned to the current caregiver")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Caretaker updated successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - caretaker not managed by current user"),
+        @ApiResponse(responseCode = "404", description = "Caretaker not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PutMapping("/caretakers/{caretakerId}")
     public ResponseEntity<User> updateCaretaker(@RequestHeader("Authorization") String authHeader,
                                               @PathVariable UUID caretakerId,
@@ -208,6 +281,12 @@ public class UserManagementController {
         }
     }
     
+    @Operation(summary = "Update own profile", description = "Update the currently authenticated user's own profile information")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
     @PutMapping("/profile")
     public ResponseEntity<User> updateProfile(@RequestHeader("Authorization") String authHeader,
                                             @RequestBody UpdateProfileRequest request) {

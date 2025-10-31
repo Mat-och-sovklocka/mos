@@ -9,6 +9,7 @@ import com.attendo.mos.config.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users/{userId}/meal-requirements")
 @CrossOrigin(origins = "http://localhost:3000")
+@Tag(name = "Meal Requirements", description = "Meal requirement management endpoints")
 public class MealRequirementController {
     
     private final MealRequirementService mealRequirementService;
@@ -58,7 +60,11 @@ public class MealRequirementController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     
-    @Operation(summary = "Get meal requirements", description = "Get all meal requirements for a user.")
+    @Operation(summary = "Get meal requirements", description = "Get all meal requirements for a user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Meal requirements retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
+    })
     @GetMapping
     public ResponseEntity<?> getMealRequirements(@RequestHeader("Authorization") String authHeader,
             @PathVariable UUID userId) {
