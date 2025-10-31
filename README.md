@@ -61,7 +61,6 @@ docs/           # Guides and internal documentation
 - Architecture overview: `docs/ARCHITECTURE_OVERVIEW.md`
 - Confluence links (SSOT): `docs/CONFLUENCE.md`
 - PWA/Notifications overview: `docs/guides/PWA_IMPLEMENTATION_GUIDE.md`
- - Changelog: `CHANGELOG.md`
 
 ### Developer workflow (Docker-first)
 - Preferred: run full stack with Docker (`docker-compose up --build`).

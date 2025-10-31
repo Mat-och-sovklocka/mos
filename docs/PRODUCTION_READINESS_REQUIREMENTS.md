@@ -1,7 +1,8 @@
 # Production Readiness Requirements
-## MOS Application - External Stakeholder Responsibilities
+## MOS Application - Production Deployment Guide
 
-### 🚨 **CRITICAL: This application is NOT production-ready without the following infrastructure and support.**
+### Overview
+This document outlines the infrastructure, operational, and resource requirements needed to deploy the MOS application to a production environment. The application is designed as a development-ready system that requires appropriate production infrastructure and support to operate reliably.
 
 ---
 
@@ -19,7 +20,7 @@
 ### **2. Database Management**
 - **Production Database Setup**
   - PostgreSQL instance with proper security configuration
-  - Database backup strategy (daily automated backups)
+  - Database backup strategy (daily automated backups recommended)
   - Database monitoring and performance tuning
   - User management and access control
   - Migration strategy for schema updates
@@ -66,12 +67,14 @@
 ## 👥 **Human Resources Requirements**
 
 ### **1. Technical Support Team**
-- **Required Roles**
-  - **System Administrator**: Server management, security, monitoring
-  - **Database Administrator**: Database optimization, backups, maintenance
-  - **DevOps Engineer**: CI/CD, deployment automation, infrastructure
-  - **Security Specialist**: Security audits, compliance, vulnerability management
-  - **Support Engineer**: User support, issue resolution, maintenance
+Recommended roles for production operation:
+- **System Administrator**: Server management, security, monitoring
+- **Database Administrator**: Database optimization, backups, maintenance
+- **DevOps Engineer**: CI/CD, deployment automation, infrastructure
+- **Security Specialist**: Security audits, compliance, vulnerability management
+- **Support Engineer**: User support, issue resolution, maintenance
+
+*Note: Depending on team size, some roles may be combined or shared.*
 
 ### **2. Collaboration & Communication**
 - **Stakeholder Engagement**
@@ -103,11 +106,11 @@
 
 ### **3. External API Integration**
 - **Meal Suggestions API**
-  - **API Key Required**: External stakeholders must provide API key for meal suggestions functionality
+  - **API Key Required**: API key for meal suggestions functionality must be obtained from the service provider
   - **API Service**: Integration with external meal/nutrition API service
-  - **API Documentation**: Complete API documentation and integration guidelines
-  - **API Support**: Technical support for API integration and troubleshooting
-  - **API Costs**: Budget approval for API usage and subscription fees
+  - **API Documentation**: API provider's documentation and integration guidelines
+  - **API Support**: Technical support from API provider for integration and troubleshooting
+  - **API Costs**: Budget consideration for API usage and subscription fees
 
 ---
 
@@ -143,19 +146,21 @@
 
 ### **2. Personnel Costs**
 - **Required Staff**
-  - System administrator salary
-  - Database administrator salary
-  - DevOps engineer salary
-  - Security specialist salary
-  - Support engineer salary
+  - System administrator
+  - Database administrator
+  - DevOps engineer
+  - Security specialist
+  - Support engineer
 
-### **3. Development Team Costs**
-- **Future Development Work**
-  - **Payment Required**: All development work after October 31, 2024 must be paid
-  - **Contract Terms**: Formal development contract required for continued work
-  - **Hourly Rates**: Development team rates for future enhancements
-  - **Project Scope**: Clear definition of future development requirements
-  - **Timeline Commitment**: Payment terms and project timelines
+### **3. Ongoing Development & Support**
+- **Future Enhancements**
+  - Additional feature development
+  - Ongoing maintenance and updates
+  - Technical support and consultation
+  - Custom integrations
+  - Performance optimization
+
+*Note: Continued development work beyond the initial implementation will require separate agreements and resource allocation.*
 
 ---
 
@@ -184,42 +189,45 @@
 
 ---
 
-## 🚫 **What We CANNOT Provide**
+## 📝 **Development Team Scope**
 
-### **1. Infrastructure Management**
-- We are **developers**, not system administrators
-- We cannot manage servers, databases, or network infrastructure
-- We cannot provide 24/7 system monitoring
-- We cannot handle security compliance and audits
+### **What the Development Team Provides**
+- Application source code and documentation
+- Technical guidance for deployment
+- Code maintenance during development phase
+- Testing infrastructure and test suites
+- API documentation and integration guides
 
-### **2. Operational Support**
-- We cannot provide ongoing system maintenance
-- We cannot handle user support and troubleshooting
-- We cannot manage backups and disaster recovery
-- We cannot provide security monitoring and incident response
+### **What Requires External Resources**
+The following operational aspects are typically handled by the deploying organization or their technical partners:
 
-### **3. External API Management**
-- We cannot provide API keys for external services
-- We cannot manage API subscriptions or billing
-- We cannot handle API rate limiting or quota management
-- We cannot provide API documentation for external services
+- **Infrastructure Management**
+  - Server provisioning and management
+  - Database administration and optimization
+  - Network infrastructure and security
+  - 24/7 system monitoring
 
-### **4. Unpaid Development Work**
-- We cannot provide free development work after October 31, 2024
-- We cannot continue development without formal payment agreements
-- We cannot provide ongoing support without compensation
-- We cannot make future enhancements without proper contracts
+- **Operational Support**
+  - Ongoing system maintenance
+  - User support and troubleshooting
+  - Backup and disaster recovery operations
+  - Security monitoring and incident response
+
+- **External Services**
+  - API keys for third-party services
+  - API subscription management
+  - External service integration support
 
 ---
 
 ## 📞 **Next Steps**
 
-### **Immediate Actions Required**
-1. **Assign dedicated technical team** for infrastructure management
-2. **Provide budget approval** for required resources
-3. **Schedule regular technical meetings** with development team
-4. **Establish clear communication channels** for requirements and feedback
-5. **Commit to timeline** for infrastructure setup
+### **Recommended Actions**
+1. **Identify technical team** for infrastructure management
+2. **Secure budget approval** for required resources
+3. **Schedule planning meetings** with development team
+4. **Establish communication channels** for requirements and feedback
+5. **Plan timeline** for infrastructure setup and deployment
 
 ### **Contact Information**
 - **Development Team**: [Your contact information]
@@ -228,16 +236,14 @@
 
 ---
 
-## ⚠️ **WARNING**
+## 📚 **Additional Resources**
 
-**This application will NOT be production-ready without the above infrastructure and support.**
-
-**The development team cannot be held responsible for production issues without proper infrastructure and operational support.**
-
-**External stakeholders must provide the required resources and personnel to make this application deployable and maintainable.**
+- Architecture Overview: See `docs/ARCHITECTURE_OVERVIEW.md`
+- Development Guide: See `docs/guides/dev-cheatsheet.md`
+- API Documentation: See `docs/api-documentation.md` and `docs/openapi.yaml`
 
 ---
 
 *Document created: [Current Date]*  
-*Version: 1.0*  
-*Status: Pending Stakeholder Review*
+*Version: 2.0*  
+*Status: Production Deployment Guide*
