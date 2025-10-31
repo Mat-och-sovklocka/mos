@@ -15,7 +15,7 @@ A lightweight reminder app for meals and sleep with an offline-first PWA demo an
 ### Live Demo (GitHub Pages)
 - Branch: `feature/gh-pages-demo`
 - URL: `https://mat-och-sovklocka.github.io/mos/`
-- Demo login (shown in app): Caregiver (Erik) and Resident (Anna)
+- Demo login shown and pre-filled in app.
 - Note: The demo runs entirely in the browser and works offline once loaded.
 
 If you install to your home screen on Android/iOS, the app will behave like a native app (standalone, icon, splash). Swedish demo instructions are shown on the demo landing page.
@@ -100,6 +100,7 @@ docker-compose up
 
 ### Demo Credentials
 - **Admin**: `admin@mos.test` / `password123`
+- **Caregiver**: `caregiver1@mos.test` / `password123`
 - **Resident**: `resident1@mos.test` / `password123`
 
 ## 🏗️ Architecture
@@ -120,12 +121,12 @@ docker-compose up
 - **Features**:
   - RESTful API
   - JWT authentication
-  - User management (Admin, Caregiver, Resident roles)
+  - User management (Admin, Caregiver, Resident roles and permissions)
   - Reminder system
 
 ### Database (PostgreSQL)
 - **Port**: 5432
-- **Features**: User management, reminders, meal requirements
+- **Features**: User management, single and recurring reminders, meal requirements, meal suggestions, statistics
 
 ## 🧪 Testing
 
@@ -207,4 +208,4 @@ See the `docs/` folder for detailed documentation:
 - Authentication flow
 - Development setup guides
 - Requirements specification
-- Demo backend strategy (`docs/demo-backend.md`)
+- Demo backend strategy
