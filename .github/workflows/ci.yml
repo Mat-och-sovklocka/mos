@@ -21,7 +21,7 @@ jobs:
         run: |
           cd backend
           chmod +x mvnw || true
-          ./mvnw -q test -Dtest=MosApplicationTests,JwtUtilTest,ReminderServiceUpdateTest,AuthenticationServiceTest
+          ./mvnw -q -Dspring.main.allow-bean-definition-overriding=true test -Dtest=MosApplicationTests,JwtUtilTest,ReminderServiceUpdateTest,AuthenticationServiceTest
 
       - name: Backend build
         run: |
