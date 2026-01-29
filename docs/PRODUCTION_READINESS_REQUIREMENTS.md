@@ -134,36 +134,6 @@ Recommended roles for production operation:
 
 ---
 
-## 💰 **Budget & Resource Requirements**
-
-### **1. Infrastructure Costs**
-- **Server Costs**
-  - Production server hosting
-  - Database server hosting
-  - CDN and content delivery
-  - SSL certificates and security tools
-  - Monitoring and logging services
-
-### **2. Personnel Costs**
-- **Required Staff**
-  - System administrator
-  - Database administrator
-  - DevOps engineer
-  - Security specialist
-  - Support engineer
-
-### **3. Ongoing Development & Support**
-- **Future Enhancements**
-  - Additional feature development
-  - Ongoing maintenance and updates
-  - Technical support and consultation
-  - Custom integrations
-  - Performance optimization
-
-*Note: Continued development work beyond the initial implementation will require separate agreements and resource allocation.*
-
----
-
 ## ⏰ **Timeline Requirements**
 
 ### **1. Infrastructure Setup**
@@ -189,61 +159,8 @@ Recommended roles for production operation:
 
 ---
 
-## 📝 **Development Team Scope**
-
-### **What the Development Team Provides**
-- Application source code and documentation
-- Technical guidance for deployment
-- Code maintenance during development phase
-- Testing infrastructure and test suites
-- API documentation and integration guides
-
-### **What Requires External Resources**
-The following operational aspects are typically handled by the deploying organization or their technical partners:
-
-- **Infrastructure Management**
-  - Server provisioning and management
-  - Database administration and optimization
-  - Network infrastructure and security
-  - 24/7 system monitoring
-
-- **Operational Support**
-  - Ongoing system maintenance
-  - User support and troubleshooting
-  - Backup and disaster recovery operations
-  - Security monitoring and incident response
-
-- **External Services**
-  - API keys for third-party services
-  - API subscription management
-  - External service integration support
-
----
-
-## 📞 **Next Steps**
-
-### **Recommended Actions**
-1. **Identify technical team** for infrastructure management
-2. **Secure budget approval** for required resources
-3. **Schedule planning meetings** with development team
-4. **Establish communication channels** for requirements and feedback
-5. **Plan timeline** for infrastructure setup and deployment
-
-### **Contact Information**
-- **Development Team**: [Your contact information]
-- **Technical Lead**: [Technical lead contact]
-- **Project Manager**: [Project manager contact]
-
----
-
 ## 📚 **Additional Resources**
 
 - Architecture Overview: See `docs/ARCHITECTURE_OVERVIEW.md`
 - Development Guide: See `docs/guides/dev-cheatsheet.md`
 - API Documentation: See `docs/api-documentation.md` and `docs/openapi.yaml`
-
----
-
-*Document created: [Current Date]*  
-*Version: 2.0*  
-*Status: Production Deployment Guide*
